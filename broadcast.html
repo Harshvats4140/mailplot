@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MailPilot Studio</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- ══ PAGE TOPBAR ══ -->
+  <header class="page-topbar">
+    <button class="mobile-sidebar-btn" id="mp-mobile-menu"><i class="fa-solid fa-bars"></i></button>
+    <div class="page-breadcrumb">
+      <a href="dashboard.html">MailPilot</a>
+      <span class="sep">/</span>
+      <span class="crumb-current">Broadcast</span>
+    </div>
+    <div class="topbar-gap"></div>
+    <div class="topbar-right">
+      <div class="status-dot"></div>
+      <div class="member-pill"><i class="fa-solid fa-users"></i> <span id="top-member-count">0</span> members</div>
+      <button class="icon-btn" id="theme-toggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+    </div>
+  </header>
+
+  <!-- ══ APP BODY ══ -->
+  <div class="page-scroll">
+
+
+    <!-- ══════════════════════════════════
+       TAB 3 — BROADCAST
+    ══════════════════════════════════ -->
+    <div class="tab-panel active" id="panel-broadcast">
+      <div class="broadcast-page">
+        <div class="broadcast-main">
+          <div class="broadcast-panel-head">
+            <h2><i class="fa-solid fa-satellite-dish" style="color:var(--text3);margin-right:0.4rem"></i> Broadcast
+              Console</h2>
+            <p>Send personalized emails to your entire member list with merge tags resolved automatically.</p>
+          </div>
+
+          <!-- Stats -->
+          <div class="bc-stats-row" id="bc-stats-row" style="display:none">
+            <div class="bc-stat"><span class="val" id="bc-total">0</span><span class="lbl">Audience</span></div>
+            <div class="bc-stat green"><span class="val" id="bc-delivered">0</span><span class="lbl">Delivered</span>
+            </div>
+            <div class="bc-stat red"><span class="val" id="bc-failed">0</span><span class="lbl">Failed</span></div>
+            <div class="bc-stat gold"><span class="val" id="bc-pct">0%</span><span class="lbl">Progress</span></div>
+          </div>
+
+          <!-- Progress -->
+          <div class="progress-wrap" id="bc-progress-wrap" style="display:none">
+            <div class="progress-label"><span>Sending progress</span><span id="bc-progress-label">0 / 0</span></div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="bc-progress-fill" style="width:0%"></div>
+            </div>
+          </div>
+
+          <!-- Audience Selection -->
+          <div class="config-card">
+            <h4><i class="fa-solid fa-users"></i> Audience</h4>
+            <div class="audience-options">
+              <div class="aud-opt active" data-aud="all">
+                <i class="fa-solid fa-globe"></i>
+                <span class="aud-count" id="aud-count-all">0</span>
+                <span>All Members</span>
+              </div>
+              <div class="aud-opt" data-aud="group" id="aud-group-opt">
+                <i class="fa-solid fa-tag"></i>
+                <span class="aud-count" id="aud-count-group">0</span>
+                <span>By Group</span>
+              </div>
+              <div class="aud-opt" data-aud="selected">
+                <i class="fa-solid fa-check-square"></i>
+                <span class="aud-count" id="aud-count-selected">0</span>
+                <span>Selected</span>
+              </div>
+            </div>
+            <div id="group-select-row" style="margin-top:0.8rem;display:none">
+              <select id="bc-group-select"
+                style="width:100%;padding:0.45rem 0.7rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:0.83rem;outline:none">
+                <option value="">— Select a group —</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- SMTP Config -->
+          <div class="config-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem">
+              <h4 style="margin:0"><i class="fa-solid fa-server"></i> SMTP Configuration</h4>
+              <button class="btn btn-outline" id="btn-toggle-smtp-visibility" type="button" style="padding:0.25rem 0.5rem; font-size:0.75rem; display:flex; align-items:center; gap:0.3rem; border-radius: 4px; border-color: var(--border); color: var(--text);">
+                <i class="fa-solid fa-eye-slash"></i> <span id="toggle-smtp-visibility-text">Hide Details</span>
+              </button>
+            </div>
+
+            <div id="smtp-fields-wrapper">
+              <div class="smtp-fields">
+                <div class="field"><label>Sender Email</label><input type="email" id="smtp-from-email"
+                    value="" placeholder="sender@yourdomain.com" readonly></div>
+                <div class="field"><label>Sender Name</label><input type="text" id="smtp-from-name" value="" placeholder="Your Name or Brand" readonly>
+                </div>
+                <div class="field"><label>SMTP Host</label><input type="text" id="smtp-host" value="" placeholder="smtp.gmail.com" readonly></div>
+                <div class="field"><label>Port</label><input type="number" id="smtp-port" value="587" readonly></div>
+                <div class="field"><label>Username</label><input type="text" id="smtp-user"
+                    value="" placeholder="your@email.com" readonly></div>
+                <div class="field" style="position:relative">
+                  <label>Password / App Key</label>
+                  <div style="position:relative; display:flex; align-items:center">
+                    <input type="password" id="smtp-pass" value="" placeholder="App password or API key" readonly style="width:100%; padding-right:2.5rem; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r); color: var(--text); font-family: var(--font); font-size: 0.83rem; outline: none; height: 35px;">
+                    <button id="toggle-broadcast-smtp-pass" type="button" style="position:absolute; right:0.5rem; background:none; border:none; color:var(--text3); cursor:pointer; padding:0.2rem; display:flex; align-items:center; justify-content:center; top: 50%; transform: translateY(-50%);">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="field" style="margin-top:0.4rem">
+                <label>Delay between emails (ms)</label>
+                <input type="number" id="smtp-delay" value="300" min="0" max="5000" readonly>
+                <div class="field-tip"><i class="fa-solid fa-circle-info"></i> Adds a delay to avoid rate-limiting.
+                  200–500ms recommended.</div>
+              </div>
+              <div class="field-row" style="margin-top:0.4rem">
+                <div class="field">
+                  <label>Batch Size</label>
+                  <input type="number" id="smtp-batch-size" value="50" min="1" max="500" readonly>
+                </div>
+                <div class="field">
+                  <label>Pause Between Batches (sec)</label>
+                  <input type="number" id="smtp-batch-pause" value="10" min="1" max="120" readonly>
+                </div>
+              </div>
+              <div class="field-tip"><i class="fa-solid fa-circle-info"></i> Sends in batches to prevent crashes &amp;
+                rate-limits. Auto-pauses between each batch.</div>
+                
+              <!-- Notice box pointing to settings -->
+              <div style="margin-top: 0.8rem; display: flex; justify-content: space-between; align-items: center; background: var(--bg2); padding: 0.5rem 0.75rem; border-radius: var(--r); border: 1px dashed var(--border)">
+                <span style="font-size:0.78rem; color:var(--text2); display:flex; align-items:center; gap:0.4rem">
+                  <i class="fa-solid fa-lock" style="color:var(--gold)"></i> 
+                  SMTP settings are read-only here. Edit them in Settings.
+                </span>
+                <a href="setting.html" class="btn btn-xs btn-outline" style="font-size:0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; text-decoration: none; border-color: var(--border); color: var(--text);">
+                  <i class="fa-solid fa-gear"></i> Go to Settings
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div style="display:flex;gap:0.7rem;flex-wrap:wrap">
+            <button class="btn btn-green btn-lg" id="btn-start-broadcast"><i class="fa-solid fa-circle-play"></i> Start
+              Broadcasting</button>
+            <button class="btn btn-outline btn-lg" id="btn-pause-broadcast" style="display:none"><i
+                class="fa-solid fa-pause"></i> Pause</button>
+            <button class="btn btn-outline btn-lg" id="btn-stop-broadcast" style="display:none"><i
+                class="fa-solid fa-stop"></i> Stop</button>
+            <button class="btn btn-outline btn-sm" id="btn-reset-broadcast" style="margin-left:auto"><i
+                class="fa-solid fa-rotate"></i> Reset</button>
+          </div>
+
+          <!-- Animation -->
+          <div class="send-anim" id="send-anim" style="display:none">
+            <div class="planes">
+              <span class="plane">✉️</span>
+              <span class="plane">✉️</span>
+              <span class="plane">✉️</span>
+            </div>
+            <p id="send-anim-text">Sending emails…</p>
+          </div>
+        </div>
+
+        <!-- Logs Panel -->
+        <div class="broadcast-logs-panel">
+          <div class="logs-head">
+            <h3><i class="fa-solid fa-terminal" style="margin-right:0.3rem"></i> SMTP Logs</h3>
+            <button class="btn btn-ghost btn-sm" id="btn-clear-logs"><i class="fa-solid fa-trash-can"></i>
+              Clear</button>
+            <button class="btn btn-outline btn-sm" id="btn-export-logs"><i class="fa-solid fa-download"></i>
+              Export</button>
+          </div>
+          <div class="logs-terminal" id="logs-terminal">
+            <div class="log-line sys"><span class="log-ts">[00:00:00]</span> MailPilot terminal initialized. Ready.
+            </div>
+            <div class="log-line info"><span class="log-ts">[00:00:00]</span> Configure SMTP settings and add members to
+              begin.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /app-body -->
+
+  <!-- ══ TOAST ══ -->
+  <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i> <span id="toast-msg"></span></div>
+
+  <!-- ══ POST-BROADCAST MODAL ══ -->
+  <div id="post-broadcast-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:10000;align-items:center;justify-content:center">
+    <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:2rem;width:420px;max-width:90vw;box-shadow:0 24px 64px rgba(0,0,0,0.4);text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:0.75rem">🎉</div>
+      <h3 style="font-family:var(--font-d);font-size:1.15rem;font-weight:700;margin-bottom:0.35rem">Broadcast Complete!</h3>
+      <p id="post-bc-summary" style="font-size:0.82rem;color:var(--text2);margin-bottom:1.5rem">All emails processed.</p>
+
+      <p style="font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:0.7rem">What would you like to do with the members who were sent emails?</p>
+
+      <div style="display:flex;gap:0.7rem;justify-content:center;flex-wrap:wrap">
+        <button id="post-bc-keep" style="flex:1;min-width:140px;padding:0.65rem 1rem;border-radius:var(--r);border:1.5px solid var(--border2);background:var(--surface);color:var(--text);font-family:var(--font);font-size:0.83rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.45rem;transition:all 0.2s">
+          <i class="fa-solid fa-database" style="color:var(--green)"></i> Keep Members
+        </button>
+        <button id="post-bc-delete" style="flex:1;min-width:140px;padding:0.65rem 1rem;border-radius:var(--r);border:1.5px solid rgba(242,92,110,0.4);background:rgba(242,92,110,0.08);color:var(--red);font-family:var(--font);font-size:0.83rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.45rem;transition:all 0.2s">
+          <i class="fa-solid fa-trash-can"></i> Delete Sent Members
+        </button>
+      </div>
+      <p style="font-size:0.7rem;color:var(--text3);margin-top:0.9rem">Deleting removes them from your local database only.</p>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="common.js"></script>
+  <script src="broadcast.js"></script>
+</body>
+
+</html>

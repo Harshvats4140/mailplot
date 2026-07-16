@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MailPilot Studio — Email Automation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --transition: 0.18s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    /* ═══════════════════════════════════════════
+       MAIN LAYOUT
+    ═══════════════════════════════════════════ */
+    .app-body {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      padding: 1rem 1.25rem 1.5rem;
+      gap: 1rem;
+      min-height: 0;
+    }
+
+    .tab-panel {
+      display: none;
+      width: 100%;
+    }
+
+    .tab-panel.active {
+      display: flex;
+    }
+
+    /* ═══════════════════════════════════════════
+       COMPOSER — LEFT SIDEBAR
+    ═══════════════════════════════════════════ */
+    #panel-composer {
+      overflow: hidden;
+    }
+
+    .composer-sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: rgba(10, 16, 29, 0.95);
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: inset -1px 0 0 rgba(255,255,255,0.03);
+      animation: slideInLeft 0.45s ease;
+    }
+
+    /* Sidebar tab strip */
+    .sidebar-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      flex-shrink: 0;
+      padding: 0.55rem 0.75rem 0;
+      gap: 0.4rem;
+    }
+
+    .stab {
+      flex: 1;
+      padding: 0.7rem 0.65rem;
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text2);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      border-radius: 10px 10px 0 0;
+      transition: all var(--transition);
+    }
+
+    .stab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: rgba(79, 142, 247, 0.06);
+    }
+
+    .stab:hover:not(.active) {
+      color: var(--text);
+      background: var(--surface);
+    }
+
+    .stab-panel {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.2rem;
+    }
+
+    .stab-panel.active {
+      display: block;
+    }
+
+    .stab-panel::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .stab-panel::-webkit-scrollbar-thumb {
+      background: var(--surface2);
+      border-radius: 4px;
+    }
+
+    /* Section headings */
+    .sec-head {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text2);
+      margin: 1.3rem 0 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .sec-head::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .sec-head:first-child {
+      margin-top: 0;
+    }
+
+    /* Form fields */
+    .field {
+      margin-bottom: 1.1rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.69rem;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      padding: 0.65rem 0.9rem;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border var(--transition), box-shadow var(--transition);
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.12);
+    }
+
+    .field select option {
+      background: var(--bg2);
+    }
+
+    .field-tip {
+      font-size: 0.67rem;
+      color: var(--text2);
+      margin-top: 0.3rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.3rem;
+      line-height: 1.4;
+    }
+
+    .field-tip i {
+      color: var(--gold);
+      margin-top: 0.1rem;
+      flex-shrink: 0;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.9rem;
+    }
+
+    /* Template cards */
+    .tpl-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .tpl-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--r);
+      padding: 0.95rem 0.75rem;
+      cursor: pointer;
+      transition: all var(--transition);
+      text-align: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .tpl-card:hover {
+      border-color: rgba(79, 142, 247, 0.18);
+      background: rgba(255,255,255,0.06);
+      transform: translateY(-2px);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .tpl-card.active {
+      border-color: var(--accent);
+      background: rgba(79, 142, 247, 0.08);
+    }
+
+    .tpl-card i {
+      font-size: 1.15rem;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    .tpl-card span {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text2);
+    }
+
+    .tpl-card.active span {
+      color: var(--text);
+    }
+
+    .tpl-card {
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeInUp 0.55s ease forwards;
+    }
+
+    .tpl-card:nth-child(1) { animation-delay: 0.08s; }
+    .tpl-card:nth-child(2) { animation-delay: 0.13s; }
+    .tpl-card:nth-child(3) { animation-delay: 0.18s; }
+    .tpl-card:nth-child(4) { animation-delay: 0.23s; }
+    .tpl-card:nth-child(5) { animation-delay: 0.28s; }
+    .tpl-card:nth-child(6) { animation-delay: 0.33s; }
+
+    @keyframes fadeInUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Color dots */
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .c-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform var(--transition), border-color var(--transition);
+    }
+
+    .c-dot:hover {
+      transform: scale(1.18);
+    }
+
+    .c-dot.active {
+      border-color: var(--text);
+      transform: scale(1.12);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+    }
+
+    input[type="color"] {
+      width: 26px;
+      height: 26px;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      cursor: pointer;
+      padding: 2px;
+      background: none;
+      outline: none;
+    }
+
+    /* Radio opts */
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+
+    .radio-opt {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.32rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 500;
+      transition: all var(--transition);
+      background: var(--bg3);
+    }
+
+    .radio-opt:hover {
+      border-color: var(--border2);
+    }
+
+    .radio-opt.active {
+      border-color: var(--accent);
+      background: rgba(79, 142, 247, 0.1);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .radio-opt input {
+      display: none;
+    }
+
+    /* ═══════════════════════════════════════════
+       COMPOSER — CENTER WORKSPACE
+    ═══════════════════════════════════════════ */
+    .composer-workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: rgba(9, 15, 26, 0.96);
+      border-radius: calc(var(--r2) + 4px);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+      min-width: 0;
+      animation: popIn 0.35s ease;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .workspace-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.3rem;
+      background: rgba(10, 16, 30, 0.96);
+      border-bottom: 1px solid rgba(79, 142, 247, 0.14);
+      flex-shrink: 0;
+      box-shadow: inset 0 -1px 0 rgba(255,255,255,0.03);
+      backdrop-filter: blur(8px);
+    }
+
+    .vp-group {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .vp-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 0.95rem;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: none;
+      color: var(--text2);
+      font-family: var(--font);
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .vp-btn.active {
+      background: var(--surface);
+      border-color: var(--border2);
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .vp-btn:hover:not(.active) {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .vp-btn i {
+      font-size: 0.72rem;
+    }
+
+    .ws-status {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      color: var(--text2);
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulseDot 2s ease infinite;
+    }
+
+    @keyframes pulseDot {
+
+      0%,
+      100% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(34, 211, 163, 0.4);
+      }
+
+      50% {
+        opacity: 0.6;
+        box-shadow: 0 0 0 4px rgba(34, 211, 163, 0);
+      }
+    }
+
+    /* Saved badge */
+    .saved-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.71rem;
+      color: var(--green);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .saved-badge.show {
+      opacity: 1;
+    }
+
+    /* Preview area */
+    .preview-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.6rem 1.35rem 1.7rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      background: rgba(255,255,255,0.02);
+      transition: background 0.35s ease;
+      animation: fadeIn 0.35s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .preview-area::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .preview-area::-webkit-scrollbar-thumb {
+      background: var(--surface2);
+      border-radius: 4px;
+    }
+
+    .preview-area.hidden {
+      display: none;
+    }
+
+    .preview-shell {
+      background: rgba(15, 24, 48, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: calc(var(--r2) + 4px);
+      overflow: hidden;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+      transition: width 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+      width: 780px;
+      max-width: 100%;
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .preview-shell:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 24px 55px rgba(0, 0, 0, 0.16);
+    }
+
+    .preview-shell.mobile {
+      width: 390px;
+    }
+
+    .preview-chrome {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.75rem 1.1rem;
+      background: rgba(10, 17, 30, 0.97);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .chrome-dots {
+      display: flex;
+      gap: 5px;
+    }
+
+    .chrome-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .chrome-dot.red {
+      background: #ff5f57;
+    }
+
+    .chrome-dot.amber {
+      background: #febc2e;
+    }
+
+    .chrome-dot.green {
+      background: #28c840;
+    }
+
+    .chrome-meta {
+      flex: 1;
+      margin-left: 0.5rem;
+    }
+
+    .chrome-meta-row {
+      display: flex;
+      gap: 0.5rem;
+      font-size: 0.73rem;
+      margin-bottom: 0.12rem;
+    }
+
+    .chrome-meta-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .chrome-meta-row .lbl {
+      color: var(--text2);
+      font-weight: 600;
+      min-width: 55px;
+    }
+
+    .chrome-meta-row .val {
+      color: var(--text);
+    }
+
+    .preview-frame-wrap {
+      width: 100%;
+    }
+
+    #email-preview-iframe {
+      width: 100%;
+      height: 580px;
+      border: none;
+      display: block;
+    }
+
+    /* Code view */
+    .code-view {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .code-view.visible {
+      display: flex;
+    }
+
+    .code-topbar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.7rem 1.1rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .code-lang {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.71rem;
+      color: var(--text2);
+    }
+
+    .code-lang i {
+      color: var(--gold);
+    }
+
+    .code-textarea {
+      flex: 1;
+      width: 100%;
+      background: #060d1a;
+      color: #7dd3fc;
+      border: none;
+      font-family: var(--font-m);
+      font-size: 0.82rem;
+      line-height: 1.7;
+      outline: none;
+      resize: none;
+      padding: 1.4rem 1.5rem;
+      overflow-y: auto;
+    }
+
+    .code-textarea::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .code-textarea::-webkit-scrollbar-thumb {
+      background: var(--surface2);
+      border-radius: 4px;
+    }
+
+    /* ═══════════════════════════════════════════
+       COMPOSER — RIGHT SIDEBAR
+    ═══════════════════════════════════════════ */
+    .composer-rsidebar {
+      width: var(--rsidebar-w);
+      min-width: var(--rsidebar-w);
+      background: #0e1a33;
+      border-left: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: inset 1px 0 0 rgba(255,255,255,0.03);
+      animation: slideInRight 0.45s ease;
+    }
+
+    .rsidebar-head {
+      padding: 1.1rem 1.1rem 0.9rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(10, 16, 28, 0.95);
+      flex-shrink: 0;
+    }
+
+    .rsidebar-head h3 {
+      font-family: var(--font-d);
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+
+    .rsidebar-head p {
+      font-size: 0.71rem;
+      color: var(--text2);
+    }
+
+    /* Member search */
+    .member-search-wrap {
+      padding: 0.85rem 0.95rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--r);
+      padding: 0.55rem 0.9rem;
+      transition: border var(--transition);
+    }
+
+    .search-box:focus-within {
+      border-color: var(--accent);
+    }
+
+    .search-box i {
+      color: var(--text2);
+      font-size: 0.75rem;
+    }
+
+    .search-box input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.88rem;
+    }
+
+    /* Member list */
+    .member-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.9rem 0.75rem 1rem;
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .member-list::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .member-list::-webkit-scrollbar-thumb {
+      background: var(--surface2);
+      border-radius: 4px;
+    }
+
+    .member-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.85rem 0.95rem;
+      border-radius: calc(var(--r) + 2px);
+      cursor: pointer;
+      transition: background var(--transition), border-color var(--transition), transform var(--transition);
+      border: 1px solid transparent;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .member-item:hover {
+      background: rgba(255,255,255,0.05);
+      transform: translateY(-1px);
+    }
+
+    .member-item.selected {
+      background: rgba(79, 142, 247, 0.08);
+      border-color: rgba(79, 142, 247, 0.22);
+    }
+
+    .member-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #fff;
+      font-family: var(--font-d);
+    }
+
+    .member-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .member-name {
+      font-size: 0.84rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .member-email {
+      font-size: 0.72rem;
+      color: var(--text2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .member-tag {
+      font-size: 0.6rem;
+      padding: 0.1rem 0.38rem;
+      border-radius: 20px;
+      font-weight: 700;
+      background: rgba(79, 142, 247, 0.12);
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .empty-list {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text2);
+      font-size: 0.8rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px dashed rgba(255,255,255,0.08);
+      border-radius: var(--r);
+    }
+
+    .empty-list i {
+      font-size: 1.8rem;
+      display: block;
+      margin-bottom: 0.5rem;
+      opacity: 0.25;
+    }
+
+    .rsidebar-footer {
+      border-top: 1px solid var(--border);
+      padding: 1rem 0.95rem;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════
+       TOAST
+    ═══════════════════════════════════════════ */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(70px);
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 30px;
+      padding: 0.55rem 1.1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: var(--shadow);
+      z-index: 9999;
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.3, 1), opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast.ok i {
+      color: var(--green);
+    }
+
+    .toast.err i {
+      color: var(--red);
+    }
+
+    .toast.warn i {
+      color: var(--gold2);
+    }
+
+    .btn-ghost:hover,
+    .btn-outline:hover {
+      transform: translateY(-1px);
+    }
+
+    /* ═══════════════════════════════════════════
+       MISC
+    ═══════════════════════════════════════════ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 0.12rem 0.42rem;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-blue {
+      background: rgba(79, 142, 247, 0.15);
+      color: var(--accent);
+    }
+
+    .badge-green {
+      background: rgba(34, 211, 163, 0.15);
+      color: var(--green);
+    }
+
+    .badge-gold {
+      background: rgba(245, 166, 35, 0.15);
+      color: var(--gold2);
+    }
+
+    .badge-red {
+      background: rgba(242, 92, 110, 0.15);
+      color: var(--red);
+    }
+
+    .badge-purple {
+      background: rgba(167, 139, 250, 0.15);
+      color: var(--purple);
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0.7rem 0;
+    }
+
+    /* Scrollbars global */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--surface2);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--border2);
+    }
+
+    ::selection {
+      background: rgba(79, 142, 247, 0.3);
+    }
+
+    /* Checkbox toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .toggle-row label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.77rem;
+      color: var(--text2);
+      cursor: pointer;
+    }
+
+    /* Powered by footer strip */
+    .powered-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.55rem 0.9rem;
+      background: var(--bg2);
+      border-top: 1px solid rgba(79, 142, 247, 0.12);
+      font-size: 0.68rem;
+      color: var(--text2);
+      flex-shrink: 0;
+    }
+
+    .powered-strip a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .powered-strip a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 1280px) {
+      .composer-sidebar {
+        width: 280px;
+        min-width: 280px;
+      }
+
+      .composer-rsidebar {
+        width: 280px;
+        min-width: 280px;
+      }
+    }
+
+    @media (max-width: 1120px) {
+      .app-body {
+        padding: 0.8rem 0.8rem 1rem;
+        gap: 0.7rem;
+      }
+
+      .composer-sidebar {
+        width: 260px;
+        min-width: 260px;
+      }
+
+      .composer-rsidebar {
+        width: 260px;
+        min-width: 260px;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .composer-sidebar,
+      .composer-rsidebar {
+        display: none;
+      }
+
+      .composer-workspace {
+        border-radius: var(--r2);
+      }
+    }
+
+    /* ═══════════════════════════════════════════
+       LIGHT THEME OVERRIDES FOR COMPOSER
+    ═══════════════════════════════════════════ */
+    [data-theme="light"] .composer-sidebar {
+      background: #ffffff;
+      border-right: 1px solid var(--border);
+      box-shadow: inset -1px 0 0 var(--border);
+    }
+
+    [data-theme="light"] .sidebar-tabs {
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+
+    [data-theme="light"] .stab:hover:not(.active) {
+      background: var(--bg3);
+    }
+
+    [data-theme="light"] .tpl-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    [data-theme="light"] .tpl-card span {
+      color: var(--text2);
+    }
+
+    [data-theme="light"] .tpl-card.active span {
+      color: var(--text);
+    }
+
+    [data-theme="light"] .tpl-card:hover {
+      border-color: var(--accent);
+      background: var(--bg3);
+      box-shadow: 0 8px 24px rgba(12, 22, 40, 0.08);
+    }
+
+    [data-theme="light"] .tpl-card.active {
+      background: rgba(79, 142, 247, 0.08);
+      border-color: var(--accent);
+    }
+
+    [data-theme="light"] .composer-workspace {
+      background: #ffffff;
+      box-shadow: none;
+      border: 1px solid var(--border);
+    }
+
+    [data-theme="light"] .workspace-bar {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    [data-theme="light"] .preview-area {
+      background: var(--bg2);
+    }
+
+    [data-theme="light"] .preview-shell {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    [data-theme="light"] .preview-shell:hover {
+      box-shadow: 0 18px 45px rgba(12, 22, 40, 0.12);
+    }
+
+    [data-theme="light"] .preview-chrome {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    [data-theme="light"] .code-textarea {
+      background: #fafbfe;
+      color: #0f172a;
+      border: 1px solid var(--border);
+    }
+
+    [data-theme="light"] .composer-rsidebar {
+      background: #ffffff;
+      border-left: 1px solid var(--border);
+      box-shadow: inset 1px 0 0 var(--border);
+    }
+
+    [data-theme="light"] .rsidebar-head {
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+
+    [data-theme="light"] .rsidebar-head h3 {
+      color: var(--text);
+    }
+
+    [data-theme="light"] .search-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+    }
+
+    [data-theme="light"] .member-item {
+      background: var(--bg2);
+      border: 1px solid transparent;
+    }
+
+    [data-theme="light"] .member-item:hover {
+      background: var(--bg);
+    }
+
+    [data-theme="light"] .member-item.selected {
+      background: rgba(79, 142, 247, 0.08);
+      border-color: var(--accent);
+    }
+
+    [data-theme="light"] .empty-list {
+      background: var(--bg2);
+      border: 1px dashed var(--border);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ PAGE TOPBAR ══ -->
+  <header class="page-topbar">
+    <button class="mobile-sidebar-btn" id="mp-mobile-menu"><i class="fa-solid fa-bars"></i></button>
+    <div class="page-breadcrumb">
+      <a href="dashboard.html">MailPilot</a>
+      <span class="sep">/</span>
+      <span class="crumb-current">Composer</span>
+    </div>
+
+    <div class="topbar-gap"></div>
+
+    <div class="topbar-right">
+      <div class="status-dot"></div>
+      <div class="member-pill">
+        <i class="fa-solid fa-users"></i>
+        <span id="top-member-count">0</span> members
+      </div>
+
+      <button class="btn btn-outline btn-sm" id="btn-export-csv">
+        <i class="fa-solid fa-download"></i> Export CSV
+      </button>
+
+      <button class="btn btn-gradient btn-sm" id="btn-quick-send">
+        <i class="fa-solid fa-paper-plane"></i> Quick Broadcast
+      </button>
+
+      <button class="icon-btn" id="theme-toggle" title="Toggle theme">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ══ INFO CALLOUT BANNER ══ -->
+  <!-- ══ APP BODY ══ -->
+  <div class="app-body">
+
+    <!-- ══ TAB 1: COMPOSER ══ -->
+    <div class="tab-panel active" id="panel-composer">
+
+      <!-- LEFT SIDEBAR -->
+      <aside class="composer-sidebar">
+        <div class="sidebar-tabs">
+          <div class="stab active" data-stab="design">Design</div>
+          <div class="stab" data-stab="content">Content</div>
+          <div class="stab" data-stab="style">Style</div>
+        </div>
+
+        <!-- DESIGN TAB -->
+        <div class="stab-panel active" id="stab-design">
+          <div class="sec-head">Template</div>
+          <div class="tpl-grid">
+            <div class="tpl-card active" data-template="event"><i class="fa-solid fa-calendar-days"
+                style="color:#4f8ef7"></i><span>Event Invite</span></div>
+            <div class="tpl-card" data-template="newsletter"><i class="fa-solid fa-newspaper"
+                style="color:#22d3a3"></i><span>Newsletter</span></div>
+            <div class="tpl-card" data-template="announcement"><i class="fa-solid fa-bullhorn"
+                style="color:#f5a623"></i><span>Announcement</span></div>
+            <div class="tpl-card" data-template="welcome"><i class="fa-solid fa-face-smile"
+                style="color:#a78bfa"></i><span>Welcome</span></div>
+            <div class="tpl-card" data-template="promotion"><i class="fa-solid fa-tag"
+                style="color:#22d3ee"></i><span>Promotion</span></div>
+            <div class="tpl-card" data-template="reminder"><i class="fa-solid fa-bell"
+                style="color:#f25c6e"></i><span>Reminder</span></div>
+          </div>
+
+          <div class="sec-head">Banner</div>
+          <div class="field">
+            <label>Banner Theme</label>
+            <select id="select-banner">
+              <option value="https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=600">Tech Conference
+              </option>
+              <option value="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=600">Community
+                Networking</option>
+              <option value="https://images.unsplash.com/photo-1515187029135-18ee286d815b?q=80&w=600">Leadership &
+                Career</option>
+              <option value="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=600">Collaborative Work
+              </option>
+              <option value="https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=600">Dark Tech</option>
+              <option value="https://images.unsplash.com/photo-1495592822108-9e6261896da8?q=80&w=600">Abstract Purple
+              </option>
+              <option value="none">No Banner</option>
+              <option value="custom">Custom URL…</option>
+            </select>
+          </div>
+          <div class="field" id="custom-banner-field" style="display:none">
+            <label>Custom Banner URL</label>
+            <input type="text" id="input-banner-url" placeholder="https://…">
+          </div>
+        </div>
+
+        <!-- CONTENT TAB -->
+        <div class="stab-panel" id="stab-content">
+          <div class="sec-head">Email Meta</div>
+          <div class="field">
+            <label>Subject Line</label>
+            <input type="text" id="input-subject" value="You're Invited! 🎉 {{Name}}, check this out">
+          </div>
+          <div class="field">
+            <label>Preheader Text</label>
+            <input type="text" id="input-preheader" value="An exclusive opportunity just for you — don't miss it!">
+          </div>
+
+          <div class="sec-head">Body</div>
+          <div class="field">
+            <label>Headline</label>
+            <input type="text" id="input-title" value="You're Invited to Something Special">
+          </div>
+          <div class="field">
+            <label>Greeting</label>
+            <input type="text" id="input-greeting" value="Hi {{Name}},">
+            <div class="field-tip"><i class="fa-solid fa-circle-info"></i> Use <code>{{Name}}</code>,
+              <code>{{Email}}</code>, <code>{{College}}</code>, <code>{{Phone}}</code></div>
+          </div>
+          <div class="field">
+            <label>Message Body</label>
+            <textarea id="input-body" rows="5">We're thrilled to invite you to an exclusive event. Join us for an unforgettable experience filled with learning, networking, and innovation.
+
+This is a unique opportunity to connect with like-minded individuals and grow together.</textarea>
+          </div>
+
+          <div class="sec-head">Event Details</div>
+          <div class="toggle-row">
+            <label><input type="checkbox" id="toggle-event-details" checked> Show event details block</label>
+          </div>
+          <div id="event-details-fields">
+            <div class="field-row">
+              <div class="field"><label>Date</label><input type="text" id="input-event-date"
+                  value="Saturday, June 14, 2026"></div>
+              <div class="field"><label>Time</label><input type="text" id="input-event-time" value="6:00 PM – 9:00 PM">
+              </div>
+            </div>
+            <div class="field"><label>Location / Venue</label><input type="text" id="input-event-location"
+                value="Main Hall, City Convention Centre"></div>
+            <div class="field">
+              <label>Agenda (one per line)</label>
+              <textarea id="input-event-agenda" rows="3">6:00 PM — Doors Open & Registration
+7:00 PM — Keynote Address
+8:30 PM — Networking & Refreshments</textarea>
+            </div>
+          </div>
+
+          <div class="sec-head">CTA Button</div>
+          <div class="field"><label>Button Text</label><input type="text" id="input-btn-text"
+              value="Reserve Your Spot Now"></div>
+          <div class="field"><label>Button URL</label><input type="text" id="input-btn-url"
+              value="https://ascentcircle.in"></div>
+
+          <div class="sec-head">Footer</div>
+          <div class="field"><label>Signature</label><input type="text" id="input-signature"
+              value="With excitement, Ascent Circle Team"></div>
+          <div class="field"><label>Footer Note</label><textarea id="input-footer-text"
+              rows="2">You're receiving this because you're part of our community. {{Email}}</textarea></div>
+          <div class="field"><label>Organization Name</label><input type="text" id="input-org-name"
+              value="Ascent Circle"></div>
+          <div class="field"><label>Website URL</label><input type="text" id="input-org-url"
+              value="https://ascentcircle.in"></div>
+        </div>
+
+        <!-- STYLE TAB -->
+        <div class="stab-panel" id="stab-style">
+          <div class="sec-head">Button Color</div>
+          <div class="color-row" style="margin-bottom:0.8rem">
+            <div class="c-dot active" data-color="#4f8ef7" style="background:#4f8ef7" title="Blue"></div>
+            <div class="c-dot" data-color="#238636" style="background:#238636" title="Green"></div>
+            <div class="c-dot" data-color="#d29922" style="background:#d29922" title="Gold"></div>
+            <div class="c-dot" data-color="#a78bfa" style="background:#a78bfa" title="Purple"></div>
+            <div class="c-dot" data-color="#f25c6e" style="background:#f25c6e" title="Red"></div>
+            <div class="c-dot" data-color="#22d3ee" style="background:#22d3ee" title="Teal"></div>
+            <div class="c-dot" data-color="#0b2240" style="background:#0b2240" title="Navy"></div>
+            <div class="c-dot" data-color="#fb8500" style="background:#fb8500" title="Orange"></div>
+            <input type="color" id="custom-btn-color" value="#4f8ef7" title="Custom">
+          </div>
+
+          <div class="sec-head">Email Background</div>
+          <div class="radio-group" id="bg-color-opts" style="margin-bottom:0.8rem">
+            <label class="radio-opt active" data-bg="#ffffff"><input type="radio" name="bg"> White</label>
+            <label class="radio-opt" data-bg="#f6f8fa"><input type="radio" name="bg"> Light Gray</label>
+            <label class="radio-opt" data-bg="#0d1117"><input type="radio" name="bg"> Dark</label>
+            <label class="radio-opt" data-bg="#fdf6ec"><input type="radio" name="bg"> Warm</label>
+            <label class="radio-opt" data-bg="#eef2ff"><input type="radio" name="bg"> Blue Tint</label>
+          </div>
+
+          <div class="sec-head">Accent Color</div>
+          <div class="color-row" style="margin-bottom:0.8rem">
+            <div class="c-dot accent-dot active" data-color="#4f8ef7" style="background:#4f8ef7"></div>
+            <div class="c-dot accent-dot" data-color="#238636" style="background:#238636"></div>
+            <div class="c-dot accent-dot" data-color="#d29922" style="background:#d29922"></div>
+            <div class="c-dot accent-dot" data-color="#a78bfa" style="background:#a78bfa"></div>
+            <div class="c-dot accent-dot" data-color="#f25c6e" style="background:#f25c6e"></div>
+            <input type="color" id="custom-accent-color" value="#4f8ef7" title="Custom accent">
+          </div>
+
+          <div class="sec-head">Font Style</div>
+          <div class="radio-group" id="font-opts" style="margin-bottom:0.8rem">
+            <label class="radio-opt active" data-font="Arial, sans-serif"><input type="radio" name="font">
+              Classic</label>
+            <label class="radio-opt" data-font="Georgia, serif"><input type="radio" name="font"> Serif</label>
+            <label class="radio-opt" data-font="'Trebuchet MS', sans-serif"><input type="radio" name="font">
+              Modern</label>
+            <label class="radio-opt" data-font="Verdana, sans-serif"><input type="radio" name="font"> Clean</label>
+          </div>
+
+          <div class="sec-head">Email Width</div>
+          <div class="radio-group" id="width-opts" style="margin-bottom:0.8rem">
+            <label class="radio-opt" data-width="520"><input type="radio" name="width"> Compact</label>
+            <label class="radio-opt active" data-width="600"><input type="radio" name="width"> Standard</label>
+            <label class="radio-opt" data-width="680"><input type="radio" name="width"> Wide</label>
+          </div>
+        </div>
+      </aside>
+
+      <!-- CENTER WORKSPACE -->
+      <section class="composer-workspace">
+        <div class="workspace-bar">
+          <div class="vp-group">
+            <button class="vp-btn active" id="vp-desktop"><i class="fa-solid fa-desktop"></i> Desktop</button>
+            <button class="vp-btn" id="vp-mobile"><i class="fa-solid fa-mobile-screen-button"></i> Mobile</button>
+            <button class="vp-btn" id="vp-code"><i class="fa-solid fa-code"></i> HTML</button>
+          </div>
+
+          <div class="ws-status">
+            <div class="pulse-dot"></div> Live Preview
+          </div>
+
+          <div class="saved-badge" id="saved-badge"><i class="fa-solid fa-check"></i> Saved</div>
+
+          <div style="display:flex;gap:0.4rem;margin-left:0.6rem">
+            <button class="btn btn-sm btn-outline" id="btn-copy-html"><i class="fa-solid fa-copy"></i> Copy
+              HTML</button>
+            <button class="btn btn-sm btn-outline" id="btn-download-html"><i class="fa-solid fa-download"></i>
+              Download</button>
+          </div>
+        </div>
+
+        <!-- Preview -->
+        <div class="preview-area" id="preview-area">
+          <div class="preview-shell" id="preview-shell">
+            <div class="preview-chrome">
+              <div class="chrome-dots">
+                <div class="chrome-dot red"></div>
+                <div class="chrome-dot amber"></div>
+                <div class="chrome-dot green"></div>
+              </div>
+              <div class="chrome-meta">
+                <div class="chrome-meta-row">
+                  <span class="lbl">To:</span>
+                  <span class="val" id="preview-to">—</span>
+                </div>
+                <div class="chrome-meta-row">
+                  <span class="lbl">Subject:</span>
+                  <span class="val" id="preview-subject">—</span>
+                </div>
+              </div>
+            </div>
+            <div class="preview-frame-wrap">
+              <iframe id="email-preview-iframe" title="Email Preview"></iframe>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code View -->
+        <div class="code-view" id="code-view">
+          <div class="code-topbar">
+            <div class="code-lang"><i class="fa-brands fa-html5"></i> Compiled Inline HTML — Ready to send</div>
+            <div style="margin-left:auto;display:flex;gap:0.4rem">
+              <button class="btn btn-sm btn-gold" id="btn-copy-code"><i class="fa-solid fa-copy"></i> Copy</button>
+              <button class="btn btn-sm btn-outline" id="btn-dl-code"><i class="fa-solid fa-download"></i>
+                Download</button>
+              <button class="btn btn-sm btn-outline" id="btn-apply-code"><i class="fa-solid fa-wand-magic-sparkles"></i>
+                Apply</button>
+            </div>
+          </div>
+          <textarea class="code-textarea" id="code-textarea" spellcheck="false"></textarea>
+        </div>
+      </section>
+
+      <!-- RIGHT SIDEBAR -->
+      <aside class="composer-rsidebar">
+        <div class="rsidebar-head">
+          <h3><i class="fa-solid fa-user-check" style="color:var(--accent);margin-right:0.35rem"></i>Preview As Member
+          </h3>
+          <p>Select a member to personalize the preview</p>
+        </div>
+        <div class="member-search-wrap">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="composer-member-search" placeholder="Search members…">
+          </div>
+        </div>
+        <div class="member-list" id="composer-member-list">
+          <div class="empty-list">
+            <i class="fa-solid fa-users-slash"></i>
+            No members yet.<br><small>Add members in the Members tab.</small>
+          </div>
+        </div>
+        <div class="rsidebar-footer">
+          <button class="btn btn-gradient btn-block" id="btn-open-broadcast-from-composer">
+            <i class="fa-solid fa-satellite-dish"></i> Go to Broadcast
+          </button>
+        </div>
+      </aside>
+
+    </div><!-- /panel-composer -->
+
+  </div><!-- /app-body -->
+
+  <!-- Powered by footer -->
+  <div class="powered-strip">
+    <i class="fa-solid fa-bolt" style="color:var(--accent);font-size:0.6rem"></i>
+    Powered by <a href="https://ascentcircle.in" target="_blank">Ascent Circle</a>
+    &nbsp;·&nbsp; MailPilot Studio v2.0
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toast-msg"></span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="common.js"></script>
+  <script src="index.js"></script>
+
+  <!-- Inline patch for new UI elements -->
+  <script>
+    // Saved badge flash
+    const _origSave = window.saveComposerState;
+    if (typeof saveComposerState !== 'undefined') {
+      const _badge = document.getElementById('saved-badge');
+      const origFn = saveComposerState;
+      window.saveComposerState = function () {
+        origFn && origFn();
+        if (_badge) {
+          _badge.classList.add('show');
+          clearTimeout(_badge._t);
+          _badge._t = setTimeout(() => _badge.classList.remove('show'), 1800);
+        }
+      };
+    }
+
+    // Profile dropdown
+    document.getElementById('pd-clear')?.addEventListener('click', () => {
+      if (confirm('Clear all MailPilot data? This cannot be undone.')) {
+        localStorage.clear();
+        location.reload();
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,1310 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile — MailPilot Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Profile specific page styles */
+    .profile-hero {
+      margin: 0 2rem 1.5rem; border-radius: var(--r3); overflow: hidden;
+      background: linear-gradient(135deg, #0d1e42 0%, #162040 40%, #1a1060 70%, #0f1535 100%);
+      border: 1px solid var(--border2); position: relative;
+    }
+    .hero-bg-pattern {
+      position: absolute; inset: 0; opacity: .07;
+      background-image: radial-gradient(circle at 20% 50%, var(--accent) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, var(--accent2) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .hero-grid-overlay {
+      position: absolute; inset: 0; opacity: .04;
+      background-image: linear-gradient(var(--border2) 1px, transparent 1px),
+                        linear-gradient(90deg, var(--border2) 1px, transparent 1px);
+      background-size: 20px 20px; pointer-events: none;
+    }
+    .hero-content {
+      position: relative; z-index: 2; padding: 2.2rem 2.5rem;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 2rem; justify-content: space-between;
+    }
+    .hero-avatar-wrap { display: flex; align-items: center; gap: 1.5rem; position: relative; }
+    .hero-avatar {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: var(--accent); border: 3px solid var(--bg); display: flex;
+      align-items: center; justify-content: center; cursor: pointer; font-size: 2.2rem; color: #fff;
+      transition: all var(--transition); overflow: hidden; position: relative;
+      font-weight: 700; font-family: var(--font-d);
+    }
+    .hero-avatar img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .hero-avatar-upload-btn {
+      position: absolute; bottom: 0; right: 0;
+      width: 32px; height: 32px; border-radius: 50%; background: var(--accent);
+      border: 2px solid var(--bg); color: #fff; display: flex; align-items: center;
+      justify-content: center; cursor: pointer; font-size: .85rem; transition: all var(--transition);
+      box-shadow: var(--shadow2);
+    }
+    .hero-avatar-upload-btn:hover { transform: scale(1.1); background: var(--accent2); }
+    #avatar-file-input { display: none; }
+    .hero-info { flex:1; min-width:200px; }
+    .hero-name { font-family:var(--font-d); font-size:1.6rem; font-weight:800; letter-spacing:-.03em; line-height:1.1; }
+    .hero-email { font-size:.82rem; color:var(--text2); margin-top:.3rem; display:flex; align-items:center; gap:.35rem; }
+    .hero-badges { display:flex; align-items:center; gap:.5rem; margin-top:.7rem; flex-wrap:wrap; }
+    .role-badge {
+      display:inline-flex; align-items:center; gap:.3rem; padding:.25rem .7rem;
+      border-radius:20px; font-size:.68rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+    }
+    .role-badge.admin { background:rgba(99,102,241,.18); color:var(--purple); border:1px solid rgba(99,102,241,.3); }
+    .role-badge.pro { background:rgba(245,166,35,.15); color:var(--gold2); border:1px solid rgba(245,166,35,.3); }
+    .hero-meta { display:flex; align-items:center; gap:1.2rem; margin-top:.9rem; flex-wrap:wrap; }
+    .hero-meta-item { display:flex; align-items:center; gap:.4rem; font-size:.72rem; color:var(--text2); }
+    .hero-meta-item i { color:var(--accent); font-size:.68rem; }
+    .hero-actions { display:flex; flex-direction:column; align-items:flex-end; gap:.6rem; }
+
+    /* ═══ CONTENT GRID ═══ */
+    .content-grid { padding:0 2rem 2rem; display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; }
+    .col-full { grid-column:1/-1; }
+    .col-left { grid-column:1/2; }
+    .col-right { grid-column:2/3; }
+
+    /* Card */
+    .card {
+      background:var(--bg2); border:1px solid var(--border); border-radius:var(--r2);
+      overflow:hidden; transition:border-color var(--transition);
+    }
+    .card:hover { border-color:var(--border2); }
+    .card-header { padding:1rem 1.2rem .8rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .card-title { font-size:.85rem; font-weight:700; display:flex; align-items:center; gap:.5rem; }
+    .card-title i { color:var(--accent); font-size:.78rem; }
+    .card-body { padding:1.2rem; }
+    .card-sub { font-size:.72rem; color:var(--text2); margin-top:.12rem; }
+
+    /* Form */
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:.9rem; }
+    .form-full { grid-column:1/-1; }
+    .field { display:flex; flex-direction:column; gap:.3rem; }
+    .field label { font-size:.68rem; font-weight:600; color:var(--text2); letter-spacing:.06em; text-transform:uppercase; }
+    .field input, .field textarea, .field select {
+      width:100%; padding:.48rem .7rem; background:var(--bg3); border:1px solid var(--border);
+      border-radius:var(--r); color:var(--text); font-family:var(--font); font-size:.82rem;
+      outline:none; transition:border var(--transition),box-shadow var(--transition);
+    }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      border-color:var(--accent); box-shadow:0 0 0 3px rgba(79,142,247,.12);
+    }
+    .field select option { background:var(--bg2); }
+    .field textarea { resize:vertical; min-height:80px; }
+    .char-count { font-size:.65rem; color:var(--text2); text-align:right; margin-top:.2rem; }
+    .char-count.warn { color:var(--gold); }
+    .char-count.danger { color:var(--red); }
+    .form-actions { display:flex; align-items:center; gap:.6rem; padding-top:.4rem; }
+
+    /* ═══ STAT CARDS ═══ */
+    .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.8rem; padding:1.2rem; }
+    .stat-card {
+      background:var(--bg3); border:1px solid var(--border); border-radius:var(--r2);
+      padding:1rem 1.1rem; transition:all var(--transition); cursor:default; position:relative; overflow:hidden;
+    }
+    .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--gradient,linear-gradient(90deg,var(--accent),var(--accent2))); }
+    .stat-card:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:var(--shadow2); }
+    .stat-icon { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:.85rem; margin-bottom:.7rem; }
+    .stat-num { font-family:var(--font-d); font-size:1.6rem; font-weight:800; letter-spacing:-.03em; line-height:1; }
+    .stat-label { font-size:.7rem; color:var(--text2); margin-top:.25rem; font-weight:500; }
+
+    /* ═══ TOGGLE SWITCHES ═══ */
+    .toggle-list { padding:.2rem 1.2rem 1.2rem; display:flex; flex-direction:column; gap:.2rem; }
+    .toggle-item { display:flex; align-items:center; justify-content:space-between; padding:.75rem 0; border-bottom:1px solid var(--border); }
+    .toggle-item:last-child { border-bottom:none; }
+    .toggle-info {}
+    .toggle-name { font-size:.82rem; font-weight:600; }
+    .toggle-desc { font-size:.7rem; color:var(--text2); margin-top:.15rem; }
+    .toggle-switch { position:relative; width:38px; height:22px; flex-shrink:0; }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-slider {
+      position:absolute; inset:0; background:var(--surface2); border-radius:22px;
+      cursor:pointer; transition:background .2s;
+    }
+    .toggle-slider::before {
+      content:''; position:absolute; width:16px; height:16px; left:3px; bottom:3px;
+      background:#fff; border-radius:50%; transition:transform .2s;
+    }
+    .toggle-switch input:checked + .toggle-slider { background:var(--accent); }
+    .toggle-switch input:checked + .toggle-slider::before { transform:translateX(16px); }
+
+    /* ═══ APPEARANCE ═══ */
+    .theme-options { display:grid; grid-template-columns:1fr 1fr; gap:.7rem; margin-bottom:1rem; }
+    .theme-card {
+      border:2px solid var(--border); border-radius:var(--r2); padding:.9rem 1rem; cursor:pointer;
+      transition:all var(--transition); display:flex; align-items:center; gap:.7rem;
+    }
+    .theme-card:hover { border-color:var(--border2); }
+    .theme-card.selected { border-color:var(--accent); background:rgba(79,142,247,.06); }
+    .theme-card-icon { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:.9rem; flex-shrink:0; }
+    .theme-card-info {}
+    .theme-card-name { font-size:.8rem; font-weight:700; }
+    .theme-card-sub { font-size:.68rem; color:var(--text2); margin-top:.1rem; }
+    .accent-colors { display:flex; gap:.5rem; flex-wrap:wrap; margin:.8rem 0; }
+    .accent-dot {
+      width:26px; height:26px; border-radius:50%; cursor:pointer; border:2px solid transparent;
+      transition:all var(--transition);
+    }
+    .accent-dot:hover { transform:scale(1.15); }
+    .accent-dot.active { border-color:var(--text); box-shadow:0 0 0 3px rgba(255,255,255,.1); transform:scale(1.1); }
+    .layout-options { display:flex; flex-direction:column; gap:.6rem; margin:.8rem 0; }
+    .layout-opt { display:flex; align-items:center; justify-content:space-between; }
+    .layout-opt-label { font-size:.8rem; font-weight:500; }
+    .layout-opt-sub { font-size:.68rem; color:var(--text2); }
+
+    /* ═══ ACCOUNT STATUS ═══ */
+    .status-grid { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; padding:1.2rem; }
+    .status-card { background:var(--bg3); border:1px solid var(--border); border-radius:var(--r2); padding:1rem; }
+    .status-card-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:.7rem; }
+    .status-card-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:.78rem; }
+    .status-badge { font-size:.62rem; font-weight:700; padding:.15rem .45rem; border-radius:20px; text-transform:uppercase; letter-spacing:.04em; }
+    .badge-ok { background:rgba(34,211,163,.15); color:var(--green); }
+    .badge-warn { background:rgba(245,166,35,.15); color:var(--gold2); }
+    .badge-err { background:rgba(242,92,110,.15); color:var(--red); }
+    .badge-info { background:rgba(79,142,247,.15); color:var(--accent); }
+    .status-card-name { font-size:.82rem; font-weight:700; }
+    .status-card-sub { font-size:.68rem; color:var(--text2); margin-top:.1rem; }
+    .progress-bar { height:5px; background:var(--surface2); border-radius:5px; overflow:hidden; margin-top:.65rem; }
+    .progress-fill { height:100%; border-radius:5px; transition:width 1.2s cubic-bezier(.4,0,.2,1); }
+
+    /* ═══ ACTIVITY TIMELINE ═══ */
+    .timeline { padding:.6rem 1.2rem 1.2rem; }
+    .timeline-item { display:flex; gap:1rem; padding:.7rem 0; position:relative; }
+    .timeline-item:not(:last-child)::after {
+      content:''; position:absolute; left:15px; top:38px; bottom:-8px;
+      width:1px; background:var(--border);
+    }
+    .tl-icon { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.7rem; flex-shrink:0; border:1px solid var(--border); }
+    .tl-content { flex:1; }
+    .tl-title { font-size:.8rem; font-weight:600; }
+    .tl-sub { font-size:.7rem; color:var(--text2); margin-top:.1rem; }
+    .tl-time { font-size:.65rem; color:var(--text2); margin-top:.2rem; display:flex; align-items:center; gap:.3rem; }
+
+    /* ═══ AVATAR UPLOAD CARD ═══ */
+    .drop-zone {
+      border:2px dashed var(--border2); border-radius:var(--r2); padding:1.5rem 1rem;
+      text-align:center; cursor:pointer; transition:all var(--transition); background:var(--bg3);
+    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color:var(--accent); background:rgba(79,142,247,.04); }
+    .drop-zone-icon { font-size:1.8rem; color:var(--text2); margin-bottom:.6rem; opacity:.4; }
+    .drop-zone-text { font-size:.78rem; color:var(--text2); }
+    .drop-zone-text strong { color:var(--accent); }
+    .avatar-preview-wrap { display:flex; align-items:center; gap:1.2rem; margin-top:1rem; }
+    .avatar-preview-large {
+      width:72px; height:72px; border-radius:50%; border:2px solid var(--border2);
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      display:flex; align-items:center; justify-content:center; font-size:1.4rem;
+      font-weight:700; color:#fff; font-family:var(--font-d); overflow:hidden; flex-shrink:0;
+    }
+    .avatar-preview-large img { width:100%; height:100%; object-fit:cover; display:none; border-radius:50%; }
+
+    /* ═══ TOAST ═══ */
+    .toast {
+      position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%) translateY(70px);
+      background:var(--surface); border:1px solid var(--border2); border-radius:30px;
+      padding:.55rem 1.1rem; font-size:.8rem; font-weight:600; display:flex;
+      align-items:center; gap:.5rem; box-shadow:var(--shadow); z-index:9999;
+      opacity:0; transition:transform .3s cubic-bezier(.2,.8,.3,1),opacity .3s ease; pointer-events:none;
+    }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.ok i { color:var(--green); }
+    .toast.err i { color:var(--red); }
+    .toast.warn i { color:var(--gold2); }
+
+    /* ═══ MISC ═══ */
+    .powered-strip {
+      display:flex; align-items:center; justify-content:center; gap:.4rem; padding:.3rem;
+      background:var(--bg); border-top:1px solid var(--border); font-size:.64rem; color:var(--text2);
+      flex-shrink:0;
+    }
+    .powered-strip a { color:var(--accent); text-decoration:none; font-weight:600; }
+    .divider { height:1px; background:var(--border); margin:.6rem 0; }
+    .section-spacer { height:1.2rem; }
+
+    /* ═══ RESPONSIVE ═══ */
+    @media (max-width:1100px) {
+      .content-grid { grid-template-columns:1fr; }
+      .col-left,.col-right { grid-column:1/-1; }
+      .form-grid { grid-template-columns:1fr; }
+      .stats-grid { grid-template-columns:repeat(2,1fr); }
+    }
+    @media (max-width:768px) {
+      .sidebar { display:none; }
+      .sidebar.mobile-open { display:flex; width:var(--sidebar-w) !important; }
+      .page-header { padding:1rem 1rem .5rem; }
+      .profile-hero { margin:0 1rem 1rem; }
+      .hero-content { padding:1.5rem 1.2rem; gap:1.2rem; }
+      .hero-name { font-size:1.3rem; }
+      .hero-actions { align-items:flex-start; }
+      .content-grid { padding:0 1rem 2rem; gap:.9rem; }
+      .stats-grid { grid-template-columns:1fr 1fr; }
+      .status-grid { grid-template-columns:1fr; }
+      .main-tabs { display:none; }
+    }
+    @media (max-width:480px) {
+      .stats-grid { grid-template-columns:1fr; }
+      .theme-options { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<header class="topbar">
+  <a class="topbar-brand" href="dashboard.html" style="display:flex;align-items:center;gap:0.6rem;text-decoration:none;">
+    <img src="logo.png" alt="MailPilot Logo" class="brand-logo-img" style="height:38px;width:auto;display:block;object-fit:contain;border-radius:4px;">
+    <span class="brand-name">MailPilot</span>
+    <span class="brand-version">Studio</span>
+  </a>
+
+  <nav class="main-tabs" style="margin-left:1.5rem">
+    <button class="tab-btn" data-tab="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+    <button class="tab-btn" data-tab="composer"><i class="fa-solid fa-pen-nib"></i> Composer</button>
+    <button class="tab-btn" data-tab="members"><i class="fa-solid fa-users"></i> Members</button>
+    <button class="tab-btn" data-tab="broadcast"><i class="fa-solid fa-satellite-dish"></i> Broadcast</button>
+    <button class="tab-btn" data-tab="templates"><i class="fa-solid fa-layer-group"></i> Templates</button>
+    <button class="tab-btn" data-tab="stats"><i class="fa-solid fa-chart-line"></i> Analytics</button>
+    <button class="tab-btn" data-tab="settings"><i class="fa-solid fa-gear"></i> Settings</button>
+  </nav>
+
+  <div class="topbar-sep"></div>
+
+  <div class="topbar-actions">
+    <span id="member-count-badge" class="badge badge-blue"><i class="fa-solid fa-users"></i> <span id="top-member-count">0</span> members</span>
+    <button class="icon-btn" id="theme-toggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+    
+    <div class="profile-container" style="position: relative;">
+      <button class="icon-btn" id="profile-trigger" title="User settings" style="border-radius: 50%; overflow: hidden; padding: 0;">
+        <i class="fa-solid fa-user"></i>
+      </button>
+      <div class="profile-dropdown" id="profile-dropdown">
+        <div class="profile-header">
+          <div class="profile-avatar-lg">HV</div>
+          <div class="profile-info">
+            <h4>Harsh Vats</h4>
+            <p>harsh@mailpilot.app</p>
+          </div>
+        </div>
+        <div class="profile-menu">
+          <div class="profile-menu-item active" id="pd-profile" style="cursor:pointer">
+            <i class="fa-solid fa-user"></i>
+            <div>
+              <span>My Profile</span>
+              <small>View and edit profile</small>
+            </div>
+          </div>
+          <div class="profile-menu-item" id="pd-settings" style="cursor:pointer">
+            <i class="fa-solid fa-gear"></i>
+            <div>
+              <span>Settings</span>
+              <small>SMTP, branding & data</small>
+            </div>
+          </div>
+          <div class="profile-menu-item">
+            <i class="fa-solid fa-users"></i>
+            <div>
+              <span>Audience Size</span>
+              <small id="profile-db-count">0 members</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="app-body">
+
+  <!-- ══ MAIN CONTENT ══ -->
+  <main class="main-content" id="main-content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb">
+          <a href="dashboard.html">MailPilot</a><span class="sep">/</span>
+          <span>Profile</span>
+        </div>
+        <div class="page-title">My Profile</div>
+        <div class="page-sub">Manage your personal information and preferences</div>
+      </div>
+    </div>
+
+    <!-- ══ HERO ══ -->
+    <div class="profile-hero" id="profile-hero">
+      <div class="hero-bg-pattern"></div>
+      <div class="hero-grid-overlay"></div>
+      <div class="hero-content">
+        <div class="hero-avatar-wrap">
+          <div class="hero-avatar" id="hero-avatar">
+            <img id="hero-avatar-img" src="" alt="Avatar">
+            <span id="hero-avatar-initials">HV</span>
+          </div>
+          <label class="hero-avatar-upload-btn" for="avatar-file-input" title="Change photo">
+            <i class="fa-solid fa-camera"></i>
+          </label>
+          <input type="file" id="avatar-file-input" accept="image/*">
+        </div>
+        <div class="hero-info">
+          <div class="hero-name" id="hero-name">Harsh Vats</div>
+          <div class="hero-email"><i class="fa-solid fa-envelope"></i> <span id="hero-email">harsh@mailpilot.app</span></div>
+          <div class="hero-badges">
+            <span class="role-badge admin"><i class="fa-solid fa-shield-halved"></i> Admin</span>
+            <span class="role-badge pro"><i class="fa-solid fa-bolt"></i> Pro Plan</span>
+          </div>
+          <div class="hero-meta">
+            <div class="hero-meta-item"><i class="fa-solid fa-calendar"></i> Member since Jan 2025</div>
+            <div class="hero-meta-item"><i class="fa-solid fa-clock-rotate-left"></i> Updated <span id="last-updated-text">just now</span></div>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-gradient" id="hero-edit-btn"><i class="fa-solid fa-pen"></i> Edit Profile</button>
+          <button class="btn btn-outline btn-sm" id="hero-remove-photo-btn" style="display:none"><i class="fa-solid fa-trash"></i> Remove Photo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CONTENT GRID ══ -->
+    <div class="content-grid">
+
+      <!-- Personal Information -->
+      <div class="card col-left" id="personal-info-card">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><i class="fa-solid fa-user-pen"></i> Personal Information</div>
+            <div class="card-sub">Update your name, contact, and identity details</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="edit-toggle-btn"><i class="fa-solid fa-pen"></i> Edit</button>
+        </div>
+        <div class="card-body">
+          <form id="profile-form">
+            <div class="form-grid">
+              <div class="field">
+                <label>Full Name</label>
+                <input type="text" id="f-name" value="Harsh Vats" disabled>
+              </div>
+              <div class="field">
+                <label>Username</label>
+                <input type="text" id="f-username" value="@harshvats" disabled>
+              </div>
+              <div class="field">
+                <label>Email Address</label>
+                <input type="email" id="f-email" value="harsh@mailpilot.app" disabled>
+              </div>
+              <div class="field">
+                <label>Phone Number</label>
+                <input type="tel" id="f-phone" value="+91 98765 43210" disabled>
+              </div>
+              <div class="field">
+                <label>Country</label>
+                <select id="f-country" disabled>
+                  <option value="IN" selected>India</option>
+                  <option value="US">United States</option>
+                  <option value="GB">United Kingdom</option>
+                  <option value="CA">Canada</option>
+                  <option value="AU">Australia</option>
+                  <option value="DE">Germany</option>
+                  <option value="SG">Singapore</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Timezone</label>
+                <select id="f-timezone" disabled>
+                  <option value="IST" selected>IST (UTC+5:30)</option>
+                  <option value="UTC">UTC</option>
+                  <option value="EST">EST (UTC-5)</option>
+                  <option value="PST">PST (UTC-8)</option>
+                  <option value="GMT">GMT (UTC+0)</option>
+                  <option value="CET">CET (UTC+1)</option>
+                  <option value="SGT">SGT (UTC+8)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Preferred Language</label>
+                <select id="f-lang" disabled>
+                  <option value="en" selected>English</option>
+                  <option value="hi">Hindi</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                  <option value="de">German</option>
+                </select>
+              </div>
+              <div class="field form-full">
+                <label>Short Bio</label>
+                <textarea id="f-bio" rows="3" maxlength="200" disabled>Building MailPilot — a premium email campaign tool for modern teams. Passionate about clean UI and seamless developer experience.</textarea>
+                <div class="char-count" id="bio-counter">182 / 200</div>
+              </div>
+            </div>
+            <div class="form-actions" id="form-actions" style="display:none">
+              <button type="submit" class="btn btn-gradient" id="save-btn"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+              <button type="button" class="btn btn-outline" id="cancel-btn"><i class="fa-solid fa-xmark"></i> Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Profile Stats -->
+      <div class="card col-right">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><i class="fa-solid fa-chart-bar"></i> Profile Statistics</div>
+            <div class="card-sub">Your activity at a glance</div>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card" style="--gradient:linear-gradient(90deg,#4f8ef7,#6366f1)">
+            <div class="stat-icon" style="background:rgba(79,142,247,.12);color:var(--accent)"><i class="fa-solid fa-satellite-dish"></i></div>
+            <div class="stat-num" data-target="24">0</div>
+            <div class="stat-label">Campaigns Created</div>
+          </div>
+          <div class="stat-card" style="--gradient:linear-gradient(90deg,#a78bfa,#6366f1)">
+            <div class="stat-icon" style="background:rgba(167,139,250,.12);color:var(--purple)"><i class="fa-solid fa-layer-group"></i></div>
+            <div class="stat-num" data-target="11">0</div>
+            <div class="stat-label">Templates Created</div>
+          </div>
+          <div class="stat-card" style="--gradient:linear-gradient(90deg,#22d3a3,#22d3ee)">
+            <div class="stat-icon" style="background:rgba(34,211,163,.12);color:var(--green)"><i class="fa-solid fa-users"></i></div>
+            <div class="stat-num" data-target="4829">0</div>
+            <div class="stat-label">Contacts Imported</div>
+          </div>
+          <div class="stat-card" style="--gradient:linear-gradient(90deg,#f5a623,#f25c6e)">
+            <div class="stat-icon" style="background:rgba(245,166,35,.12);color:var(--gold2)"><i class="fa-solid fa-paper-plane"></i></div>
+            <div class="stat-num" data-target="52140">0</div>
+            <div class="stat-label">Emails Sent</div>
+          </div>
+          <div class="stat-card" style="--gradient:linear-gradient(90deg,#22d3ee,#4f8ef7)">
+            <div class="stat-icon" style="background:rgba(34,211,238,.12);color:var(--teal)"><i class="fa-solid fa-file-pen"></i></div>
+            <div class="stat-num" data-target="5">0</div>
+            <div class="stat-label">Draft Campaigns</div>
+          </div>
+          <div class="stat-card" style="--gradient:linear-gradient(90deg,#a78bfa,#22d3ee)">
+            <div class="stat-icon" style="background:rgba(99,102,241,.12);color:var(--accent2)"><i class="fa-solid fa-calendar-clock"></i></div>
+            <div class="stat-num" data-target="3">0</div>
+            <div class="stat-label">Scheduled</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notification Preferences -->
+      <div class="card col-left">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><i class="fa-solid fa-bell"></i> Notification Preferences</div>
+            <div class="card-sub">Choose what alerts you receive</div>
+          </div>
+        </div>
+        <div class="toggle-list">
+          <div class="toggle-item">
+            <div class="toggle-info">
+              <div class="toggle-name">Email Notifications</div>
+              <div class="toggle-desc">Receive emails for important account events</div>
+            </div>
+            <label class="toggle-switch"><input type="checkbox" checked id="notif-email"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-item">
+            <div class="toggle-info">
+              <div class="toggle-name">Campaign Notifications</div>
+              <div class="toggle-desc">Alerts when a campaign finishes sending</div>
+            </div>
+            <label class="toggle-switch"><input type="checkbox" checked id="notif-campaign"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-item">
+            <div class="toggle-info">
+              <div class="toggle-name">Security Alerts</div>
+              <div class="toggle-desc">New logins and suspicious activity</div>
+            </div>
+            <label class="toggle-switch"><input type="checkbox" checked id="notif-security"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-item">
+            <div class="toggle-info">
+              <div class="toggle-name">System Updates</div>
+              <div class="toggle-desc">Product updates, maintenance windows</div>
+            </div>
+            <label class="toggle-switch"><input type="checkbox" id="notif-system"><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+        <div style="padding:.5rem 1.2rem 1rem">
+          <button class="btn btn-gradient btn-sm" id="save-notifs-btn"><i class="fa-solid fa-floppy-disk"></i> Save Preferences</button>
+        </div>
+      </div>
+
+      <!-- Account Security -->
+      <div class="card col-left" id="security-card">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><i class="fa-solid fa-shield-halved"></i> Account Security</div>
+            <div class="card-sub">Set or update your MailPilot account login password</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <form id="password-form">
+            <div class="form-grid">
+              <div class="field form-full">
+                <label>New Password</label>
+                <div style="position: relative; display: flex; align-items: center;">
+                  <input type="password" id="new-password" placeholder="Enter new password" required style="padding-right: 2.5rem;">
+                  <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('new-password', this)" style="position: absolute; right: 10px; background: transparent; border: none; color: var(--text2); cursor: pointer; display: flex; align-items: center; justify-content: center; height: 100%;">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="field form-full">
+                <label>Confirm Password</label>
+                <div style="position: relative; display: flex; align-items: center;">
+                  <input type="password" id="confirm-password" placeholder="Confirm new password" required style="padding-right: 2.5rem;">
+                  <button type="button" class="password-toggle-btn" onclick="togglePassVisibility('confirm-password', this)" style="position: absolute; right: 10px; background: transparent; border: none; color: var(--text2); cursor: pointer; display: flex; align-items: center; justify-content: center; height: 100%;">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top: 1rem; font-size: 0.72rem; color: var(--text2); line-height: 1.45; display: flex; align-items: flex-start; gap: 0.4rem;">
+              <i class="fa-solid fa-circle-info" style="color: var(--accent); margin-top: 2px;"></i>
+              <span>Setting a password allows you to log in with your email address directly, even if your account was created using Google.</span>
+            </div>
+            <div class="form-actions" style="margin-top: 1rem;">
+              <button type="submit" class="btn btn-gradient" id="btn-save-password"><i class="fa-solid fa-key"></i> Set Password</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Appearance Settings -->
+      <div class="card col-right">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><i class="fa-solid fa-palette"></i> Appearance</div>
+            <div class="card-sub">Customize how MailPilot looks</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:.6rem">Theme</div>
+          <div class="theme-options">
+            <div class="theme-card selected" data-theme-val="dark" id="theme-dark-card">
+              <div class="theme-card-icon" style="background:rgba(10,15,30,.8);border:1px solid var(--border2);color:var(--accent)"><i class="fa-solid fa-moon"></i></div>
+              <div class="theme-card-info"><div class="theme-card-name">Dark Mode</div><div class="theme-card-sub">Easy on the eyes</div></div>
+            </div>
+            <div class="theme-card" data-theme-val="light" id="theme-light-card">
+              <div class="theme-card-icon" style="background:#f0f4fb;border:1px solid #dce5f5;color:#5a72a0"><i class="fa-solid fa-sun"></i></div>
+              <div class="theme-card-info"><div class="theme-card-name">Light Mode</div><div class="theme-card-sub">Clean and bright</div></div>
+            </div>
+          </div>
+          <div style="font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:.5rem">Accent Color</div>
+          <div class="accent-colors">
+            <div class="accent-dot active" style="background:#4f8ef7" data-accent="#4f8ef7" title="Blue"></div>
+            <div class="accent-dot" style="background:#6366f1" data-accent="#6366f1" title="Indigo"></div>
+            <div class="accent-dot" style="background:#a78bfa" data-accent="#a78bfa" title="Purple"></div>
+            <div class="accent-dot" style="background:#22d3a3" data-accent="#22d3a3" title="Teal"></div>
+            <div class="accent-dot" style="background:#f5a623" data-accent="#f5a623" title="Gold"></div>
+            <div class="accent-dot" style="background:#f25c6e" data-accent="#f25c6e" title="Red"></div>
+          </div>
+          <div class="divider"></div>
+          <div class="layout-options">
+            <div class="layout-opt">
+              <div><div class="layout-opt-label">Compact Layout</div><div class="layout-opt-sub">Reduce spacing between elements</div></div>
+              <label class="toggle-switch"><input type="checkbox" id="compact-toggle"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="layout-opt">
+              <div><div class="layout-opt-label">Collapsed Sidebar</div><div class="layout-opt-sub">Icons only by default</div></div>
+              <label class="toggle-switch"><input type="checkbox" id="sidebar-pref-toggle"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <button class="btn btn-gradient btn-sm" style="margin-top:.8rem" id="save-appearance-btn"><i class="fa-solid fa-floppy-disk"></i> Save Preferences</button>
+        </div>
+      </div>
+
+      <!-- Account Status -->
+      <div class="card col-full">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><i class="fa-solid fa-circle-check"></i> Account Status</div>
+            <div class="card-sub">Verification and connection health</div>
+          </div>
+        </div>
+        <div class="status-grid">
+          <div class="status-card">
+            <div class="status-card-top">
+              <div class="status-card-icon" style="background:rgba(34,211,163,.12);color:var(--green)"><i class="fa-solid fa-envelope-circle-check"></i></div>
+              <span class="status-badge badge-ok">Verified</span>
+            </div>
+            <div class="status-card-name">Email Verification</div>
+            <div class="status-card-sub">harsh@mailpilot.app is confirmed</div>
+          </div>
+          <div class="status-card">
+            <div class="status-card-top">
+              <div class="status-card-icon" style="background:rgba(79,142,247,.12);color:var(--accent)"><i class="fa-solid fa-user-check"></i></div>
+              <span class="status-badge badge-info">82%</span>
+            </div>
+            <div class="status-card-name">Profile Completion</div>
+            <div class="status-card-sub">Add phone and bio to reach 100%</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2))" data-width="82"></div></div>
+          </div>
+          <div class="status-card">
+            <div class="status-card-top">
+              <div class="status-card-icon" style="background:rgba(34,211,163,.12);color:var(--green)"><i class="fa-solid fa-server"></i></div>
+              <span class="status-badge badge-ok">Connected</span>
+            </div>
+            <div class="status-card-name">SMTP Server</div>
+            <div class="status-card-sub">smtp.mailpilot.app · Port 587</div>
+          </div>
+          <div class="status-card">
+            <div class="status-card-top">
+              <div class="status-card-icon" style="background:rgba(34,211,163,.12);color:var(--green)"><i class="fa-solid fa-database"></i></div>
+              <span class="status-badge badge-ok">Connected</span>
+            </div>
+            <div class="status-card-name">Database</div>
+            <div class="status-card-sub">Supabase · 4,829 rows synced</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="card col-left">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity</div>
+            <div class="card-sub">Your latest actions in MailPilot</div>
+          </div>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="tl-icon" style="background:rgba(34,211,163,.1);color:var(--green);border-color:rgba(34,211,163,.2)"><i class="fa-solid fa-right-to-bracket"></i></div>
+            <div class="tl-content"><div class="tl-title">Logged In</div><div class="tl-sub">Session started from Chrome on Windows</div><div class="tl-time"><i class="fa-regular fa-clock"></i> Today, 10:42 AM</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-icon" style="background:rgba(79,142,247,.1);color:var(--accent);border-color:rgba(79,142,247,.2)"><i class="fa-solid fa-satellite-dish"></i></div>
+            <div class="tl-content"><div class="tl-title">Campaign Created</div><div class="tl-sub">"Summer Outreach 2025" — 2,140 recipients</div><div class="tl-time"><i class="fa-regular fa-clock"></i> Yesterday, 3:18 PM</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-icon" style="background:rgba(167,139,250,.1);color:var(--purple);border-color:rgba(167,139,250,.2)"><i class="fa-solid fa-user-pen"></i></div>
+            <div class="tl-content"><div class="tl-title">Profile Updated</div><div class="tl-sub">Bio and timezone changed</div><div class="tl-time"><i class="fa-regular fa-clock"></i> 2 days ago</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-icon" style="background:rgba(34,211,163,.1);color:var(--green);border-color:rgba(34,211,163,.2)"><i class="fa-solid fa-users"></i></div>
+            <div class="tl-content"><div class="tl-title">Contacts Imported</div><div class="tl-sub">48 contacts added from CSV upload</div><div class="tl-time"><i class="fa-regular fa-clock"></i> 3 days ago</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-icon" style="background:rgba(245,166,35,.1);color:var(--gold2);border-color:rgba(245,166,35,.2)"><i class="fa-solid fa-layer-group"></i></div>
+            <div class="tl-content"><div class="tl-title">Template Saved</div><div class="tl-sub">"Event Invite Dark" — marked as default</div><div class="tl-time"><i class="fa-regular fa-clock"></i> 4 days ago</div></div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-icon" style="background:rgba(242,92,110,.1);color:var(--red);border-color:rgba(242,92,110,.2)"><i class="fa-solid fa-server"></i></div>
+            <div class="tl-content"><div class="tl-title">SMTP Updated</div><div class="tl-sub">Port changed from 465 to 587</div><div class="tl-time"><i class="fa-regular fa-clock"></i> 6 days ago</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Avatar Upload Card -->
+      <div class="card col-right">
+        <div class="card-header">
+          <div>
+            <div class="card-title"><i class="fa-solid fa-image"></i> Avatar Upload</div>
+            <div class="card-sub">Drag & drop or browse to upload</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="drop-zone" id="drop-zone">
+            <div class="drop-zone-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <div class="drop-zone-text"><strong>Drop image here</strong> or click to browse<br><span style="font-size:.68rem">PNG, JPG, WEBP up to 5MB</span></div>
+          </div>
+          <div class="avatar-preview-wrap">
+            <div class="avatar-preview-large" id="avatar-preview-large">
+              <img id="avatar-preview-img" src="" alt="Preview">
+              <span id="avatar-preview-initials">HV</span>
+            </div>
+            <div>
+              <div style="font-size:.8rem;font-weight:600;margin-bottom:.3rem">Current Avatar</div>
+              <div style="font-size:.72rem;color:var(--text2);margin-bottom:.7rem" id="avatar-filename">No file selected</div>
+              <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+                <label for="avatar-file-input" class="btn btn-primary btn-sm"><i class="fa-solid fa-upload"></i> Upload</label>
+                <button class="btn btn-danger btn-sm" id="remove-avatar-btn"><i class="fa-solid fa-trash"></i> Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content-grid -->
+  </main>
+</div><!-- /app-body -->
+
+<!-- Footer -->
+<div class="powered-strip">
+  <i class="fa-solid fa-bolt" style="color:var(--accent);font-size:.6rem"></i>
+  MailPilot v1.0 &nbsp;·&nbsp; Connected to Supabase &nbsp;·&nbsp; Made with <span style="color:var(--red);margin:0 .1rem">❤️</span> by Harsh Vats
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toast-msg"></span></div>
+
+<!-- Core Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="common.js"></script>
+<script>
+/* ══ PROFILE METADATA SYNC ══ */
+async function loadUserProfile() {
+  const client = initSupabaseClient();
+  if (!client) {
+    setTimeout(loadUserProfile, 100);
+    return;
+  }
+  try {
+    let user = null;
+    try {
+      const { data } = await client.auth.getUser();
+      user = data?.user;
+    } catch (e) {
+      console.warn('getUser failed, checking session cache:', e);
+    }
+    
+    if (!user) {
+      const { data } = await client.auth.getSession();
+      user = data?.session?.user;
+    }
+    
+    if (!user) return;
+
+    // Populate profile details
+    const name = user.user_metadata?.full_name || '';
+    const username = user.user_metadata?.username || '';
+    const email = user.email || '';
+    const phone = user.user_metadata?.phone || '';
+    const country = user.user_metadata?.country || 'IN';
+    const timezone = user.user_metadata?.timezone || 'IST';
+    const lang = user.user_metadata?.lang || 'en';
+    const bio = user.user_metadata?.bio || '';
+    const avatarUrl = user.user_metadata?.avatar_url || '';
+
+    // Form inputs
+    document.getElementById('f-name').value = name;
+    document.getElementById('f-username').value = username;
+    document.getElementById('f-email').value = email;
+    document.getElementById('f-phone').value = phone;
+    document.getElementById('f-country').value = country;
+    document.getElementById('f-timezone').value = timezone;
+    document.getElementById('f-lang').value = lang;
+    document.getElementById('f-bio').value = bio;
+
+    // Hero display
+    document.getElementById('hero-name').textContent = name || email.split('@')[0];
+    document.getElementById('hero-email').textContent = email;
+
+    // Initials & Avatars
+    const initialsStr = initials(name || email.split('@')[0]);
+    
+    // Set initials in hero avatar and preview avatar
+    const heroInitialsEl = document.getElementById('hero-avatar-initials');
+    if (heroInitialsEl) heroInitialsEl.textContent = initialsStr;
+    const previewInitialsEl = document.getElementById('avatar-preview-initials');
+    if (previewInitialsEl) previewInitialsEl.textContent = initialsStr;
+
+    const heroImgEl = document.getElementById('hero-avatar-img');
+    const previewImgEl = document.getElementById('avatar-preview-img');
+    const removeBtn = document.getElementById('hero-remove-photo-btn');
+
+    if (avatarUrl) {
+      if (heroImgEl) {
+        heroImgEl.src = avatarUrl;
+        heroImgEl.style.display = 'block';
+      }
+      if (heroInitialsEl) heroInitialsEl.style.display = 'none';
+      
+      if (previewImgEl) {
+        previewImgEl.src = avatarUrl;
+        previewImgEl.style.display = 'block';
+      }
+      if (previewInitialsEl) previewInitialsEl.style.display = 'none';
+      if (removeBtn) removeBtn.style.display = '';
+    } else {
+      if (heroImgEl) heroImgEl.style.display = 'none';
+      if (heroInitialsEl) heroInitialsEl.style.display = 'block';
+      if (previewImgEl) previewImgEl.style.display = 'none';
+      if (previewInitialsEl) previewInitialsEl.style.display = 'block';
+      if (removeBtn) removeBtn.style.display = 'none';
+    }
+
+    // Set stats and other dynamic counts
+    const totalMembers = STATE.members ? STATE.members.length : 0;
+    
+    // Update Stats Card targets
+    const membersStatCard = document.querySelector('.stat-card i.fa-users')?.parentElement?.querySelector('.stat-num');
+    if (membersStatCard) {
+      membersStatCard.setAttribute('data-target', totalMembers);
+      membersStatCard.textContent = totalMembers;
+    }
+    
+    // Update DB status card subtitle
+    const dbStatusSub = document.querySelector('.status-card i.fa-database')?.parentElement?.parentElement?.querySelector('.status-card-sub');
+    if (dbStatusSub) {
+      dbStatusSub.textContent = `Supabase · ${totalMembers} rows synced`;
+    }
+
+    // Initialize UI theme states
+    const activeTheme = localStorage.getItem('mf_theme') || 'dark';
+    updateThemeUI(activeTheme);
+
+    // Initialize UI accent dot
+    const activeAccent = localStorage.getItem('mp_accent_color') || '#4f8ef7';
+    document.documentElement.style.setProperty('--accent', activeAccent);
+    document.querySelectorAll('.accent-dot').forEach(dot => {
+      dot.classList.toggle('active', dot.dataset.accent === activeAccent);
+    });
+
+  } catch (err) {
+    console.error('loadUserProfile error:', err);
+  }
+}
+
+/* ══ THEME ══ */
+function updateThemeUI(theme) {
+  const darkCard = document.getElementById('theme-dark-card');
+  const lightCard = document.getElementById('theme-light-card');
+  if (darkCard) darkCard.classList.toggle('selected', theme === 'dark');
+  if (lightCard) lightCard.classList.toggle('selected', theme === 'light');
+}
+
+document.querySelectorAll('.theme-card').forEach(c => {
+  c.addEventListener('click', () => {
+    const t = c.dataset.themeVal;
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('mf_theme', t);
+    updateThemeUI(t);
+    // Update toggle icon in topbar
+    const themeBtn = document.getElementById('theme-toggle');
+    if (themeBtn) {
+      themeBtn.querySelector('i').className = `fa-solid fa-${t === 'dark' ? 'moon' : 'sun'}`;
+    }
+    showToast('Theme updated to ' + (t === 'dark' ? 'Dark Mode' : 'Light Mode'));
+  });
+});
+
+/* ══ AVATAR UPLOAD ══ */
+const avatarFileInput = document.getElementById('avatar-file-input');
+const heroAvatarImg = document.getElementById('hero-avatar-img');
+const heroAvatarInitials = document.getElementById('hero-avatar-initials');
+const avatarPreviewImg = document.getElementById('avatar-preview-img');
+const avatarPreviewInitials = document.getElementById('avatar-preview-initials');
+const avatarFilename = document.getElementById('avatar-filename');
+const heroRemoveBtn = document.getElementById('hero-remove-photo-btn');
+const dropZone = document.getElementById('drop-zone');
+
+function applyAvatar(file) {
+  if (!file || !file.type.startsWith('image/')) { showToast('Please upload a valid image', 'err'); return; }
+  if (file.size > 5 * 1024 * 1024) { showToast('Image too large (max 5MB)', 'err'); return; }
+  const reader = new FileReader();
+  reader.onload = async e => {
+    const src = e.target.result;
+    if (heroAvatarImg) { heroAvatarImg.src = src; heroAvatarImg.style.display = 'block'; }
+    if (heroAvatarInitials) heroAvatarInitials.style.display = 'none';
+    if (avatarPreviewImg) { avatarPreviewImg.src = src; avatarPreviewImg.style.display = 'block'; }
+    if (avatarPreviewInitials) avatarPreviewInitials.style.display = 'none';
+    if (avatarFilename) avatarFilename.textContent = file.name;
+    if (heroRemoveBtn) heroRemoveBtn.style.display = '';
+    
+    const client = initSupabaseClient();
+    if (client) {
+      try {
+        const { error } = await client.auth.updateUser({
+          data: { avatar_url: src }
+        });
+        if (error) throw error;
+        showToast('Avatar updated successfully');
+        const { data: { session } } = await client.auth.getSession();
+        if (session?.user) updateProfileDropdownWithUser(session.user);
+      } catch (err) {
+        console.warn('updateUser avatar error, fallback to offline local storage:', err);
+        try {
+          const { data: { session } } = await client.auth.getSession();
+          if (session && session.user) {
+            let userCopy = JSON.parse(JSON.stringify(session.user));
+            userCopy.user_metadata = {
+              ...userCopy.user_metadata,
+              avatar_url: src
+            };
+            const storageKey = `sb-${SUPABASE_URL.split('://')[1].split('.')[0]}-auth-token`;
+            const cachedSessionStr = localStorage.getItem(storageKey);
+            if (cachedSessionStr) {
+              const cachedSession = JSON.parse(cachedSessionStr);
+              cachedSession.user = userCopy;
+              localStorage.setItem(storageKey, JSON.stringify(cachedSession));
+            }
+            updateProfileDropdownWithUser(userCopy);
+            showToast('Avatar updated (offline mode - saved locally)');
+          } else {
+            showToast(err.message || 'Error updating avatar', 'err');
+          }
+        } catch (localErr) {
+          showToast(err.message || 'Error updating avatar', 'err');
+        }
+      }
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+if (avatarFileInput) {
+  avatarFileInput.addEventListener('change', e => { if (e.target.files[0]) applyAvatar(e.target.files[0]); });
+}
+
+if (dropZone) {
+  dropZone.addEventListener('click', () => avatarFileInput.click());
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault(); dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) applyAvatar(file);
+  });
+}
+
+async function removeAvatar() {
+  if (heroAvatarImg) { heroAvatarImg.src = ''; heroAvatarImg.style.display = 'none'; }
+  if (heroAvatarInitials) heroAvatarInitials.style.display = '';
+  if (avatarPreviewImg) { avatarPreviewImg.src = ''; avatarPreviewImg.style.display = 'none'; }
+  if (avatarPreviewInitials) avatarPreviewInitials.style.display = '';
+  if (avatarFilename) avatarFilename.textContent = 'No file selected';
+  if (heroRemoveBtn) heroRemoveBtn.style.display = 'none';
+  if (avatarFileInput) avatarFileInput.value = '';
+
+  const client = initSupabaseClient();
+  if (client) {
+    try {
+      const { error } = await client.auth.updateUser({
+        data: { avatar_url: null }
+      });
+      if (error) throw error;
+      showToast('Avatar removed', 'warn');
+      const { data: { session } } = await client.auth.getSession();
+      if (session?.user) updateProfileDropdownWithUser(session.user);
+    } catch (err) {
+      console.warn('removeAvatar error, fallback to offline local storage:', err);
+      try {
+        const { data: { session } } = await client.auth.getSession();
+        if (session && session.user) {
+          let userCopy = JSON.parse(JSON.stringify(session.user));
+          userCopy.user_metadata = {
+            ...userCopy.user_metadata,
+            avatar_url: null
+          };
+          const storageKey = `sb-${SUPABASE_URL.split('://')[1].split('.')[0]}-auth-token`;
+          const cachedSessionStr = localStorage.getItem(storageKey);
+          if (cachedSessionStr) {
+            const cachedSession = JSON.parse(cachedSessionStr);
+            cachedSession.user = userCopy;
+            localStorage.setItem(storageKey, JSON.stringify(cachedSession));
+          }
+          updateProfileDropdownWithUser(userCopy);
+          showToast('Avatar removed (offline mode - saved locally)', 'warn');
+        } else {
+          showToast(err.message || 'Error removing avatar', 'err');
+        }
+      } catch (localErr) {
+        showToast(err.message || 'Error removing avatar', 'err');
+      }
+    }
+  }
+}
+
+document.getElementById('remove-avatar-btn')?.addEventListener('click', removeAvatar);
+heroRemoveBtn?.addEventListener('click', removeAvatar);
+
+/* ══ PROFILE FORM ══ */
+const formFields = ['f-name','f-username','f-email','f-phone','f-country','f-timezone','f-lang','f-bio'];
+let isEditing = false;
+
+function setFormEditable(editable) {
+  isEditing = editable;
+  formFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      // Don't allow editing email address as it is the primary login identifier in Auth
+      if (id === 'f-email') el.disabled = true;
+      else el.disabled = !editable;
+    }
+  });
+  document.getElementById('form-actions').style.display = editable ? 'flex' : 'none';
+  const editBtn = document.getElementById('edit-toggle-btn');
+  if (editBtn) {
+    editBtn.innerHTML = editable ? '<i class="fa-solid fa-xmark"></i> Cancel' : '<i class="fa-solid fa-pen"></i> Edit';
+  }
+}
+
+document.getElementById('edit-toggle-btn')?.addEventListener('click', () => {
+  if (isEditing) { setFormEditable(false); showToast('Edit cancelled', 'warn'); }
+  else setFormEditable(true);
+});
+
+document.getElementById('hero-edit-btn')?.addEventListener('click', () => {
+  setFormEditable(true);
+  document.getElementById('personal-info-card').scrollIntoView({ behavior:'smooth', block:'start' });
+});
+
+document.getElementById('cancel-btn')?.addEventListener('click', () => {
+  setFormEditable(false); showToast('Changes discarded', 'warn');
+  loadUserProfile(); // Reload original values
+});
+
+document.getElementById('profile-form')?.addEventListener('submit', async e => {
+  e.preventDefault();
+  const name = document.getElementById('f-name').value.trim();
+  const username = document.getElementById('f-username').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const country = document.getElementById('f-country').value;
+  const timezone = document.getElementById('f-timezone').value;
+  const lang = document.getElementById('f-lang').value;
+  const bio = document.getElementById('f-bio').value.trim();
+
+  if (!name) { showToast('Full name is required', 'err'); return; }
+
+  const client = initSupabaseClient();
+  if (!client) {
+    showToast('Supabase client not ready', 'err');
+    return;
+  }
+
+  try {
+    const { data, error } = await client.auth.updateUser({
+      data: {
+        full_name: name,
+        username: username,
+        phone: phone,
+        country: country,
+        timezone: timezone,
+        lang: lang,
+        bio: bio
+      }
+    });
+
+    if (error) {
+      showToast(error.message, 'err');
+      return;
+    }
+
+    // Update hero
+    document.getElementById('hero-name').textContent = name;
+    
+    // Update initials
+    const initialsStr = initials(name);
+    const heroInitialsEl = document.getElementById('hero-avatar-initials');
+    if (heroInitialsEl) heroInitialsEl.textContent = initialsStr;
+    const previewInitialsEl = document.getElementById('avatar-preview-initials');
+    if (previewInitialsEl) previewInitialsEl.textContent = initialsStr;
+
+    // Trigger common.js topbar update
+    updateProfileDropdownWithUser(data.user);
+
+    document.getElementById('last-updated-text').textContent = 'just now';
+    setFormEditable(false);
+    animateSaveBtn();
+    showToast('Profile saved successfully');
+  } catch (err) {
+    console.warn('updateUser profile error, fallback to offline local storage:', err);
+    try {
+      const { data: { session } } = await client.auth.getSession();
+      if (session && session.user) {
+        let userCopy = JSON.parse(JSON.stringify(session.user));
+        userCopy.user_metadata = {
+          ...userCopy.user_metadata,
+          full_name: name,
+          username: username,
+          phone: phone,
+          country: country,
+          timezone: timezone,
+          lang: lang,
+          bio: bio
+        };
+        
+        // Find the Supabase auth token storage key in localStorage
+        const storageKey = `sb-${SUPABASE_URL.split('://')[1].split('.')[0]}-auth-token`;
+        const cachedSessionStr = localStorage.getItem(storageKey);
+        if (cachedSessionStr) {
+          const cachedSession = JSON.parse(cachedSessionStr);
+          cachedSession.user = userCopy;
+          localStorage.setItem(storageKey, JSON.stringify(cachedSession));
+        }
+        
+        // Update hero and UI locally
+        document.getElementById('hero-name').textContent = name;
+        const initialsStr = initials(name);
+        const heroInitialsEl = document.getElementById('hero-avatar-initials');
+        if (heroInitialsEl) heroInitialsEl.textContent = initialsStr;
+        const previewInitialsEl = document.getElementById('avatar-preview-initials');
+        if (previewInitialsEl) previewInitialsEl.textContent = initialsStr;
+        
+        updateProfileDropdownWithUser(userCopy);
+        
+        document.getElementById('last-updated-text').textContent = 'just now';
+        setFormEditable(false);
+        animateSaveBtn();
+        showToast('Profile updated (offline mode - saved locally)');
+        return;
+      }
+    } catch (localErr) {
+      console.error("Local storage fallback failed:", localErr);
+    }
+    showToast(err.message || 'Error saving profile', 'err');
+  }
+});
+
+function animateSaveBtn() {
+  const btn = document.getElementById('save-btn');
+  if (!btn) return;
+  btn.innerHTML = '<i class="fa-solid fa-check"></i> Saved!';
+  btn.style.background = 'var(--green)';
+  setTimeout(() => {
+    btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
+    btn.style.background = '';
+  }, 2000);
+}
+
+/* ══ BIO COUNTER ══ */
+const bioEl = document.getElementById('f-bio');
+const counter = document.getElementById('bio-counter');
+function updateCounter() {
+  if (!bioEl || !counter) return;
+  const len = bioEl.value.length, max = 200;
+  counter.textContent = len + ' / ' + max;
+  counter.className = 'char-count' + (len > 180 ? ' danger' : len > 150 ? ' warn' : '');
+}
+if (bioEl) {
+  bioEl.addEventListener('input', updateCounter);
+  updateCounter();
+}
+
+/* ══ NOTIFICATION PREFS SAVE ══ */
+document.getElementById('save-notifs-btn')?.addEventListener('click', () => {
+  showToast('Notification preferences saved');
+});
+
+/* ══ APPEARANCE PREFS SAVE ══ */
+document.getElementById('save-appearance-btn')?.addEventListener('click', () => {
+  const compact = document.getElementById('compact-toggle')?.checked;
+  document.body.style.fontSize = compact ? '12.5px' : '';
+  showToast('Appearance preferences saved');
+});
+
+/* ══ ACCENT COLORS ══ */
+document.querySelectorAll('.accent-dot').forEach(dot => {
+  dot.addEventListener('click', () => {
+    document.querySelectorAll('.accent-dot').forEach(d => d.classList.remove('active'));
+    dot.classList.add('active');
+    const color = dot.dataset.accent;
+    document.documentElement.style.setProperty('--accent', color);
+    localStorage.setItem('mp_accent_color', color);
+    showToast('Accent color updated');
+  });
+});
+
+/* ══ ANIMATED COUNTERS ══ */
+function animateCounters() {
+  document.querySelectorAll('.stat-num[data-target]').forEach(el => {
+    const target = parseInt(el.dataset.target);
+    const duration = 1400;
+    const start = performance.now();
+    function frame(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(ease * target).toLocaleString();
+      if (progress < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+/* ══ PROGRESS BARS ══ */
+function animateProgress() {
+  document.querySelectorAll('.progress-fill[data-width]').forEach(el => {
+    setTimeout(() => { el.style.width = el.dataset.width + '%'; }, 300);
+  });
+}
+
+/* ══ INTERSECTION OBSERVER ══ */
+const statsSection = document.querySelector('.stats-grid');
+if (statsSection) {
+  const obs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) { animateCounters(); obs.disconnect(); }
+  }, { threshold:.2 });
+  obs.observe(statsSection);
+}
+
+const statusSection = document.querySelector('.status-grid');
+if (statusSection) {
+  const obs2 = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) { animateProgress(); obs2.disconnect(); }
+  }, { threshold:.2 });
+  obs2.observe(statusSection);
+}
+
+/* ══ KEYBOARD SHORTCUTS ══ */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.profile-dropdown,.notif-dropdown').forEach(d => d.classList.remove('show'));
+    if (isEditing) setFormEditable(false);
+  }
+});
+
+/* ══ ACCOUNT SECURITY FORM ══ */
+function togglePassVisibility(id, btn) {
+  const input = document.getElementById(id);
+  const icon = btn.querySelector('i');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.classList.remove('fa-eye');
+    icon.classList.add('fa-eye-slash');
+  } else {
+    input.type = 'password';
+    icon.classList.remove('fa-eye-slash');
+    icon.classList.add('fa-eye');
+  }
+}
+
+document.getElementById('password-form')?.addEventListener('submit', async e => {
+  e.preventDefault();
+  const newPass = document.getElementById('new-password').value;
+  const confirmPass = document.getElementById('confirm-password').value;
+
+  if (newPass.length < 6) {
+    showToast('Password must be at least 6 characters long', 'err');
+    return;
+  }
+  if (newPass !== confirmPass) {
+    showToast('Passwords do not match', 'err');
+    return;
+  }
+
+  const client = initSupabaseClient();
+  if (!client) {
+    showToast('Supabase client not ready', 'err');
+    return;
+  }
+
+  const saveBtn = document.getElementById('btn-save-password');
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating...';
+
+  try {
+    const { error } = await client.auth.updateUser({ password: newPass });
+    if (error) throw error;
+    showToast('Password set successfully!');
+    document.getElementById('password-form').reset();
+  } catch (err) {
+    showToast(err.message || 'Error updating password', 'err');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = '<i class="fa-solid fa-key"></i> Set Password';
+  }
+});
+
+/* ══ INIT PROFILE ══ */
+document.addEventListener('DOMContentLoaded', () => {
+  loadUserProfile();
+});
+</script>
+</body>
+</html>

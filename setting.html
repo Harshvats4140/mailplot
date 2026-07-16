@@ -1,0 +1,2851 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings — MailPilot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="common.js" defer></script>
+    <style>
+        /* ── LEFT NAV ── */
+        .settings-nav {
+            width: var(--settings-nav-w);
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            flex-shrink: 0;
+            padding: 1.2rem 0.9rem;
+        }
+
+        .settings-nav::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .settings-nav::-webkit-scrollbar-thumb {
+            background: var(--surface2);
+            border-radius: 4px;
+        }
+
+        .nav-group {
+            margin-bottom: 1.4rem;
+        }
+
+        .nav-group-title {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text2);
+            padding: 0 0.6rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.55rem 0.7rem;
+            border-radius: var(--r);
+            cursor: pointer;
+            color: var(--text2);
+            font-size: 0.84rem;
+            font-weight: 500;
+            transition: all 0.16s;
+            margin-bottom: 0.1rem;
+            border: 1px solid transparent;
+        }
+
+        .nav-item i {
+            width: 16px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .nav-item:hover {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: rgba(79, 142, 247, 0.1);
+            color: var(--accent);
+            border-color: rgba(79, 142, 247, 0.25);
+        }
+
+        .nav-item .item-dot {
+            margin-left: auto;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            flex-shrink: 0;
+        }
+
+        /* ── MAIN CONTENT ── */
+        .settings-main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem 2.5rem 4rem;
+        }
+
+        .settings-main::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .settings-main::-webkit-scrollbar-thumb {
+            background: var(--surface2);
+            border-radius: 4px;
+        }
+
+        .settings-section {
+            display: none;
+            max-width: 760px;
+        }
+
+        .settings-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .section-head {
+            margin-bottom: 1.6rem;
+        }
+
+        .section-head h1 {
+            font-family: var(--font-d);
+            font-size: 1.6rem;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+        }
+
+        .section-head p {
+            font-size: 0.85rem;
+            color: var(--text2);
+        }
+
+        /* ── CARD ── */
+        .s-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--r2);
+            padding: 1.4rem 1.5rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .s-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .s-card-head h3 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .s-card-head h3 i {
+            color: var(--gold);
+            font-size: 0.85rem;
+        }
+
+        .s-card-sub {
+            font-size: 0.78rem;
+            color: var(--text2);
+            margin-top: -0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ── FORM ── */
+        .field {
+            margin-bottom: 0.95rem;
+        }
+
+        .field:last-child {
+            margin-bottom: 0;
+        }
+
+        .field label {
+            display: block;
+            font-size: 0.71rem;
+            font-weight: 600;
+            color: var(--text2);
+            margin-bottom: 0.35rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .field input,
+        .field textarea,
+        .field select {
+            width: 100%;
+            padding: 0.55rem 0.75rem;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.86rem;
+            outline: none;
+            transition: border 0.18s;
+        }
+
+        .field input:focus,
+        .field textarea:focus,
+        .field select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.12);
+        }
+
+        .field-tip {
+            font-size: 0.7rem;
+            color: var(--text2);
+            margin-top: 0.35rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.35rem;
+            line-height: 1.45;
+        }
+
+        .field-tip i {
+            color: var(--gold);
+            margin-top: 0.12rem;
+            flex-shrink: 0;
+        }
+
+        .field-tip code {
+            background: var(--surface2);
+            padding: 0.05rem 0.35rem;
+            border-radius: 4px;
+            font-family: var(--font-m);
+            font-size: 0.68rem;
+        }
+
+        .field-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.7rem;
+        }
+
+        .field-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.7rem;
+        }
+
+        .input-with-action {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .input-with-action input {
+            flex: 1;
+        }
+
+        /* Password toggle */
+        .pw-wrap {
+            position: relative;
+        }
+
+        .pw-wrap input {
+            padding-right: 2.4rem;
+        }
+
+        .pw-toggle {
+            position: absolute;
+            right: 0.6rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text2);
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 0.2rem;
+        }
+
+        .pw-toggle:hover {
+            color: var(--text);
+        }
+
+        /* ── SWITCH (TOGGLE) ── */
+        .switch-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .switch-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .switch-row:first-child {
+            padding-top: 0;
+        }
+
+        .switch-info strong {
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+
+        .switch-info span {
+            font-size: 0.76rem;
+            color: var(--text2);
+        }
+
+        .switch {
+            position: relative;
+            width: 42px;
+            height: 24px;
+            flex-shrink: 0;
+            margin-left: 1rem;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch-slider {
+            position: absolute;
+            inset: 0;
+            background: var(--surface2);
+            border-radius: 24px;
+            cursor: pointer;
+            transition: background 0.25s;
+            border: 1px solid var(--border2);
+        }
+
+        .switch-slider::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            left: 3px;
+            top: 3px;
+            background: var(--text2);
+            border-radius: 50%;
+            transition: transform 0.25s, background 0.25s;
+        }
+
+        .switch input:checked+.switch-slider {
+            background: rgba(79, 142, 247, 0.25);
+            border-color: var(--accent);
+        }
+
+        .switch input:checked+.switch-slider::before {
+            transform: translateX(18px);
+            background: var(--accent);
+        }
+
+        /* ── COLOR ROW ── */
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .c-dot {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform 0.18s, border-color 0.18s;
+            flex-shrink: 0;
+        }
+
+        .c-dot:hover {
+            transform: scale(1.15);
+        }
+
+        .c-dot.active {
+            border-color: var(--text);
+            transform: scale(1.1);
+        }
+
+        input[type="color"] {
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            cursor: pointer;
+            padding: 2px;
+            background: none;
+            outline: none;
+            flex-shrink: 0;
+        }
+
+        /* ── LOGO UPLOAD ── */
+        .logo-upload-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-preview {
+            width: 64px;
+            height: 64px;
+            border-radius: var(--r);
+            background: var(--bg3);
+            border: 1px dashed var(--border2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+            font-size: 1.4rem;
+            color: var(--text2);
+        }
+
+        .logo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.45rem 0.95rem;
+            border-radius: var(--r);
+            border: 1px solid transparent;
+            font-family: var(--font);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn i {
+            font-size: 0.76rem;
+        }
+
+        .btn-sm {
+            padding: 0.32rem 0.7rem;
+            font-size: 0.76rem;
+        }
+
+        .btn-block {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .btn-primary:hover {
+            background: #3a7de8;
+        }
+
+        .btn-green {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .btn-green:hover {
+            background: #1a7a2e;
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: #000;
+            border-color: var(--gold);
+        }
+
+        .btn-gold:hover {
+            background: #c08a1c;
+        }
+
+        .btn-red {
+            background: var(--red);
+            color: #fff;
+            border-color: var(--red);
+        }
+
+        .btn-red:hover {
+            background: #bf2724;
+        }
+
+        .btn-outline {
+            background: none;
+            color: var(--text);
+            border-color: var(--border2);
+        }
+
+        .btn-outline:hover {
+            background: var(--surface);
+        }
+
+        .btn-ghost {
+            background: none;
+            color: var(--text2);
+            border-color: transparent;
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .btn-danger-outline {
+            background: none;
+            color: var(--red2);
+            border-color: rgba(218, 54, 51, 0.35);
+        }
+
+        .btn-danger-outline:hover {
+            background: rgba(218, 54, 51, 0.1);
+        }
+
+        /* ── ALERT BOXES ── */
+        .alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.65rem;
+            padding: 0.85rem 1rem;
+            border-radius: var(--r);
+            font-size: 0.8rem;
+            line-height: 1.55;
+            margin-bottom: 1rem;
+        }
+
+        .alert i {
+            margin-top: 0.1rem;
+            flex-shrink: 0;
+        }
+
+        .alert-info {
+            background: rgba(31, 111, 235, 0.08);
+            border: 1px solid rgba(31, 111, 235, 0.2);
+            color: var(--text2);
+        }
+
+        .alert-info i {
+            color: var(--text3);
+        }
+
+        .alert-warn {
+            background: rgba(210, 153, 34, 0.08);
+            border: 1px solid rgba(210, 153, 34, 0.2);
+            color: var(--text2);
+        }
+
+        .alert-warn i {
+            color: var(--gold2);
+        }
+
+        .alert-danger {
+            background: rgba(218, 54, 51, 0.08);
+            border: 1px solid rgba(218, 54, 51, 0.25);
+            color: var(--text2);
+        }
+
+        .alert-danger i {
+            color: var(--red2);
+        }
+
+        .alert strong {
+            color: var(--text);
+        }
+
+        /* ── DANGER ZONE ── */
+        .danger-card {
+            border: 1px solid rgba(218, 54, 51, 0.3);
+            background: rgba(218, 54, 51, 0.04);
+        }
+
+        .danger-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(218, 54, 51, 0.15);
+            gap: 1rem;
+        }
+
+        .danger-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .danger-row:first-child {
+            padding-top: 0;
+        }
+
+        .danger-info strong {
+            font-size: 0.85rem;
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+
+        .danger-info span {
+            font-size: 0.76rem;
+            color: var(--text2);
+        }
+
+        /* ── STATS GRID (data overview) ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.7rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .stat-box {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-box .num {
+            font-family: var(--font-d);
+            font-size: 1.7rem;
+            line-height: 1;
+        }
+
+        .stat-box .lbl {
+            font-size: 0.68rem;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.35rem;
+            display: block;
+            font-weight: 600;
+        }
+
+        .stat-box.blue .num {
+            color: var(--text3);
+        }
+
+        .stat-box.green .num {
+            color: var(--green);
+        }
+
+        .stat-box.gold .num {
+            color: var(--gold2);
+        }
+
+        .stat-box.purple .num {
+            color: var(--purple);
+        }
+
+        /* ── KEY-VALUE LIST (provider presets) ── */
+        .preset-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+
+        .preset-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.65rem 0.8rem;
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            background: var(--bg3);
+            cursor: pointer;
+            transition: all 0.18s;
+            text-align: left;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--border2);
+            background: var(--surface);
+        }
+
+        .preset-btn i {
+            font-size: 1.05rem;
+            width: 22px;
+            text-align: center;
+        }
+
+        .preset-btn .pname {
+            font-size: 0.82rem;
+            font-weight: 600;
+            display: block;
+        }
+
+        .preset-btn .pdetail {
+            font-size: 0.68rem;
+            color: var(--text2);
+        }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--surface);
+            border: 1px solid var(--border2);
+            border-radius: var(--r2);
+            padding: 0.65rem 1.2rem;
+            font-size: 0.83rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+            z-index: 9999;
+            opacity: 0;
+            transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.3, 1), opacity 0.35s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.ok i {
+            color: var(--green);
+        }
+
+        .toast.err i {
+            color: var(--red2);
+        }
+
+        .toast.warn i {
+            color: var(--gold2);
+        }
+
+        /* ── MODAL (confirm) ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-box {
+            background: var(--bg2);
+            border: 1px solid var(--border2);
+            border-radius: var(--r2);
+            padding: 1.5rem;
+            width: 420px;
+            max-width: 92vw;
+            box-shadow: var(--shadow);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.3, 1);
+        }
+
+        .modal-overlay.open .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-box .micon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(218, 54, 51, 0.12);
+            color: var(--red2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-box h3 {
+            font-family: var(--font-d);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-box p {
+            font-size: 0.84rem;
+            color: var(--text2);
+            margin-bottom: 1.3rem;
+            line-height: 1.55;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.6rem;
+            justify-content: flex-end;
+        }
+
+        .confirm-input {
+            width: 100%;
+            padding: 0.5rem 0.7rem;
+            margin-bottom: 1.2rem;
+            background: var(--bg3);
+            border: 1px solid var(--border2);
+            border-radius: var(--r);
+            color: var(--text);
+            font-family: var(--font-m);
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        /* ── BADGE ── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .badge-blue {
+            background: rgba(31, 111, 235, 0.18);
+            color: var(--text3);
+        }
+
+        .badge-green {
+            background: rgba(63, 185, 80, 0.18);
+            color: var(--green);
+        }
+
+        .badge-gold {
+            background: rgba(210, 153, 34, 0.18);
+            color: var(--gold2);
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 1.1rem 0;
+        }
+
+        /* ── FOOTER ACTIONS BAR (sticky save) ── */
+        .save-bar {
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            padding: 0.85rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            margin: 2rem -2.5rem -4rem;
+            margin-top: 1.5rem;
+        }
+
+        .save-bar .status {
+            font-size: 0.76rem;
+            color: var(--text2);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .save-bar .status i {
+            color: var(--green);
+        }
+
+        .save-bar .ml-auto {
+            margin-left: auto;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--surface2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border2);
+        }
+
+        ::selection {
+            background: rgba(31, 111, 235, 0.3);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .settings-nav {
+                display: none;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .field-row-2,
+            .field-row-3,
+            .preset-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .settings-main {
+                padding: 1.2rem;
+            }
+
+            .save-bar {
+                margin: 1.5rem -1.2rem -1.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══ TOPBAR ══ -->
+    <header class="topbar">
+      <a class="topbar-brand" href="dashboard.html" style="display:flex;align-items:center;gap:0.6rem;text-decoration:none;">
+        <img src="logo.png" alt="MailPilot Logo" class="brand-logo-img" style="height:38px;width:auto;display:block;object-fit:contain;border-radius:4px;">
+        <span class="brand-name">MailPilot</span>
+        <span class="brand-version">Studio</span>
+      </a>
+
+      <nav class="main-tabs" style="margin-left:1.5rem">
+        <button class="tab-btn" data-tab="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+        <button class="tab-btn" data-tab="composer"><i class="fa-solid fa-pen-nib"></i> Composer</button>
+        <button class="tab-btn" data-tab="members"><i class="fa-solid fa-users"></i> Members</button>
+        <button class="tab-btn" data-tab="broadcast"><i class="fa-solid fa-satellite-dish"></i> Broadcast</button>
+        <button class="tab-btn" data-tab="templates"><i class="fa-solid fa-layer-group"></i> Templates</button>
+        <button class="tab-btn" data-tab="stats"><i class="fa-solid fa-chart-line"></i> Analytics</button>
+        <button class="tab-btn" data-tab="settings"><i class="fa-solid fa-gear"></i> Settings</button>
+      </nav>
+
+      <div class="topbar-sep"></div>
+
+      <div class="topbar-actions">
+        <span id="member-count-badge" class="badge badge-blue"><i class="fa-solid fa-users"></i> <span id="top-member-count">0</span> members</span>
+        <button class="icon-btn" id="theme-toggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+        
+        <div class="profile-container" style="position: relative;">
+          <button class="icon-btn" id="profile-trigger" title="User settings" style="border-radius: 50%; overflow: hidden; padding: 0;">
+            <i class="fa-solid fa-user"></i>
+          </button>
+          <div class="profile-dropdown" id="profile-dropdown">
+            <div class="profile-header">
+              <div class="profile-avatar-lg">HV</div>
+              <div class="profile-info">
+                <h4>Harsh Vats</h4>
+                <p>harsh@mailpilot.app</p>
+              </div>
+            </div>
+            <div class="profile-menu">
+              <div class="profile-menu-item" id="pd-profile" style="cursor:pointer">
+                <i class="fa-solid fa-user"></i>
+                <div>
+                  <span>My Profile</span>
+                  <small>View and edit profile</small>
+                </div>
+              </div>
+              <div class="profile-menu-item active" id="pd-settings" style="cursor:pointer">
+                <i class="fa-solid fa-gear"></i>
+                <div>
+                  <span>Settings</span>
+                  <small>SMTP, branding & data</small>
+                </div>
+              </div>
+              <div class="profile-menu-item">
+                <i class="fa-solid fa-users"></i>
+                <div>
+                  <span>Audience Size</span>
+                  <small id="profile-db-count">0 members</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-body">
+
+        <!-- ══ LEFT NAV ══ -->
+        <nav class="settings-nav">
+            <div class="nav-group">
+                <div class="nav-group-title">Account</div>
+                <div class="nav-item active" data-target="general"><i class="fa-solid fa-sliders"></i> General</div>
+                <div class="nav-item" data-target="sender"><i class="fa-solid fa-id-badge"></i> Sender Identity</div>
+                <div class="nav-item" data-target="branding"><i class="fa-solid fa-palette"></i> Branding & Defaults</div>
+                <div class="nav-item" data-target="security"><i class="fa-solid fa-shield-halved" style="color:var(--accent)"></i> Account Security</div>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Sending</div>
+                <div class="nav-item" data-target="smtp"><i class="fa-solid fa-server"></i> SMTP Connection <span
+                        class="item-dot" id="smtp-status-dot"></span></div>
+                <div class="nav-item" data-target="broadcast"><i class="fa-solid fa-satellite-dish"></i> Broadcast Rules
+                </div>
+                <div class="nav-item" data-target="notifications"><i class="fa-solid fa-bell"></i> Notifications</div>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Data</div>
+                <div class="nav-item" data-target="data"><i class="fa-solid fa-database"></i> Data Management</div>
+                <div class="nav-item" data-target="privacy"><i class="fa-solid fa-shield-halved"></i> Privacy &
+                    Compliance</div>
+                <div class="nav-item" data-target="supabase" style="display:none !important"><i class="fa-solid fa-cloud" style="color:var(--teal)"></i> Supabase Sync</div>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Advanced</div>
+                <div class="nav-item" data-target="danger"><i class="fa-solid fa-triangle-exclamation"
+                        style="color:var(--red2)"></i> Danger Zone</div>
+                <div class="nav-item" data-target="about"><i class="fa-solid fa-circle-info"></i> About</div>
+            </div>
+        </nav>
+
+        <!-- ══ MAIN CONTENT ══ -->
+        <main class="settings-main">
+
+            <!-- ═══════════ GENERAL ═══════════ -->
+            <section class="settings-section active" id="sec-general">
+                <div class="section-head">
+                    <h1><i class="fa-solid fa-sliders" style="color:var(--text3)"></i> General</h1>
+                    <p>Workspace-wide preferences for how MailPilot looks and behaves.</p>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-paint-roller"></i> Appearance</h3>
+                    </div>
+                    <div class="switch-row">
+                        <div class="switch-info"><strong>Dark Mode</strong><span>Use a dark interface across the whole
+                                app</span></div>
+                        <label class="switch"><input type="checkbox" id="set-dark-mode" checked><span
+                                class="switch-slider"></span></label>
+                    </div>
+                    <div class="switch-row">
+                        <div class="switch-info"><strong>Compact Tables</strong><span>Reduce row height in the member
+                                directory</span></div>
+                        <label class="switch"><input type="checkbox" id="set-compact-tables"><span
+                                class="switch-slider"></span></label>
+                    </div>
+                    <div class="switch-row">
+                        <div class="switch-info"><strong>Show Live Status Dot</strong><span>Pulsing indicator in the
+                                composer workspace bar</span></div>
+                        <label class="switch"><input type="checkbox" id="set-live-dot" checked><span
+                                class="switch-slider"></span></label>
+                    </div>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-globe"></i> Localization</h3>
+                    </div>
+                    <div class="field-row-2">
+                        <div class="field">
+                            <label>Date Format</label>
+                            <select id="set-date-format">
+                                <option value="long">Saturday, June 14, 2026</option>
+                                <option value="short">14 Jun 2026</option>
+                                <option value="iso">2026-06-14</option>
+                                <option value="us">06/14/2026</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Default Timezone</label>
+                            <select id="set-timezone">
+                                <option value="auto">Auto-detect from browser</option>
+                                <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                                <option value="UTC">UTC</option>
+                                <option value="America/New_York">America/New York (ET)</option>
+                                <option value="Europe/London">Europe/London (GMT)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ SENDER IDENTITY ═══════════ -->
+            <section class="settings-section" id="sec-sender">
+                <div class="section-head">
+                    <h1><i class="fa-solid fa-id-badge" style="color:var(--purple)"></i> Sender Identity</h1>
+                    <p>This identity is pre-filled whenever you compose or broadcast a new email. Works for any
+                        organization, club, business, or individual.</p>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-building"></i> Organization Details</h3>
+                    </div>
+                    <div class="field">
+                        <label>Organization / Brand Name</label>
+                        <input type="text" id="set-org-name" placeholder="e.g. Your Company, Club, or Name">
+                    </div>
+                    <div class="field">
+                        <label>Website URL</label>
+                        <input type="text" id="set-org-url" placeholder="https://yourwebsite.com">
+                    </div>
+                    <div class="field-row-2">
+                        <div class="field">
+                            <label>Default Sender Name</label>
+                            <input type="text" id="set-from-name" placeholder="e.g. Team Notifications">
+                        </div>
+                        <div class="field">
+                            <label>Default Sender Email</label>
+                            <input type="email" id="set-from-email" placeholder="hello@yourdomain.com">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Reply-To Email (optional)</label>
+                        <input type="email" id="set-reply-to" placeholder="support@yourdomain.com">
+                        <div class="field-tip"><i class="fa-solid fa-circle-info"></i> If left blank, replies go to the
+                            sender email above.</div>
+                    </div>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-signature"></i> Default Signature & Footer</h3>
+                    </div>
+                    <div class="field">
+                        <label>Closing Signature</label>
+                        <input type="text" id="set-signature" placeholder="e.g. Warm regards, The Team">
+                    </div>
+                    <div class="field">
+                        <label>Footer Legal / Unsubscribe Note</label>
+                        <textarea id="set-footer-note" rows="2"
+                            placeholder="You're receiving this email because you're part of our community. {{Email}}"></textarea>
+                        <div class="field-tip"><i class="fa-solid fa-circle-info"></i> Supports merge tags like
+                            <code>{{Name}}</code>, <code>{{Email}}</code>.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ BRANDING & DEFAULTS ═══════════ -->
+            <section class="settings-section" id="sec-branding">
+                <div class="section-head">
+                    <h1><i class="fa-solid fa-palette" style="color:var(--gold2)"></i> Branding & Defaults</h1>
+                    <p>Set the default look for every new email you compose. You can still override these per-email in
+                        the Composer.</p>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-image"></i> Logo</h3>
+                    </div>
+                    <div class="logo-upload-row">
+                        <div class="logo-preview" id="logo-preview"><i class="fa-solid fa-image"></i></div>
+                        <div style="flex:1">
+                            <input type="file" id="logo-file-input" accept="image/*" style="display:none">
+                            <div style="display:flex;gap:0.5rem">
+                                <button class="btn btn-outline btn-sm" id="btn-upload-logo"><i
+                                        class="fa-solid fa-upload"></i> Upload Logo</button>
+                                <button class="btn btn-ghost btn-sm" id="btn-remove-logo"><i
+                                        class="fa-solid fa-trash"></i> Remove</button>
+                            </div>
+                            <div class="field-tip" style="margin-top:0.5rem"><i class="fa-solid fa-circle-info"></i> PNG
+                                or SVG with transparent background recommended, max 200KB.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-droplet"></i> Default Colors</h3>
+                    </div>
+                    <div class="field">
+                        <label>Button Color</label>
+                        <div class="color-row">
+                            <div class="c-dot active" data-target="btn" data-color="#1f6feb" style="background:#1f6feb">
+                            </div>
+                            <div class="c-dot" data-target="btn" data-color="#238636" style="background:#238636"></div>
+                            <div class="c-dot" data-target="btn" data-color="#d29922" style="background:#d29922"></div>
+                            <div class="c-dot" data-target="btn" data-color="#a371f7" style="background:#a371f7"></div>
+                            <div class="c-dot" data-target="btn" data-color="#da3633" style="background:#da3633"></div>
+                            <div class="c-dot" data-target="btn" data-color="#39c5cf" style="background:#39c5cf"></div>
+                            <input type="color" id="set-btn-color-custom" value="#1f6feb">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Accent / Highlight Color</label>
+                        <div class="color-row">
+                            <div class="c-dot active" data-target="accent" data-color="#1f6feb"
+                                style="background:#1f6feb"></div>
+                            <div class="c-dot" data-target="accent" data-color="#238636" style="background:#238636">
+                            </div>
+                            <div class="c-dot" data-target="accent" data-color="#d29922" style="background:#d29922">
+                            </div>
+                            <div class="c-dot" data-target="accent" data-color="#a371f7" style="background:#a371f7">
+                            </div>
+                            <div class="c-dot" data-target="accent" data-color="#da3633" style="background:#da3633">
+                            </div>
+                            <input type="color" id="set-accent-color-custom" value="#1f6feb">
+                        </div>
+                    </div>
+                    <div class="field-row-2">
+                        <div class="field">
+                            <label>Default Email Background</label>
+                            <select id="set-bg-color">
+                                <option value="#ffffff">White</option>
+                                <option value="#f6f8fa">Light Gray</option>
+                                <option value="#0d1117">Dark</option>
+                                <option value="#fdf6ec">Warm</option>
+                                <option value="#eef2ff">Blue Tint</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Default Font Style</label>
+                            <select id="set-font-family">
+                                <option value="Arial, sans-serif">Classic (Arial)</option>
+                                <option value="Georgia, serif">Serif (Georgia)</option>
+                                <option value="'Trebuchet MS', sans-serif">Modern (Trebuchet)</option>
+                                <option value="Verdana, sans-serif">Clean (Verdana)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Default Email Width</label>
+                        <select id="set-email-width">
+                            <option value="520">Compact (520px)</option>
+                            <option value="600" selected>Standard (600px)</option>
+                            <option value="680">Wide (680px)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-calendar-days"></i> Default Template</h3>
+                    </div>
+                    <div class="field">
+                        <label>Open Composer With</label>
+                        <select id="set-default-template">
+                            <option value="event">Event Invite</option>
+                            <option value="newsletter">Newsletter</option>
+                            <option value="announcement">Announcement</option>
+                            <option value="welcome">Welcome</option>
+                            <option value="promotion">Promotion</option>
+                            <option value="reminder">Reminder</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ ACCOUNT SECURITY ═══════════ -->
+            <section class="settings-section" id="sec-security">
+                <div class="section-head">
+                    <h1><i class="fa-solid fa-shield-halved" style="color:var(--accent)"></i> Account Security</h1>
+                    <p>Manage your login credentials and app-specific passwords for secure email delivery.</p>
+                </div>
+
+                <!-- Auth method status banner -->
+                <div class="alert alert-info" id="auth-method-banner">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <div id="auth-method-text">Detecting authentication method...</div>
+                </div>
+
+                <!-- ── SET / UPDATE ACCOUNT PASSWORD ── -->
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-key"></i> Account Password</h3>
+                        <span class="badge" id="pw-status-badge" style="background:rgba(245,166,35,.15);color:var(--gold2)"><i class="fa-solid fa-spinner fa-spin"></i> Checking...</span>
+                    </div>
+                    <p class="s-card-sub" id="pw-section-desc">Set a password to enable direct email/password login in addition to Google OAuth.</p>
+
+                    <form id="sec-password-form" autocomplete="off">
+                        <div class="field">
+                            <label>New Password</label>
+                            <div class="pw-wrap">
+                                <input type="password" id="sec-new-password" placeholder="Minimum 8 characters" autocomplete="new-password">
+                                <button class="pw-toggle" type="button" onclick="secTogglePw('sec-new-password', this)"><i class="fa-solid fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Confirm Password</label>
+                            <div class="pw-wrap">
+                                <input type="password" id="sec-confirm-password" placeholder="Re-enter new password" autocomplete="new-password">
+                                <button class="pw-toggle" type="button" onclick="secTogglePw('sec-confirm-password', this)"><i class="fa-solid fa-eye"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Password strength bar -->
+                        <div style="margin-bottom:0.8rem">
+                            <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text2);margin-bottom:0.25rem">
+                                <span>Password Strength</span>
+                                <span id="pw-strength-label">—</span>
+                            </div>
+                            <div style="height:4px;background:var(--bg3);border-radius:4px;overflow:hidden">
+                                <div id="pw-strength-bar" style="height:100%;width:0%;border-radius:4px;transition:width 0.3s,background 0.3s"></div>
+                            </div>
+                        </div>
+
+                        <div class="field-tip" style="margin-bottom:1rem">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span>This sets your MailPilot account password in Supabase Auth. You can then log in with your email + this password — even if you originally signed up with Google.</span>
+                        </div>
+
+                        <div id="sec-pw-feedback" style="font-size:0.78rem;margin-bottom:0.6rem;display:none"></div>
+
+                        <button type="submit" class="btn btn-primary" id="btn-set-password">
+                            <i class="fa-solid fa-floppy-disk"></i> <span id="btn-set-pw-label">Set Password</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- ── GOOGLE APP PASSWORDS ── -->
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-brands fa-google" style="color:#ea4335"></i> Google App Passwords</h3>
+                        <span class="badge badge-gold"><i class="fa-solid fa-shield"></i> SMTP Auth</span>
+                    </div>
+                    <p class="s-card-sub">Optional: save Google App Passwords to autofill SMTP credentials for Gmail or Google Workspace sending. This is only needed if you choose Gmail as your SMTP provider.</p>
+
+                    <div class="alert alert-warn" style="margin-bottom:1rem">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <div>Google App Passwords require <strong>2-Step Verification</strong> and are only necessary for Gmail SMTP. If you do not use Gmail, skip this section.</div>
+                    </div>
+
+                    <div id="app-passwords-list">
+                        <!-- Dynamically populated -->
+                    </div>
+
+                    <div id="app-pw-add-form" style="margin-top:1rem;padding:1rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);display:none">
+                        <div class="field">
+                            <label>Label (e.g. "MailPilot SMTP")</label>
+                            <input type="text" id="app-pw-label" placeholder="Friendly label for this password">
+                        </div>
+                        <div class="field">
+                            <label>Gmail Address</label>
+                            <input type="email" id="app-pw-email" placeholder="yourname@gmail.com">
+                        </div>
+                        <div class="field">
+                            <label>App Password (16-char, no spaces)</label>
+                            <div class="pw-wrap">
+                                <input type="password" id="app-pw-value" placeholder="xxxx xxxx xxxx xxxx" maxlength="19">
+                                <button class="pw-toggle" type="button" onclick="secTogglePw('app-pw-value', this)"><i class="fa-solid fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+                            <button class="btn btn-primary btn-sm" id="btn-save-app-pw"><i class="fa-solid fa-check"></i> Save</button>
+                            <button class="btn btn-ghost btn-sm" id="btn-cancel-app-pw"><i class="fa-solid fa-xmark"></i> Cancel</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap">
+                        <button class="btn btn-outline btn-sm" id="btn-add-app-pw"><i class="fa-solid fa-plus"></i> Add App Password</button>
+                        <button class="btn btn-ghost btn-sm" id="btn-apply-app-pw-to-smtp" style="display:none"><i class="fa-solid fa-plug"></i> Apply to SMTP Settings</button>
+                    </div>
+                </div>
+
+                <!-- ── ACTIVE SESSIONS ── -->
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-desktop"></i> Active Session</h3>
+                    </div>
+                    <div id="session-info" style="font-size:0.82rem;color:var(--text2);line-height:1.7">
+                        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem">
+                            <div style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0"></div>
+                            <strong style="color:var(--text)">Current session is active</strong>
+                        </div>
+                        <div>User: <span id="session-email" style="color:var(--text)">—</span></div>
+                        <div>Provider: <span id="session-provider" style="color:var(--accent)">—</span></div>
+                        <div>Last sign-in: <span id="session-last-signin" style="color:var(--text)">—</span></div>
+                    </div>
+                    <div style="margin-top:1rem">
+                        <button class="btn btn-danger-outline btn-sm" id="btn-sign-out-all">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out of All Sessions
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ SMTP CONNECTION ═══════════ -->
+            <section class="settings-section" id="sec-smtp">
+                <div class="section-head">
+                    <h1><i class="fa-solid fa-server" style="color:var(--text3)"></i> SMTP Connection</h1>
+                    <p>Configure the mail server used for broadcasting. These defaults populate the Broadcast tab
+                        automatically.</p>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <div>Works with <strong>any</strong> SMTP-compatible provider — Gmail, Outlook, Zoho, SendGrid,
+                        Mailgun, Amazon SES, or your own mail server. Pick a quick preset below or enter custom values.
+                    </div>
+                </div>
+
+
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-bolt"></i> Quick Presets</h3>
+                    </div>
+                    <div class="preset-grid">
+                        <button class="preset-btn" data-preset="gmail">
+                            <i class="fa-brands fa-google" style="color:#ea4335"></i>
+                            <div><span class="pname">Gmail / Google Workspace</span><span class="pdetail">smtp.gmail.com
+                                    · Port 587</span></div>
+                        </button>
+                        <button class="preset-btn" data-preset="outlook">
+                            <i class="fa-brands fa-microsoft" style="color:#0078d4"></i>
+                            <div><span class="pname">Outlook / Office 365</span><span class="pdetail">smtp.office365.com
+                                    · Port 587</span></div>
+                        </button>
+                        <button class="preset-btn" data-preset="zoho">
+                            <i class="fa-solid fa-z" style="color:#c8202f"></i>
+                            <div><span class="pname">Zoho Mail</span><span class="pdetail">smtp.zoho.com · Port
+                                    587</span></div>
+                        </button>
+                        <button class="preset-btn" data-preset="sendgrid">
+                            <i class="fa-solid fa-paper-plane" style="color:#1a82e2"></i>
+                            <div><span class="pname">SendGrid</span><span class="pdetail">smtp.sendgrid.net · Port
+                                    587</span></div>
+                        </button>
+                        <button class="preset-btn" data-preset="mailgun">
+                            <i class="fa-solid fa-envelope-circle-check" style="color:#f06b66"></i>
+                            <div><span class="pname">Mailgun</span><span class="pdetail">smtp.mailgun.org · Port
+                                    587</span></div>
+                        </button>
+                        <button class="preset-btn" data-preset="ses">
+                            <i class="fa-brands fa-aws" style="color:#ff9900"></i>
+                            <div><span class="pname">Amazon SES</span><span
+                                    class="pdetail">email-smtp.us-east-1...</span></div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-plug"></i> Connection Details</h3>
+                    </div>
+                    <div class="field-row-2">
+                        <div class="field">
+                            <label>SMTP Host</label>
+                            <input type="text" id="set-smtp-host" placeholder="smtp.yourprovider.com">
+                        </div>
+                        <div class="field">
+                            <label>Port</label>
+                            <input type="number" id="set-smtp-port" placeholder="587">
+                        </div>
+                    </div>
+                    <div class="field-row-2">
+                        <div class="field">
+                            <label>Username</label>
+                            <input type="text" id="set-smtp-user" placeholder="your@email.com">
+                        </div>
+                        <div class="field">
+                            <label>Password / App Key</label>
+                            <div class="pw-wrap">
+                                <input type="password" id="set-smtp-pass" placeholder="App password or API key">
+                                <button class="pw-toggle" id="toggle-smtp-pass" type="button"><i
+                                        class="fa-solid fa-eye"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Encryption</label>
+                        <select id="set-smtp-encryption">
+                            <option value="tls">STARTTLS (recommended)</option>
+                            <option value="ssl">SSL</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                    <div style="display:flex;gap:0.6rem;margin-top:1rem">
+                        <button class="btn btn-outline" id="btn-test-connection"><i
+                                class="fa-solid fa-plug-circle-check"></i> Test Connection</button>
+                        <span id="test-conn-result"
+                            style="font-size:0.78rem;display:flex;align-items:center;gap:0.4rem"></span>
+                    </div>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-gauge-high"></i> Sending Rate</h3>
+                    </div>
+                    <div class="field-row-2">
+                        <div class="field">
+                            <label>Delay Between Emails (ms)</label>
+                            <input type="number" id="set-send-delay" placeholder="300" min="0" max="5000">
+                        </div>
+                        <div class="field">
+                            <label>Max Emails Per Batch</label>
+                            <input type="number" id="set-batch-size" placeholder="500" min="1">
+                        </div>
+                    </div>
+                    <div class="field-tip"><i class="fa-solid fa-circle-info"></i> Lower delays send faster but risk
+                        provider rate-limits. 200–500ms is a safe default for most SMTP providers.</div>
+                </div>
+            </section>
+
+            <!-- ═══════════ BROADCAST RULES ═══════════ -->
+            <section class="settings-section" id="sec-broadcast">
+                <div class="section-head">
+                    <h1><i class="fa-solid fa-satellite-dish" style="color:var(--accent)"></i> Broadcast Rules</h1>
+                    <p>Safety nets and automation behavior for sending campaigns.</p>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-shield"></i> Safety Checks</h3>
+                    </div>
+                    <div class="switch-row">
+                        <div class="switch-info"><strong>Require confirmation before sending</strong><span>Show a
+                                confirmation dialog before any broadcast starts</span></div>
+                        <label class="switch"><input type="checkbox" id="set-confirm-before-send" checked><span
+                                class="switch-slider"></span></label>
+                    </div>
+                    <div class="switch-row">
+                        <div class="switch-info"><strong>Skip duplicate emails</strong><span>Automatically prevent
+                                sending two emails to the same address in one campaign</span></div>
+                        <label class="switch"><input type="checkbox" id="set-skip-duplicates" checked><span
+                                class="switch-slider"></span></label>
+                    </div>
+                    <div class="switch-row">
+                        <div class="switch-info"><strong>Validate email format before sending</strong><span>Skip
+                                malformed addresses automatically and log them as failed</span></div>
+                        <label class="switch"><input type="checkbox" id="set-validate-emails" checked><span
+                                class="switch-slider"></span></label>
+                    </div>
+                    <div class="switch-row">
+                        <div class="switch-info"><strong>Auto-retry failed sends</strong><span>Retry once after a short
+                                delay if delivery fails</span></div>
+                        <label class="switch"><input type="checkbox" id="set-auto-retry"><span
+                                class="switch-slider"></span></label>
+                    </div>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-terminal"></i> Logging</h3>
+                    </div>
+                    <div class="switch-row">
+                        <div class="switch-info"><strong>Keep detailed SMTP logs</strong><span>Store per-recipient send
+                                logs for export later</span></div>
+                        <label class="switch"><input type="checkbox" id="set-detailed-logs" checked><span
+                                class="switch-slider"></span></label>
+                    </div>
+                    <div class="field" style="margin-top:0.9rem">
+                        <label>Auto-clear logs after</label>
+                        <select id="set-log-retention">
+                            <option value="never">Never</option>
+                            <option value="7">7 days</option>
+                            <option value="30" selected>30 days</option>
+                            <option value="90">90 days</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ NOTIFICATIONS ═══════════ -->
+            <section class="settings-section" id="sec-notifications">
+                <div class="section-head">
+                    <h1><i class="fa-solid fa-bell" style="color:var(--gold2)"></i> Notifications</h1>
+                    <p>Choose what MailPilot alerts you about while you work.</p>
+                </div>
+
+                <div class="s-card">
+                    <div class="switch-row">
+                        <div class="switch-info"><strong>Broadcast completed</strong><span>Toast notification when a
+                                campaign finishes sending</span></div>
+                        <label class="switch"><input type="checkbox" id="set-notify-complete" checked><span
+                                class="switch-slider"></span></label>
+                    </div>
+                    <div class="switch-row">
+                        <div class="switch-info"><strong>High failure rate warning</strong><span>Alert if more than 10%
+                                of sends fail during a broadcast</span></div>
+                        <label class="switch"><input type="checkbox" id="set-notify-failure" checked><span
+                                class="switch-slider"></span></label>
+                    </div>
+                    <div class="switch-row">
+                        <div class="switch-info"><strong>New member imported</strong><span>Confirmation toast after CSV
+                                import finishes</span></div>
+                        <label class="switch"><input type="checkbox" id="set-notify-import" checked><span
+                                class="switch-slider"></span></label>
+                    </div>
+                    <div class="switch-row">
+                        <div class="switch-info"><strong>Sound on completion</strong><span>Play a subtle chime when a
+                                broadcast finishes</span></div>
+                        <label class="switch"><input type="checkbox" id="set-notify-sound"><span
+                                class="switch-slider"></span></label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ DATA MANAGEMENT ═══════════ -->
+            <section class="settings-section" id="sec-data">
+                <div class="section-head">
+                    <h1><i class="fa-solid fa-database" style="color:var(--teal)"></i> Data Management</h1>
+                    <p>All your data — members, groups, and settings — lives locally in this browser. Back it up
+                        regularly.</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box blue"><span class="num" id="data-stat-members">0</span><span
+                            class="lbl">Members</span></div>
+                    <div class="stat-box green"><span class="num" id="data-stat-groups">0</span><span
+                            class="lbl">Groups</span></div>
+                    <div class="stat-box gold"><span class="num" id="data-stat-size">0 KB</span><span
+                            class="lbl">Storage Used</span></div>
+                    <div class="stat-box purple"><span class="num" id="data-stat-updated">—</span><span class="lbl">Last
+                            Modified</span></div>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-box-archive"></i> Backup & Restore</h3>
+                    </div>
+                    <div class="field-tip" style="margin-bottom:0.9rem"><i class="fa-solid fa-circle-info"></i> Export a
+                        full backup (members, groups, and settings) as a single JSON file. Import it later or on another
+                        device to restore everything.</div>
+                    <div style="display:flex;gap:0.6rem;flex-wrap:wrap">
+                        <button class="btn btn-green" id="btn-export-backup"><i class="fa-solid fa-download"></i> Export
+                            Full Backup (JSON)</button>
+                        <button class="btn btn-outline" id="btn-import-backup"><i class="fa-solid fa-upload"></i> Import
+                            Backup</button>
+                        <input type="file" id="backup-file-input" accept=".json" style="display:none">
+                    </div>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-file-csv"></i> Member Data</h3>
+                    </div>
+                    <div style="display:flex;gap:0.6rem;flex-wrap:wrap">
+                        <button class="btn btn-outline" id="btn-export-members-csv"><i class="fa-solid fa-download"></i>
+                            Export Members as CSV</button>
+                        <a href="dashboard.html" class="btn btn-outline"><i
+                                class="fa-solid fa-arrow-up-right-from-square"></i> Manage in Members Tab</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ PRIVACY & COMPLIANCE ═══════════ -->
+            <section class="settings-section" id="sec-privacy">
+                <div class="section-head">
+                    <h1><i class="fa-solid fa-shield-halved" style="color:var(--green)"></i> Privacy & Compliance</h1>
+                    <p>Good practices for responsible bulk email sending.</p>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <div>All member data and settings are stored <strong>only in this browser's local storage</strong>.
+                        Nothing is sent to any external server by MailPilot itself — your SMTP credentials are used
+                        directly to connect to your chosen mail provider.</div>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-list-check"></i> Sending Compliance</h3>
+                    </div>
+                    <div class="switch-row">
+                        <div class="switch-info"><strong>Always include unsubscribe link</strong><span>Append an
+                                unsubscribe link to every footer automatically</span></div>
+                        <label class="switch"><input type="checkbox" id="set-require-unsubscribe" checked><span
+                                class="switch-slider"></span></label>
+                    </div>
+                    <div class="switch-row">
+                        <div class="switch-info"><strong>Require consent confirmation</strong><span>Mark members as
+                                opted-in before they're eligible for broadcasts</span></div>
+                        <label class="switch"><input type="checkbox" id="set-require-consent"><span
+                                class="switch-slider"></span></label>
+                    </div>
+                </div>
+
+                <div class="alert alert-warn">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>Only email people who have agreed to receive communications from you. Most countries have
+                        anti-spam laws (CAN-SPAM, GDPR, etc.) — check what applies to you before sending bulk email.
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ SUPABASE SYNC ═══════════ -->
+            <section class="settings-section" id="sec-supabase" style="display:none !important">
+                <div class="section-head">
+                    <h1><i class="fa-solid fa-cloud" style="color:var(--teal)"></i> Supabase Sync</h1>
+                    <p>Connect to your Supabase project to pull members, push updates, and enable cloud backup.</p>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <div>Credentials are stored <strong>only in this browser</strong> and used directly to connect to your Supabase project — never sent anywhere else.</div>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-key"></i> Project Credentials</h3>
+                        <span class="badge badge-green" id="sb-conn-badge" style="display:none"><i class="fa-solid fa-circle-check"></i> Connected</span>
+                    </div>
+                    <div class="field">
+                        <label>Supabase Project URL</label>
+                        <input type="text" id="set-supabase-url" placeholder="https://xxxxxxxxxxxx.supabase.co">
+                    </div>
+                    <div class="field">
+                        <label>Anon / Public API Key</label>
+                        <div class="pw-wrap">
+                            <input type="password" id="set-supabase-key" placeholder="eyJhbGciOiJIUzI1NiIs...">
+                            <button class="pw-toggle" id="toggle-sb-key" type="button"><i class="fa-solid fa-eye"></i></button>
+                        </div>
+                        <div class="field-tip"><i class="fa-solid fa-circle-info"></i> Use the <code>anon</code> public key from your Supabase dashboard &rarr; Settings &rarr; API.</div>
+                    </div>
+                    <div class="field">
+                        <label>Members Table Name</label>
+                        <input type="text" id="set-supabase-table" placeholder="members">
+                    </div>
+                    <div style="display:flex;gap:0.6rem;align-items:center;margin-top:1rem;flex-wrap:wrap">
+                        <button class="btn btn-outline" id="btn-sb-test"><i class="fa-solid fa-plug-circle-check"></i> Test Connection</button>
+                        <span id="sb-test-result" style="font-size:0.78rem;display:flex;align-items:center;gap:0.4rem"></span>
+                    </div>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-arrows-rotate"></i> Member Sync</h3>
+                    </div>
+                    <p class="s-card-sub">Pull the latest members from Supabase into your local database, or push local records back up.</p>
+                    <div class="field-row-2" style="margin-bottom:1rem">
+                        <div class="stat-box blue"><span class="num" id="sb-stat-local">0</span><span class="lbl">Local Members</span></div>
+                        <div class="stat-box green"><span class="num" id="sb-stat-remote">&mdash;</span><span class="lbl">Supabase Members</span></div>
+                    </div>
+                    <div style="display:flex;gap:0.6rem;flex-wrap:wrap">
+                        <button class="btn btn-primary" id="btn-sb-pull"><i class="fa-solid fa-cloud-arrow-down"></i> Pull from Supabase</button>
+                        <button class="btn btn-outline" id="btn-sb-push"><i class="fa-solid fa-cloud-arrow-up"></i> Push to Supabase</button>
+                        <button class="btn btn-ghost" id="btn-sb-count"><i class="fa-solid fa-list-ol"></i> Refresh Count</button>
+                    </div>
+                    <div id="sb-sync-log" style="margin-top:1rem;font-family:var(--font-m);font-size:0.73rem;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:0.75rem 1rem;max-height:140px;overflow-y:auto;display:none"></div>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-bolt"></i> Auto-Sync Options</h3>
+                    </div>
+                    <div class="switch-row">
+                        <div class="switch-info"><strong>Pull on app load</strong><span>Automatically fetch latest members from Supabase when MailPilot opens</span></div>
+                        <label class="switch"><input type="checkbox" id="set-sb-auto-pull"><span class="switch-slider"></span></label>
+                    </div>
+                    <div class="switch-row">
+                        <div class="switch-info"><strong>Push changes after broadcast</strong><span>Sync member deletions back to Supabase after a broadcast completes</span></div>
+                        <label class="switch"><input type="checkbox" id="set-sb-push-after-broadcast"><span class="switch-slider"></span></label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ DANGER ZONE ═══════════ -->
+            <section class="settings-section" id="sec-danger">
+                <div class="section-head">
+                    <h1><i class="fa-solid fa-triangle-exclamation" style="color:var(--red2)"></i> Danger Zone</h1>
+                    <p>These actions are permanent and cannot be undone. Proceed carefully.</p>
+                </div>
+
+                <div class="s-card danger-card">
+                    <div class="danger-row">
+                        <div class="danger-info"><strong>Clear all members</strong><span>Permanently delete every member
+                                from your directory</span></div>
+                        <button class="btn btn-danger-outline btn-sm" id="btn-danger-clear-members"><i
+                                class="fa-solid fa-trash"></i> Clear Members</button>
+                    </div>
+                    <div class="danger-row">
+                        <div class="danger-info"><strong>Reset all settings</strong><span>Restore every setting on this
+                                page to its default value</span></div>
+                        <button class="btn btn-danger-outline btn-sm" id="btn-danger-reset-settings"><i
+                                class="fa-solid fa-rotate-left"></i> Reset Settings</button>
+                    </div>
+                    <div class="danger-row">
+                        <div class="danger-info"><strong>Erase everything</strong><span>Delete all members, groups,
+                                settings, and logs — full factory reset</span></div>
+                        <button class="btn btn-red btn-sm" id="btn-danger-erase-all"><i class="fa-solid fa-bomb"></i>
+                            Erase Everything</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ ABOUT ═══════════ -->
+            <section class="settings-section" id="sec-about">
+                <div class="section-head">
+                    <h1><i class="fa-solid fa-circle-info" style="color:var(--text3)"></i> About MailPilot</h1>
+                    <p>Version, credits, and useful links.</p>
+                </div>
+
+                <div class="s-card" style="text-align:center;padding:2.2rem 1.5rem">
+                    <div class="brand-icon"
+                        style="width:56px;height:56px;border-radius:14px;font-size:1.3rem;margin:0 auto 1rem;background:linear-gradient(135deg,#4f8ef7,#6366f1)">MP</div>
+                    <h2 style="font-family:var(--font-d);font-size:1.4rem;margin-bottom:0.3rem">Mail<span style="color:var(--accent)">Pilot</span></h2>
+                    <p style="color:var(--text2);font-size:0.85rem;margin-bottom:1rem">Premium Email Automation Studio — broadcast, compose &amp; track with ease.</p>
+                    <span class="badge badge-blue">Version 2.0</span>
+                </div>
+
+                <div class="s-card">
+                    <div class="s-card-head">
+                        <h3><i class="fa-solid fa-layer-group"></i> Built With</h3>
+                    </div>
+                    <p style="font-size:0.83rem;color:var(--text2);line-height:1.8">
+                        A fully client-side composer, member manager, and broadcast console.
+                        No backend required for design and previewing — connect your own SMTP credentials to send real
+                        campaigns.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ── STICKY SAVE BAR ── -->
+            <div class="save-bar">
+                <span class="status" id="save-status"><i class="fa-solid fa-circle-check"></i> All changes saved
+                    automatically</span>
+                <div class="ml-auto">
+                    <button class="btn btn-outline" id="btn-discard"><i class="fa-solid fa-rotate-left"></i> Discard
+                        Changes</button>
+                    <button class="btn btn-primary" id="btn-save-settings"><i class="fa-solid fa-floppy-disk"></i> Save
+                        Settings</button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ══ TOAST ══ -->
+    <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i> <span id="toast-msg"></span></div>
+
+    <!-- ══ CONFIRM MODAL ══ -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-box">
+            <div class="micon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3 id="confirm-title">Are you sure?</h3>
+            <p id="confirm-desc">This action cannot be undone.</p>
+            <input type="text" class="confirm-input" id="confirm-input" placeholder="Type DELETE to confirm"
+                style="display:none">
+            <div class="modal-actions">
+                <button class="btn btn-ghost" id="confirm-cancel">Cancel</button>
+                <button class="btn btn-red" id="confirm-ok">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ══════════════════════════════════════════════════════════
+           MAILPILOT SETTINGS — Engine
+        ══════════════════════════════════════════════════════════ */
+
+        const SETTINGS_KEY = 'mf_settings';
+        const DEFAULTS = {
+            darkMode: true, compactTables: false, liveDot: true,
+            dateFormat: 'long', timezone: 'auto',
+            orgName: 'Your Organization', orgUrl: 'https://yoursite.com',
+            fromName: 'Your Organization', fromEmail: 'hello@yourorg.com', replyTo: '',
+            signature: 'With excitement, The Team', footerNote: "You're receiving this because you're part of our community. {{Email}}",
+            logo: '', btnColor: '#1f6feb', accentColor: '#1f6feb',
+            bgColor: '#ffffff', fontFamily: 'Arial, sans-serif', emailWidth: '600',
+            defaultTemplate: 'event',
+            smtpHost: '', smtpPort: '587', smtpUser: '', smtpPass: '', smtpEncryption: 'tls',
+            sendDelay: 300, batchSize: 500,
+            confirmBeforeSend: true, skipDuplicates: true, validateEmails: true, autoRetry: false,
+            detailedLogs: true, logRetention: '30',
+            notifyComplete: true, notifyFailure: true, notifyImport: true, notifySound: false,
+            requireUnsubscribe: true, requireConsent: false,
+            supabaseUrl: '',
+            supabaseKey: '',
+            supabaseTable: 'users',
+            sbAutoPull: false, sbPushAfterBroadcast: false,
+        };
+
+        let settings = { ...DEFAULTS };
+        let dirty = false;
+
+        async function loadSettings() {
+            try {
+                const raw = localStorage.getItem(SETTINGS_KEY);
+                if (raw) settings = { ...DEFAULTS, ...JSON.parse(raw) };
+
+                // Hardened: purge any legacy client-side credentials
+                localStorage.removeItem('mf_smtp_pass');
+                localStorage.removeItem('mf_smtp_user');
+
+                const headers = await getAuthHeaders();
+                const res = await fetch(`${window.API_BASE_URL}/api/settings`, { headers });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && data.settings) {
+                        settings = { ...settings, ...data.settings };
+                        // Save a sanitized version to local storage (no passwords)
+                        const sanitized = { ...settings };
+                        delete sanitized.smtpPass;
+                        localStorage.setItem(SETTINGS_KEY, JSON.stringify(sanitized));
+                    }
+                }
+
+                // Sync settings.darkMode from global mf_theme if set
+                const globalTheme = localStorage.getItem('mf_theme');
+                if (globalTheme) {
+                    settings.darkMode = (globalTheme === 'dark');
+                }
+            } catch (e) {
+                console.error("Error loading server settings:", e);
+            }
+        }
+        async function persistSettings() {
+            // Save sanitized local fallback (without password)
+            const sanitized = { ...settings };
+            delete sanitized.smtpPass;
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(sanitized));
+            localStorage.setItem('mf_theme', settings.darkMode ? 'dark' : 'light');
+
+            try {
+                const headers = await getAuthHeaders({ 'Content-Type': 'application/json' });
+                const res = await fetch(`${window.API_BASE_URL}/api/settings`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({ settings })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && data.settings) {
+                        settings = { ...settings, ...data.settings };
+                        const passEl = document.getElementById('set-smtp-pass');
+                        if (passEl) passEl.value = settings.smtpPass || '';
+                    }
+                }
+            } catch (e) {
+                console.error("Error persisting settings to server:", e);
+            }
+
+            dirty = false;
+            updateSaveStatus();
+        }
+        function markDirty() {
+            dirty = true;
+            updateSaveStatus();
+        }
+        function updateSaveStatus() {
+            const el = document.getElementById('save-status');
+            if (dirty) {
+                el.innerHTML = '<i class="fa-solid fa-circle" style="color:var(--gold2)"></i> Unsaved changes';
+            } else {
+                el.innerHTML = '<i class="fa-solid fa-circle-check"></i> All changes saved automatically';
+            }
+        }
+
+        function showToast(msg, type = 'ok') {
+            const t = document.getElementById('toast');
+            t.querySelector('#toast-msg').textContent = msg;
+            t.querySelector('i').className = `fa-solid fa-${type === 'ok' ? 'circle-check' : type === 'err' ? 'circle-xmark' : 'triangle-exclamation'}`;
+            t.className = `toast show ${type}`;
+            clearTimeout(t._t); t._t = setTimeout(() => { t.className = 'toast'; }, 2800);
+        }
+
+        // ── BIND FORM <-> SETTINGS ──────────────────────────────────
+        const FIELD_MAP = {
+            'set-dark-mode': 'darkMode', 'set-compact-tables': 'compactTables', 'set-live-dot': 'liveDot',
+            'set-date-format': 'dateFormat', 'set-timezone': 'timezone',
+            'set-org-name': 'orgName', 'set-org-url': 'orgUrl',
+            'set-from-name': 'fromName', 'set-from-email': 'fromEmail', 'set-reply-to': 'replyTo',
+            'set-signature': 'signature', 'set-footer-note': 'footerNote',
+            'set-bg-color': 'bgColor', 'set-font-family': 'fontFamily', 'set-email-width': 'emailWidth',
+            'set-default-template': 'defaultTemplate',
+            'set-smtp-host': 'smtpHost', 'set-smtp-port': 'smtpPort', 'set-smtp-user': 'smtpUser',
+            'set-smtp-pass': 'smtpPass', 'set-smtp-encryption': 'smtpEncryption',
+            'set-send-delay': 'sendDelay', 'set-batch-size': 'batchSize',
+            'set-confirm-before-send': 'confirmBeforeSend', 'set-skip-duplicates': 'skipDuplicates',
+            'set-validate-emails': 'validateEmails', 'set-auto-retry': 'autoRetry',
+            'set-detailed-logs': 'detailedLogs', 'set-log-retention': 'logRetention',
+            'set-notify-complete': 'notifyComplete', 'set-notify-failure': 'notifyFailure',
+            'set-notify-import': 'notifyImport', 'set-notify-sound': 'notifySound',
+            'set-require-unsubscribe': 'requireUnsubscribe', 'set-require-consent': 'requireConsent',
+            'set-supabase-url': 'supabaseUrl', 'set-supabase-key': 'supabaseKey',
+            'set-supabase-table': 'supabaseTable',
+            'set-sb-auto-pull': 'sbAutoPull', 'set-sb-push-after-broadcast': 'sbPushAfterBroadcast',
+        };
+
+        function populateForm() {
+            Object.entries(FIELD_MAP).forEach(([elId, key]) => {
+                const el = document.getElementById(elId);
+                if (!el) return;
+                if (el.type === 'checkbox') el.checked = !!settings[key];
+                else el.value = settings[key] ?? '';
+            });
+            // Colors
+            document.querySelectorAll('.c-dot[data-target="btn"]').forEach(d => d.classList.toggle('active', d.dataset.color === settings.btnColor));
+            document.querySelectorAll('.c-dot[data-target="accent"]').forEach(d => d.classList.toggle('active', d.dataset.color === settings.accentColor));
+            document.getElementById('set-btn-color-custom').value = settings.btnColor;
+            document.getElementById('set-accent-color-custom').value = settings.accentColor;
+            // Logo
+            renderLogoPreview();
+            // Theme
+            document.documentElement.dataset.theme = settings.darkMode ? 'dark' : 'light';
+            document.getElementById('theme-toggle').querySelector('i').className = `fa-solid fa-${settings.darkMode ? 'moon' : 'sun'}`;
+        }
+
+        function bindFormListeners() {
+            Object.entries(FIELD_MAP).forEach(([elId, key]) => {
+                const el = document.getElementById(elId);
+                if (!el) return;
+                const evt = (el.tagName === 'SELECT' || el.type === 'checkbox') ? 'change' : 'input';
+                el.addEventListener(evt, () => {
+                    settings[key] = el.type === 'checkbox' ? el.checked : el.value;
+                    markDirty();
+                    if (elId === 'set-dark-mode') {
+                        document.documentElement.dataset.theme = el.checked ? 'dark' : 'light';
+                        document.getElementById('theme-toggle').querySelector('i').className = `fa-solid fa-${el.checked ? 'moon' : 'sun'}`;
+                    }
+                });
+            });
+        }
+
+        // ── COLOR DOTS ──────────────────────────────────────────────
+        document.querySelectorAll('.c-dot[data-target="btn"]').forEach(dot => {
+            dot.addEventListener('click', () => {
+                document.querySelectorAll('.c-dot[data-target="btn"]').forEach(d => d.classList.remove('active'));
+                dot.classList.add('active');
+                settings.btnColor = dot.dataset.color;
+                document.getElementById('set-btn-color-custom').value = dot.dataset.color;
+                markDirty();
+            });
+        });
+        document.getElementById('set-btn-color-custom').addEventListener('input', function () {
+            settings.btnColor = this.value;
+            document.querySelectorAll('.c-dot[data-target="btn"]').forEach(d => d.classList.remove('active'));
+            markDirty();
+        });
+        document.querySelectorAll('.c-dot[data-target="accent"]').forEach(dot => {
+            dot.addEventListener('click', () => {
+                document.querySelectorAll('.c-dot[data-target="accent"]').forEach(d => d.classList.remove('active'));
+                dot.classList.add('active');
+                settings.accentColor = dot.dataset.color;
+                document.getElementById('set-accent-color-custom').value = dot.dataset.color;
+                markDirty();
+            });
+        });
+        document.getElementById('set-accent-color-custom').addEventListener('input', function () {
+            settings.accentColor = this.value;
+            document.querySelectorAll('.c-dot[data-target="accent"]').forEach(d => d.classList.remove('active'));
+            markDirty();
+        });
+
+        // ── LOGO UPLOAD ─────────────────────────────────────────────
+        function renderLogoPreview() {
+            const preview = document.getElementById('logo-preview');
+            if (settings.logo) {
+                preview.innerHTML = `<img src="${settings.logo}" alt="Logo">`;
+            } else {
+                preview.innerHTML = `<i class="fa-solid fa-image"></i>`;
+            }
+        }
+        document.getElementById('btn-upload-logo').addEventListener('click', () => document.getElementById('logo-file-input').click());
+        document.getElementById('logo-file-input').addEventListener('change', function () {
+            const f = this.files[0];
+            if (!f) return;
+            if (f.size > 250000) { showToast('Logo file too large (max ~200KB)', 'warn'); return; }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                settings.logo = e.target.result;
+                renderLogoPreview();
+                markDirty();
+                showToast('Logo uploaded');
+            };
+            reader.readAsDataURL(f);
+            this.value = '';
+        });
+        document.getElementById('btn-remove-logo').addEventListener('click', () => {
+            settings.logo = '';
+            renderLogoPreview();
+            markDirty();
+        });
+
+        // ── SMTP PRESETS ────────────────────────────────────────────
+
+
+        const PRESETS = {
+            gmail: { host: 'smtp.gmail.com', port: '587', enc: 'tls' },
+            outlook: { host: 'smtp.office365.com', port: '587', enc: 'tls' },
+            zoho: { host: 'smtp.zoho.com', port: '587', enc: 'tls' },
+            sendgrid: { host: 'smtp.sendgrid.net', port: '587', enc: 'tls' },
+            mailgun: { host: 'smtp.mailgun.org', port: '587', enc: 'tls' },
+            ses: { host: 'email-smtp.us-east-1.amazonaws.com', port: '587', enc: 'tls' },
+        };
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const p = PRESETS[btn.dataset.preset];
+                if (!p) return;
+                document.getElementById('set-smtp-host').value = p.host;
+                document.getElementById('set-smtp-port').value = p.port;
+                document.getElementById('set-smtp-encryption').value = p.enc;
+                settings.smtpHost = p.host; settings.smtpPort = p.port; settings.smtpEncryption = p.enc;
+                markDirty();
+                showToast(`Loaded ${btn.querySelector('.pname').textContent} preset`);
+            });
+        });
+
+        // Password visibility toggle
+        document.getElementById('toggle-smtp-pass').addEventListener('click', function () {
+            const inp = document.getElementById('set-smtp-pass');
+            const isPw = inp.type === 'password';
+            inp.type = isPw ? 'text' : 'password';
+            this.querySelector('i').className = `fa-solid fa-eye${isPw ? '-slash' : ''}`;
+        });
+
+        // Test connection
+        document.getElementById('btn-test-connection').addEventListener('click', async function () {
+            const host = document.getElementById('set-smtp-host').value.trim();
+            const port = document.getElementById('set-smtp-port').value.trim();
+            const user = document.getElementById('set-smtp-user').value.trim();
+            const pass = document.getElementById('set-smtp-pass').value.trim();
+            const secure = document.getElementById('set-smtp-encryption').value;
+            const result = document.getElementById('test-conn-result');
+
+            if (!host || !user || !pass) {
+                result.innerHTML = '<span style="color:var(--red2)"><i class="fa-solid fa-circle-xmark"></i> Provide SMTP host, username, and password to test connection.</span>';
+                showToast('Enter all SMTP credentials before testing', 'warn');
+                return;
+            }
+
+            result.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="color:var(--text3)"></i> Testing connection…';
+            try {
+                const headers = await getAuthHeaders({ 'Content-Type': 'application/json' });
+                const res = await fetch(`${window.API_BASE_URL}/api/settings/test`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({ host, port, user, pass, secure })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    result.innerHTML = '<span style="color:var(--green)"><i class="fa-solid fa-circle-check"></i> Connection successful! SMTP settings are correct.</span>';
+                    showToast('SMTP connection test succeeded!', 'ok');
+                } else {
+                    result.innerHTML = `<span style="color:var(--red2)"><i class="fa-solid fa-circle-xmark"></i> Connection failed: ${data.error || 'Unknown error'}</span>`;
+                    showToast('SMTP connection test failed', 'err');
+                }
+            } catch (e) {
+                console.error("SMTP test connection error:", e);
+                result.innerHTML = '<span style="color:var(--red2)"><i class="fa-solid fa-circle-xmark"></i> Network error during SMTP test.</span>';
+                showToast('SMTP connection test error', 'err');
+            }
+        });
+
+        // ── NAV SWITCHING ───────────────────────────────────────────
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+                item.classList.add('active');
+                document.getElementById('sec-' + item.dataset.target).classList.add('active');
+                document.querySelector('.settings-main').scrollTop = 0;
+            });
+        });
+
+        // ── THEME TOGGLE (topbar) ──────────────────────────────────
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            // common.js toggles the theme first, so we just read the updated theme and update settings
+            setTimeout(() => {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                settings.darkMode = isDark;
+                const setDarkModeCheckbox = document.getElementById('set-dark-mode');
+                if (setDarkModeCheckbox) {
+                    setDarkModeCheckbox.checked = isDark;
+                }
+                markDirty();
+            }, 50);
+        });
+
+        // ── SAVE / DISCARD ──────────────────────────────────────────
+        document.getElementById('btn-save-settings').addEventListener('click', () => {
+            persistSettings();
+            showToast('Settings saved successfully');
+        });
+        document.getElementById('btn-discard').addEventListener('click', () => {
+            loadSettings();
+            populateForm();
+            dirty = false;
+            updateSaveStatus();
+            showToast('Changes discarded', 'warn');
+        });
+
+        // Autosave every change after short debounce too (so reloading mid-edit doesn't lose everything)
+        let autosaveTimer;
+        function scheduleAutosave() {
+            clearTimeout(autosaveTimer);
+            autosaveTimer = setTimeout(() => { if (dirty) persistSettings(); }, 2000);
+        }
+        document.querySelector('.settings-main').addEventListener('input', scheduleAutosave);
+        document.querySelector('.settings-main').addEventListener('change', scheduleAutosave);
+
+        // ── DATA MANAGEMENT ─────────────────────────────────────────
+        function getMembers() { try { return JSON.parse(localStorage.getItem('mf_members') || '[]'); } catch (e) { return []; } }
+        function getGroups() { try { return JSON.parse(localStorage.getItem('mf_groups') || '[]'); } catch (e) { return []; } }
+
+        function refreshDataStats() {
+            const members = getMembers();
+            const groups = getGroups();
+            document.getElementById('data-stat-members').textContent = members.length;
+            document.getElementById('data-stat-groups').textContent = groups.length;
+            const totalBytes = (localStorage.getItem('mf_members') || '').length + (localStorage.getItem('mf_groups') || '').length + (localStorage.getItem(SETTINGS_KEY) || '').length;
+            document.getElementById('data-stat-size').textContent = (totalBytes / 1024).toFixed(1) + ' KB';
+            const lastMod = localStorage.getItem('mf_last_modified');
+            document.getElementById('data-stat-updated').textContent = lastMod ? new Date(parseInt(lastMod)).toLocaleDateString() : 'Today';
+            document.getElementById('smtp-status-dot').style.background = settings.smtpHost ? 'var(--green)' : 'var(--text2)';
+        }
+
+        document.getElementById('btn-export-backup').addEventListener('click', () => {
+            const backup = {
+                version: '2.0', exportedAt: new Date().toISOString(),
+                members: getMembers(), groups: getGroups(), settings: settings,
+            };
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }));
+            a.download = `mailpilot-backup-${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            showToast('Backup exported');
+        });
+
+        document.getElementById('btn-import-backup').addEventListener('click', () => document.getElementById('backup-file-input').click());
+        document.getElementById('backup-file-input').addEventListener('change', function () {
+            const f = this.files[0];
+            if (!f) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.members) localStorage.setItem('mf_members', JSON.stringify(data.members));
+                    if (data.groups) localStorage.setItem('mf_groups', JSON.stringify(data.groups));
+                    if (data.settings) { settings = { ...DEFAULTS, ...data.settings }; persistSettings(); populateForm(); }
+                    refreshDataStats();
+                    showToast('Backup imported successfully');
+                } catch (err) {
+                    showToast('Invalid backup file', 'err');
+                }
+            };
+            reader.readAsText(f);
+            this.value = '';
+        });
+
+        document.getElementById('btn-export-members-csv').addEventListener('click', () => {
+            const members = getMembers();
+            if (!members.length) { showToast('No members to export', 'warn'); return; }
+            const rows = [['name', 'email', 'college', 'phone', 'group'],
+            ...members.map(m => [m.name, m.email, m.college || '', m.phone || '', m.group || ''])];
+            const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+            a.download = 'members.csv'; a.click();
+            showToast('Members exported as CSV');
+        });
+
+        // ── DANGER ZONE ─────────────────────────────────────────────
+        function openConfirm(title, desc, requireTyping, onConfirm) {
+            const modal = document.getElementById('confirm-modal');
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-desc').textContent = desc;
+            const input = document.getElementById('confirm-input');
+            const okBtn = document.getElementById('confirm-ok');
+            if (requireTyping) {
+                input.style.display = 'block';
+                input.value = '';
+                input.placeholder = `Type ${requireTyping} to confirm`;
+                okBtn.disabled = true;
+                input.oninput = () => { okBtn.disabled = input.value !== requireTyping; };
+            } else {
+                input.style.display = 'none';
+                okBtn.disabled = false;
+            }
+            modal.classList.add('open');
+            okBtn.onclick = () => {
+                if (requireTyping && input.value !== requireTyping) return;
+                onConfirm();
+                modal.classList.remove('open');
+            };
+        }
+        document.getElementById('confirm-cancel').addEventListener('click', () => document.getElementById('confirm-modal').classList.remove('open'));
+
+        document.getElementById('btn-danger-clear-members').addEventListener('click', () => {
+            openConfirm('Clear all members?', 'This will permanently delete every member from your directory. This cannot be undone.', 'DELETE', () => {
+                localStorage.setItem('mf_members', '[]');
+                refreshDataStats();
+                showToast('All members cleared');
+            });
+        });
+        document.getElementById('btn-danger-reset-settings').addEventListener('click', () => {
+            openConfirm('Reset all settings?', 'Every setting on this page will be restored to its default value. Members and groups are not affected.', null, () => {
+                settings = { ...DEFAULTS };
+                persistSettings();
+                populateForm();
+                showToast('Settings reset to defaults');
+            });
+        });
+        document.getElementById('btn-danger-erase-all').addEventListener('click', () => {
+            openConfirm('Erase everything?', 'This deletes ALL members, groups, settings, and logs. This is a full factory reset and cannot be undone.', 'ERASE', () => {
+                localStorage.removeItem('mf_members');
+                localStorage.removeItem('mf_groups');
+                localStorage.removeItem(SETTINGS_KEY);
+                settings = { ...DEFAULTS };
+                persistSettings();
+                populateForm();
+                refreshDataStats();
+                showToast('Everything has been erased');
+            });
+        });
+
+        // ── SUPABASE SYNCHRONIZATION ENGINE ─────────────────────────
+        function getSbCredentials() {
+            const url = document.getElementById('set-supabase-url').value.trim();
+            const key = document.getElementById('set-supabase-key').value.trim();
+            const table = document.getElementById('set-supabase-table').value.trim() || 'users';
+            return { url, key, table };
+        }
+
+        function logSbSync(msg, type = 'info') {
+            const logEl = document.getElementById('sb-sync-log');
+            if (!logEl) return;
+            logEl.style.display = 'block';
+            const time = new Date().toLocaleTimeString();
+            let color = 'var(--text2)';
+            let icon = 'ℹ';
+            if (type === 'success') { color = 'var(--green)'; icon = '✔'; }
+            if (type === 'error') { color = 'var(--red2)'; icon = '✘'; }
+            if (type === 'warning') { color = 'var(--gold2)'; icon = '⚠'; }
+            logEl.innerHTML += `<div style="color:${color};margin-bottom:0.25rem">[${time}] ${icon} ${msg}</div>`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        // Test connection
+        document.getElementById('btn-sb-test').addEventListener('click', async () => {
+            const resultEl = document.getElementById('sb-test-result');
+            const badgeEl = document.getElementById('sb-conn-badge');
+            
+            resultEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="color:var(--text3)"></i> Testing connection via relay...';
+            badgeEl.style.display = 'none';
+
+            try {
+                const table = document.getElementById('set-supabase-table').value.trim() || 'users';
+                const headers = await getAuthHeaders();
+                const res = await fetch(`${window.API_BASE_URL}/api/members?table=${encodeURIComponent(table)}`, { headers });
+                if (!res.ok) throw new Error(res.statusText);
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error);
+                
+                resultEl.innerHTML = '<span style="color:var(--green)"><i class="fa-solid fa-circle-check"></i> Connected successfully!</span>';
+                badgeEl.style.display = 'inline-flex';
+                showToast('Supabase connection successful!', 'ok');
+            } catch (err) {
+                console.error(err);
+                resultEl.innerHTML = `<span style="color:var(--red2)"><i class="fa-solid fa-circle-xmark"></i> Connection failed: ${err.message || 'Unknown error'}</span>`;
+                badgeEl.style.display = 'none';
+                showToast('Supabase connection failed', 'err');
+            }
+        });
+
+        // Toggle Key Visibility
+        document.getElementById('toggle-sb-key').addEventListener('click', function () {
+            const inp = document.getElementById('set-supabase-key');
+            const isPw = inp.type === 'password';
+            inp.type = isPw ? 'text' : 'password';
+            this.querySelector('i').className = `fa-solid fa-eye${isPw ? '-slash' : ''}`;
+        });
+
+        // Refresh Counts
+        async function refreshSbCounts() {
+            // Local count
+            const localM = getMembers();
+            document.getElementById('sb-stat-local').textContent = localM.length;
+            
+            const remoteEl = document.getElementById('sb-stat-remote');
+            remoteEl.textContent = '...';
+            try {
+                const table = settings.supabaseTable || 'users';
+                const headers = await getAuthHeaders();
+                const res = await fetch(`${window.API_BASE_URL}/api/members?table=${encodeURIComponent(table)}`, { headers });
+                if (!res.ok) throw new Error(res.statusText);
+                const result = await res.json();
+                if (!result.success) throw new Error(result.error);
+                remoteEl.textContent = result.data ? result.data.length : 0;
+            } catch (err) {
+                console.error(err);
+                remoteEl.textContent = 'error';
+            }
+        }
+        document.getElementById('btn-sb-count').addEventListener('click', refreshSbCounts);
+
+        // Pull from Supabase
+        document.getElementById('btn-sb-pull').addEventListener('click', async () => {
+            const btn = document.getElementById('btn-sb-pull');
+            const orig = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Pulling...';
+            
+            logSbSync('Starting members pull from Supabase table...');
+            try {
+                const table = settings.supabaseTable || 'users';
+                const headers = await getAuthHeaders();
+                const res = await fetch(`${window.API_BASE_URL}/api/members?table=${encodeURIComponent(table)}`, { headers });
+                if (!res.ok) throw new Error(res.statusText);
+                const result = await res.json();
+                if (!result.success) throw new Error(result.error);
+                
+                const data = result.data;
+                if (!data || !data.length) {
+                    logSbSync('No members found in remote database table.', 'warning');
+                    showToast('No remote members found', 'warn');
+                    btn.disabled = false;
+                    btn.innerHTML = orig;
+                    refreshSbCounts();
+                    return;
+                }
+                
+                logSbSync(`Fetched ${data.length} member records from Supabase. Merging into local database...`);
+                
+                const deletedIds = new Set(JSON.parse(localStorage.getItem('mf_deleted_ids') || '[]'));
+                
+                const remoteMembers = data.map(remote => ({
+                    id: remote.id || remote.email,
+                    name: remote.name || remote.email.split('@')[0],
+                    email: remote.email,
+                    college: remote.college || '',
+                    phone: remote.phone || '',
+                    group: remote.group || (remote.role === 'admin' ? 'Admin' : 'General'),
+                    custom: remote.custom || null
+                }));
+
+                // Filter out deleted IDs
+                const filteredRemote = remoteMembers.filter(m => !deletedIds.has(m.id));
+                
+                let localMembers = getMembers();
+                let added = 0;
+                let updated = 0;
+                
+                filteredRemote.forEach(remote => {
+                    const email = (remote.email || '').trim().toLowerCase();
+                    if (!email) return;
+                    
+                    const idx = localMembers.findIndex(m => (m.email || '').trim().toLowerCase() === email);
+                    if (idx > -1) {
+                        localMembers[idx] = { ...localMembers[idx], ...remote };
+                        updated++;
+                    } else {
+                        localMembers.push(remote);
+                        added++;
+                    }
+                });
+                
+                localStorage.setItem('mf_members', JSON.stringify(localMembers));
+                
+                const groups = Array.from(new Set(localMembers.map(m => m.group || 'General')));
+                if (!groups.includes('General')) groups.unshift('General');
+                localStorage.setItem('mf_groups', JSON.stringify(groups));
+                
+                logSbSync(`Pull completed! Added ${added} new members, updated ${updated} existing.`, 'success');
+                showToast(`Pulled ${added + updated} members from Supabase`, 'ok');
+                
+                localStorage.setItem('mf_last_modified', Date.now().toString());
+                
+                refreshDataStats();
+                refreshSbCounts();
+            } catch (err) {
+                console.error(err);
+                logSbSync(`Pull failed: ${err.message || 'Unknown error'}`, 'error');
+                showToast('Pull failed', 'err');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        });
+
+        // Push to Supabase
+        document.getElementById('btn-sb-push').addEventListener('click', async () => {
+            const localMembers = getMembers();
+            if (!localMembers.length) {
+                showToast('No local members to push', 'warn');
+                return;
+            }
+            
+            const btn = document.getElementById('btn-sb-push');
+            const orig = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Pushing...';
+            
+            logSbSync('Starting members push to Supabase table...');
+            try {
+                const table = settings.supabaseTable || 'users';
+                const headers = await getAuthHeaders({ 'Content-Type': 'application/json' });
+                const response = await fetch(`${window.API_BASE_URL}/api/members?table=${encodeURIComponent(table)}`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(localMembers)
+                });
+                const result = await response.json();
+                if (!result.success) throw new Error(result.error);
+                
+                logSbSync(`Push completed! Successfully synchronized ${localMembers.length} member records.`, 'success');
+                showToast(`Pushed ${localMembers.length} members to Supabase`, 'ok');
+                
+                refreshSbCounts();
+            } catch (err) {
+                console.error(err);
+                logSbSync(`Push failed: ${err.message || 'Unknown error'}.`, 'error');
+                showToast('Push failed', 'err');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        });
+
+        // ── INIT ────────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', () => {
+            (async () => {
+                await loadSettings();
+                populateForm();
+                bindFormListeners();
+                refreshDataStats();
+                updateSaveStatus();
+
+                // Auto pull on load if configured
+                setTimeout(() => {
+                    refreshSbCounts();
+                    if (settings.sbAutoPull) {
+                        const btn = document.getElementById('btn-sb-pull');
+                        if (btn) btn.click();
+                    }
+                }, 800);
+            })();
+        });
+
+        // ════════════════════════════════════════
+        // ACCOUNT SECURITY MODULE
+        // ════════════════════════════════════════
+
+        /* Toggle password visibility helper */
+        function secTogglePw(inputId, btn) {
+            const inp = document.getElementById(inputId);
+            if (!inp) return;
+            const isHidden = inp.type === 'password';
+            inp.type = isHidden ? 'text' : 'password';
+            btn.querySelector('i').className = `fa-solid fa-eye${isHidden ? '-slash' : ''}`;
+        }
+        window.secTogglePw = secTogglePw;
+
+        /* Password strength checker */
+        function checkPasswordStrength(pw) {
+            let score = 0;
+            if (pw.length >= 8)  score++;
+            if (pw.length >= 12) score++;
+            if (/[A-Z]/.test(pw)) score++;
+            if (/[0-9]/.test(pw)) score++;
+            if (/[^A-Za-z0-9]/.test(pw)) score++;
+            const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+            const colors = ['#da3633', '#f5a623', '#d29922', '#4f8ef7', '#22d3a3'];
+            return { score, label: labels[Math.min(score, 4)], color: colors[Math.min(score, 4)], pct: (score / 5) * 100 };
+        }
+
+        document.getElementById('sec-new-password')?.addEventListener('input', function () {
+            const { label, color, pct } = checkPasswordStrength(this.value);
+            const bar = document.getElementById('pw-strength-bar');
+            const lbl = document.getElementById('pw-strength-label');
+            if (bar) { bar.style.width = pct + '%'; bar.style.background = color; }
+            if (lbl) { lbl.textContent = this.value ? label : '—'; lbl.style.color = color; }
+        });
+
+        /* Detect auth method and populate session info */
+        async function loadSecurityInfo() {
+            const client = typeof initSupabaseClient === 'function' ? initSupabaseClient() : null;
+            if (!client) { setTimeout(loadSecurityInfo, 200); return; }
+
+            try {
+                const { data: { session } } = await client.auth.getSession();
+                if (!session) return;
+
+                const user = session.user;
+                const providers = user.app_metadata?.providers || [user.app_metadata?.provider || 'email'];
+                const isGoogleOnly = providers.includes('google') && !providers.includes('email');
+                const hasPassword = user.app_metadata?.providers?.includes('email') || false;
+
+                // Banner
+                const banner = document.getElementById('auth-method-banner');
+                const bannerText = document.getElementById('auth-method-text');
+                if (isGoogleOnly) {
+                    banner.className = 'alert alert-warn';
+                    banner.querySelector('i').className = 'fa-brands fa-google';
+                    bannerText.innerHTML = 'You signed in with <strong>Google OAuth</strong>. Set an account password below to also enable email + password login.';
+                } else if (hasPassword) {
+                    banner.className = 'alert alert-info';
+                    bannerText.innerHTML = '<i class="fa-solid fa-circle-check" style="color:var(--green)"></i> You have both Google OAuth and email/password login enabled.';
+                } else {
+                    banner.className = 'alert alert-info';
+                    bannerText.innerHTML = 'Signed in with <strong>email/password</strong>. Use the form below to update your password.';
+                }
+
+                // Password section desc & button label
+                const badge = document.getElementById('pw-status-badge');
+                const desc = document.getElementById('pw-section-desc');
+                const btnLabel = document.getElementById('btn-set-pw-label');
+
+                if (hasPassword) {
+                    badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Password Set';
+                    badge.style.cssText = 'background:rgba(34,211,163,.15);color:var(--green)';
+                    if (desc) desc.textContent = 'Update your existing account password. Changes take effect on your next login.';
+                    if (btnLabel) btnLabel.textContent = 'Update Password';
+                } else {
+                    badge.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> No Password';
+                    badge.style.cssText = 'background:rgba(242,92,110,.15);color:var(--red2)';
+                    if (desc) desc.textContent = 'No password set. Set one to enable email + password login alongside Google OAuth.';
+                    if (btnLabel) btnLabel.textContent = 'Set Password';
+                }
+
+                // Session info
+                const el = id => document.getElementById(id);
+                if (el('session-email'))      el('session-email').textContent = user.email || '—';
+                if (el('session-provider'))   el('session-provider').textContent = providers.join(', ');
+                if (el('session-last-signin')) {
+                    const ts = user.last_sign_in_at;
+                    el('session-last-signin').textContent = ts ? new Date(ts).toLocaleString() : '—';
+                }
+
+            } catch (e) {
+                console.warn('Security info load error:', e);
+            }
+        }
+
+        /* Set / Update Password form submit */
+        document.getElementById('sec-password-form')?.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const newPw  = document.getElementById('sec-new-password').value.trim();
+            const confPw = document.getElementById('sec-confirm-password').value.trim();
+            const feedback = document.getElementById('sec-pw-feedback');
+            const btn = document.getElementById('btn-set-password');
+
+            const showFeedback = (msg, ok) => {
+                feedback.style.display = 'block';
+                feedback.style.color = ok ? 'var(--green)' : 'var(--red2)';
+                feedback.innerHTML = (ok ? '<i class="fa-solid fa-circle-check"></i> ' : '<i class="fa-solid fa-circle-xmark"></i> ') + msg;
+            };
+
+            if (!newPw || newPw.length < 8) { showFeedback('Password must be at least 8 characters.', false); return; }
+            if (newPw !== confPw)           { showFeedback('Passwords do not match.', false); return; }
+
+            const origHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+            try {
+                const client = initSupabaseClient();
+                if (!client) throw new Error('Supabase client not available');
+
+                const { error } = await client.auth.updateUser({ password: newPw });
+                if (error) throw error;
+
+                showFeedback('Password updated successfully! You can now log in with your email + password.', true);
+                showToast('Password updated successfully', 'ok');
+
+                document.getElementById('sec-new-password').value = '';
+                document.getElementById('sec-confirm-password').value = '';
+                const bar = document.getElementById('pw-strength-bar');
+                if (bar) { bar.style.width = '0%'; }
+                const lbl = document.getElementById('pw-strength-label');
+                if (lbl) lbl.textContent = '—';
+
+                // Refresh UI state
+                await loadSecurityInfo();
+
+            } catch (err) {
+                console.error('Password update error:', err);
+                showFeedback(err.message || 'Failed to update password. Try again.', false);
+                showToast('Password update failed', 'err');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = origHTML;
+            }
+        });
+
+        // ── GOOGLE APP PASSWORDS MANAGEMENT ───────────────────────────
+        const APP_PW_KEY = 'mf_app_passwords';
+
+        function getAppPasswords() {
+            try { return JSON.parse(localStorage.getItem(APP_PW_KEY) || '[]'); }
+            catch (e) { return []; }
+        }
+
+        function saveAppPasswords(list) {
+            localStorage.setItem(APP_PW_KEY, JSON.stringify(list));
+        }
+
+        function renderAppPasswords() {
+            const list = getAppPasswords();
+            const container = document.getElementById('app-passwords-list');
+            const applyBtn = document.getElementById('btn-apply-app-pw-to-smtp');
+            if (!container) return;
+
+            if (!list.length) {
+                container.innerHTML = '<div style="font-size:0.8rem;color:var(--text2);padding:0.5rem 0">No app passwords saved yet. Add one below.</div>';
+                if (applyBtn) applyBtn.style.display = 'none';
+                return;
+            }
+
+            if (applyBtn) applyBtn.style.display = 'inline-flex';
+
+            container.innerHTML = list.map((ap, idx) => `
+                <div class="switch-row" style="gap:0.75rem" id="app-pw-row-${idx}">
+                    <div class="switch-info" style="flex:1;min-width:0">
+                        <strong>${esc(ap.label)}</strong>
+                        <span>${esc(ap.email)} &nbsp;·&nbsp; <span style="font-family:var(--font-m);letter-spacing:0.08em">••••&nbsp;••••&nbsp;••••&nbsp;${esc(ap.value.slice(-4))}</span></span>
+                    </div>
+                    <div style="display:flex;gap:0.4rem;flex-shrink:0">
+                        <button class="btn btn-ghost btn-sm" title="Apply to SMTP" onclick="applyAppPwToSmtp(${idx})">
+                            <i class="fa-solid fa-plug"></i>
+                        </button>
+                        <button class="btn btn-danger-outline btn-sm" title="Delete" onclick="deleteAppPw(${idx})">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function applyAppPwToSmtp(idx) {
+            const list = getAppPasswords();
+            const ap = list[idx];
+            if (!ap) return;
+            // Apply to SMTP settings
+            const hostEl = document.getElementById('set-smtp-host');
+            const userEl = document.getElementById('set-smtp-user');
+            const passEl = document.getElementById('set-smtp-pass');
+            const portEl = document.getElementById('set-smtp-port');
+            if (hostEl) hostEl.value = 'smtp.gmail.com';
+            if (portEl) portEl.value = '587';
+            if (userEl) userEl.value = ap.email;
+            if (passEl) passEl.value = ap.value;
+            // Update settings object and persist
+            settings.smtpHost     = 'smtp.gmail.com';
+            settings.smtpPort     = 587;
+            settings.smtpUser     = ap.email;
+            settings.smtpPass = ap.value;
+            persistSettings();
+            showToast(`App Password "${ap.label}" applied to SMTP settings`, 'ok');
+            // Navigate to SMTP section
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+            const smtpNav = document.querySelector('[data-target="smtp"]');
+            if (smtpNav) smtpNav.classList.add('active');
+            document.getElementById('sec-smtp')?.classList.add('active');
+        }
+        window.applyAppPwToSmtp = applyAppPwToSmtp;
+
+        function deleteAppPw(idx) {
+            const list = getAppPasswords();
+            list.splice(idx, 1);
+            saveAppPasswords(list);
+            renderAppPasswords();
+            showToast('App password removed', 'warn');
+        }
+        window.deleteAppPw = deleteAppPw;
+
+        document.getElementById('btn-add-app-pw')?.addEventListener('click', () => {
+            document.getElementById('app-pw-add-form').style.display = 'block';
+            document.getElementById('btn-add-app-pw').style.display = 'none';
+            document.getElementById('app-pw-label').focus();
+        });
+
+        document.getElementById('btn-cancel-app-pw')?.addEventListener('click', () => {
+            document.getElementById('app-pw-add-form').style.display = 'none';
+            document.getElementById('btn-add-app-pw').style.display = 'inline-flex';
+            document.getElementById('app-pw-label').value = '';
+            document.getElementById('app-pw-email').value = '';
+            document.getElementById('app-pw-value').value = '';
+        });
+
+        document.getElementById('btn-save-app-pw')?.addEventListener('click', () => {
+            const label = document.getElementById('app-pw-label').value.trim();
+            const email = document.getElementById('app-pw-email').value.trim();
+            const value = document.getElementById('app-pw-value').value.trim().replace(/\s/g, '');
+
+            if (!label) { showToast('Enter a label', 'warn'); return; }
+            if (!email || !email.includes('@')) { showToast('Enter a valid Gmail address', 'warn'); return; }
+            if (value.length < 16) { showToast('App password must be 16 characters', 'warn'); return; }
+
+            const list = getAppPasswords();
+            list.push({ label, email, value, createdAt: new Date().toISOString() });
+            saveAppPasswords(list);
+            renderAppPasswords();
+
+            // Hide form, reset
+            document.getElementById('app-pw-add-form').style.display = 'none';
+            document.getElementById('btn-add-app-pw').style.display = 'inline-flex';
+            document.getElementById('app-pw-label').value = '';
+            document.getElementById('app-pw-email').value = '';
+            document.getElementById('app-pw-value').value = '';
+
+            showToast(`App password "${label}" saved`, 'ok');
+        });
+
+        /* Apply all (pick first) from the top-level button */
+        document.getElementById('btn-apply-app-pw-to-smtp')?.addEventListener('click', () => {
+            const list = getAppPasswords();
+            if (list.length === 0) { showToast('No app passwords saved', 'warn'); return; }
+            applyAppPwToSmtp(0);
+        });
+
+        /* Sign out of all sessions */
+        document.getElementById('btn-sign-out-all')?.addEventListener('click', async () => {
+            const client = typeof initSupabaseClient === 'function' ? initSupabaseClient() : null;
+            if (!client) { showToast('Supabase not ready', 'warn'); return; }
+            try {
+                await client.auth.signOut({ scope: 'global' });
+                showToast('Signed out of all sessions. Redirecting...', 'ok');
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
+            } catch (err) {
+                showToast('Sign out failed: ' + (err.message || 'Unknown error'), 'err');
+            }
+        });
+
+        /* Initialise security panel when tab is first clicked */
+        let securityPanelLoaded = false;
+        document.querySelector('[data-target="security"]')?.addEventListener('click', () => {
+            if (!securityPanelLoaded) {
+                securityPanelLoaded = true;
+                loadSecurityInfo();
+                renderAppPasswords();
+            }
+        });
+    </script>
+</body>
+
+</html>

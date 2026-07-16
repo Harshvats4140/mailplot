@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — MailPilot Studio</title>
+  <meta name="description" content="MailPilot Studio command center — monitor campaigns, audience growth, and SMTP infrastructure.">
+  <!-- Google Fonts (MailPilot Design System) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- MailPilot Design System -->
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ═══════════════════════════════════════
+       DASHBOARD COMPONENT STYLES
+    ═══════════════════════════════════════ */
+    .hero-shell {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top left, rgba(79, 142, 247, 0.2), transparent 45%),
+        linear-gradient(135deg, rgba(79, 142, 247, 0.16) 0%, rgba(99, 102, 241, 0.1) 45%, rgba(167, 139, 250, 0.08) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--r3);
+      padding: 1.4rem 1.5rem;
+      margin-bottom: 1.4rem;
+      box-shadow: var(--shadow2);
+    }
+
+    .hero-shell::after {
+      content: '';
+      position: absolute;
+      inset: auto -30px -40px auto;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.14), transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      background: rgba(34, 211, 163, 0.13);
+      color: var(--green);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.7rem;
+    }
+
+    .hero-shell h2 {
+      font-family: var(--font-d);
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 0.35rem;
+      line-height: 1.2;
+    }
+
+    .hero-shell p {
+      font-size: 0.84rem;
+      color: var(--text2);
+      max-width: 700px;
+      line-height: 1.6;
+    }
+
+    .hero-highlights {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1rem;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.38rem 0.7rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text);
+      font-size: 0.74rem;
+      font-weight: 600;
+    }
+
+    .hero-pill i {
+      color: var(--accent);
+    }
+
+    .insight-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-bottom: 1.5rem;
+    }
+
+    .insight-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      padding: 1rem 1.1rem;
+      box-shadow: var(--shadow3);
+    }
+
+    .insight-card .label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--text2);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.4rem;
+    }
+
+    .insight-card .value {
+      font-family: var(--font-d);
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+    }
+
+    .insight-card .sub {
+      font-size: 0.78rem;
+      color: var(--text2);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      padding: 1.25rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s var(--ease), border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+      cursor: default;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border2);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .stat-card:hover::before {
+      opacity: 1;
+    }
+
+    .stat-card.success::before {
+      background: var(--green);
+    }
+    .stat-card.warning::before {
+      background: var(--gold);
+    }
+    .stat-card.danger::before {
+      background: var(--red);
+    }
+    .stat-card.purple::before {
+      background: var(--purple);
+    }
+
+    .stat-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .stat-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      background: rgba(79, 142, 247, 0.1);
+      color: var(--accent);
+    }
+
+    .stat-card.success .stat-icon {
+      background: rgba(34, 211, 163, 0.1);
+      color: var(--green);
+    }
+    .stat-card.warning .stat-icon {
+      background: rgba(245, 166, 35, 0.1);
+      color: var(--gold);
+    }
+    .stat-card.danger .stat-icon {
+      background: rgba(242, 92, 110, 0.1);
+      color: var(--red);
+    }
+    .stat-card.purple .stat-icon {
+      background: rgba(167, 139, 250, 0.1);
+      color: var(--purple);
+    }
+
+    .stat-trend {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+
+    .stat-trend.up {
+      background: rgba(34, 211, 163, 0.12);
+      color: var(--green);
+    }
+    .stat-trend.down {
+      background: rgba(242, 92, 110, 0.12);
+      color: var(--red);
+    }
+    .stat-trend.neutral {
+      background: rgba(122, 144, 187, 0.12);
+      color: var(--text2);
+    }
+
+    .stat-value {
+      font-family: var(--font-d);
+      font-size: 1.75rem;
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text2);
+      margin-top: 0.25rem;
+      font-weight: 500;
+    }
+
+    /* Cards & Layout */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-header h3 {
+      font-family: var(--font-d);
+      font-size: 0.9rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text);
+    }
+
+    .card-header h3 i {
+      color: var(--accent);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .card-body {
+      padding: 1.25rem;
+    }
+
+    /* Table styles */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    thead th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text2);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background var(--dur) var(--ease);
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: rgba(79, 142, 247, 0.03);
+    }
+
+    tbody td {
+      padding: 0.8rem 1rem;
+      vertical-align: middle;
+      color: var(--text2);
+    }
+
+    .td-primary {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .td-mono {
+      font-family: var(--font-m);
+      font-size: 0.75rem;
+    }
+
+    /* Activity timeline */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 0.8rem;
+      padding: 0.75rem 0;
+      position: relative;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 2rem;
+      width: 1px;
+      height: calc(100% - 1rem);
+      background: var(--border);
+    }
+
+    .timeline-item:last-child::before {
+      display: none;
+    }
+
+    .timeline-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      z-index: 1;
+    }
+
+    .timeline-dot.success {
+      background: rgba(34, 211, 163, 0.1);
+      color: var(--green);
+      border-color: rgba(34, 211, 163, 0.2);
+    }
+    .timeline-dot.primary {
+      background: rgba(79, 142, 247, 0.1);
+      color: var(--accent);
+      border-color: rgba(79, 142, 247, 0.2);
+    }
+    .timeline-dot.warning {
+      background: rgba(245, 166, 35, 0.1);
+      color: var(--gold);
+      border-color: rgba(245, 166, 35, 0.2);
+    }
+    .timeline-dot.danger {
+      background: rgba(242, 92, 110, 0.1);
+      color: var(--red);
+      border-color: rgba(242, 92, 110, 0.2);
+    }
+
+    .timeline-content {
+      flex: 1;
+      padding-top: 0.25rem;
+    }
+
+    .timeline-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.15rem;
+    }
+
+    .timeline-desc {
+      font-size: 0.72rem;
+      color: var(--text2);
+      line-height: 1.4;
+    }
+
+    .timeline-time {
+      font-size: 0.65rem;
+      color: var(--text2);
+      opacity: 0.8;
+      margin-top: 0.25rem;
+    }
+
+    /* Contacts layout */
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .contact-item:last-child {
+      border-bottom: none;
+    }
+
+    .contact-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .contact-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .contact-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .contact-email {
+      font-size: 0.7rem;
+      color: var(--text2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .contact-tag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.1rem 0.45rem;
+      border-radius: 20px;
+      background: rgba(79, 142, 247, 0.1);
+      color: var(--accent);
+    }
+
+    /* Quick Actions */
+    .qa-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .qa-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      padding: 1rem 0.75rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .qa-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border2);
+      box-shadow: var(--shadow);
+    }
+
+    .qa-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      margin: 0 auto 0.6rem;
+      background: rgba(79, 142, 247, 0.1);
+      color: var(--accent);
+    }
+
+    .qa-card.purple .qa-icon { background: rgba(167, 139, 250, 0.1); color: var(--purple); }
+    .qa-card.green .qa-icon { background: rgba(34, 211, 163, 0.1); color: var(--green); }
+    .qa-card.gold .qa-icon { background: rgba(245, 166, 35, 0.1); color: var(--gold); }
+    .qa-card.red .qa-icon { background: rgba(242, 92, 110, 0.1); color: var(--red); }
+
+    .qa-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-bottom: 0.15rem;
+    }
+
+    .qa-sub {
+      font-size: 0.65rem;
+      color: var(--text2);
+    }
+
+    /* Mini Calendar */
+    .calendar-wrap {
+      margin-top: 1rem;
+    }
+
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .calendar-month {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .calendar-nav {
+      background: none;
+      border: none;
+      color: var(--text2);
+      cursor: pointer;
+      padding: 0.2rem;
+      font-size: 0.75rem;
+      transition: color 0.2s;
+    }
+
+    .calendar-nav:hover {
+      color: var(--text);
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.25rem;
+      text-align: center;
+      font-size: 0.72rem;
+    }
+
+    .cal-day-name {
+      font-weight: 700;
+      color: var(--text2);
+      padding: 0.25rem 0;
+    }
+
+    .cal-day {
+      padding: 0.3rem 0;
+      border-radius: 4px;
+      color: var(--text);
+      cursor: default;
+    }
+
+    .cal-day.today {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .cal-day.has-event {
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .cal-day.other-month {
+      color: var(--text2);
+      opacity: 0.35;
+    }
+
+    /* SMTP Connection details */
+    .smtp-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.78rem;
+    }
+
+    .smtp-row:last-child {
+      border-bottom: none;
+    }
+
+    .smtp-key {
+      color: var(--text2);
+    }
+
+    .smtp-val {
+      font-family: var(--font-m);
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 220px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ PAGE TOPBAR ══ -->
+  <header class="page-topbar">
+    <button class="mobile-sidebar-btn" id="mp-mobile-menu"><i class="fa-solid fa-bars"></i></button>
+    <div class="page-breadcrumb">
+      <a href="dashboard.html">MailPilot</a>
+      <span class="sep">/</span>
+      <span class="crumb-current">Dashboard</span>
+    </div>
+    <div class="topbar-gap"></div>
+    <div class="topbar-right">
+      <div class="status-dot" title="System online"></div>
+      <div class="member-pill"><i class="fa-solid fa-users"></i> <span id="top-member-count">0</span> members</div>
+      <button class="icon-btn" id="theme-toggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+    </div>
+  </header>
+
+  <!-- ══ APP BODY ══ -->
+  <div class="page-scroll" style="padding:1.5rem 2rem 3rem;display:flex;flex-direction:column;gap:1.5rem">
+
+    
+    <!-- Hero Banner -->
+    <section class="hero-shell">
+      <div class="hero-top">
+        <div>
+          <div class="hero-badge"><i class="fa-solid fa-signal"></i> Workspace Operational</div>
+          <h2>
+            Welcome back, <span id="hero-username" style="background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Harsh</span> 👋
+          </h2>
+          <p>
+            Monitor deliverability, audience growth, and campaign momentum from one refined command center designed for modern email teams.
+          </p>
+        </div>
+        <a href="composer.html" class="btn btn-gradient" onclick="if(window.parent!==window){event.preventDefault();window.parent.postMessage({type:'mailpilot-navigate',page:'composer'},'*')}"><i class="fa-solid fa-paper-plane"></i> Launch Campaign</a>
+      </div>
+      <div class="hero-highlights">
+        <div class="hero-pill"><i class="fa-solid fa-bolt"></i> Last sync <span id="last-sync-time" style="color:var(--accent)">Just Now</span></div>
+        <div class="hero-pill"><i class="fa-solid fa-shield-halved"></i> Delivery shield active</div>
+        <div class="hero-pill"><i class="fa-solid fa-chart-line"></i> Smart insights enabled</div>
+      </div>
+    </section>
+    <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}</style>
+
+    <!-- ══ KEY STATS CARDS ══ -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-top">
+          <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+          <div class="stat-trend up" id="contacts-trend"><i class="fa-solid fa-arrow-trend-up"></i> 100%</div>
+        </div>
+        <div class="stat-value" id="stat-contacts">0</div>
+        <div class="stat-label">Total Contacts</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-top">
+          <div class="stat-icon"><i class="fa-solid fa-satellite-dish"></i></div>
+          <div class="stat-trend neutral"><i class="fa-solid fa-minus"></i> Active</div>
+        </div>
+        <div class="stat-value" id="stat-campaigns">0</div>
+        <div class="stat-label">Unique Campaigns</div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-top">
+          <div class="stat-icon"><i class="fa-solid fa-paper-plane"></i></div>
+          <div class="stat-trend up" id="emails-sent-trend"><i class="fa-solid fa-arrow-trend-up"></i> Live</div>
+        </div>
+        <div class="stat-value" id="stat-sent">0</div>
+        <div class="stat-label">Emails Dispatched</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-top">
+          <div class="stat-icon"><i class="fa-solid fa-server"></i></div>
+          <span class="status-pill" style="font-size:0.6rem;background:rgba(34, 211, 163, 0.15);color:var(--green);padding:0.15rem 0.45rem;border-radius:10px;font-weight:700">ONLINE</span>
+        </div>
+        <div class="stat-value" style="font-size:1rem;font-family:var(--font-m);margin-top:0.4rem;" id="stat-smtp-server">smtp.gmail.com</div>
+        <div class="stat-label">SMTP Integration</div>
+      </div>
+    </div>
+
+    <section class="insight-grid" aria-label="workspace insights">
+      <div class="insight-card">
+        <div class="label"><i class="fa-solid fa-bullseye"></i> Delivery Focus</div>
+        <div class="value">97.4%</div>
+        <div class="sub">Healthy inbox placement and strong sender reputation.</div>
+      </div>
+      <div class="insight-card">
+        <div class="label"><i class="fa-solid fa-fire"></i> Momentum</div>
+        <div class="value">+18.2%</div>
+        <div class="sub">Audience engagement is climbing this week.</div>
+      </div>
+      <div class="insight-card">
+        <div class="label"><i class="fa-solid fa-wand-magic-sparkles"></i> Automation</div>
+        <div class="value">12 flows</div>
+        <div class="sub">Scheduled nurtures and reminder sequences are live.</div>
+      </div>
+    </section>
+
+    <!-- ══ MAIN DASHBOARD GRID ══ -->
+    <div class="dashboard-grid">
+      
+      <!-- Left Column: Activity Chart + Recent Campaigns -->
+      <div>
+        <!-- Chart -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-chart-line"></i> Campaign Dispatch History</h3>
+            <div class="card-actions">
+              <button class="btn btn-sm btn-ghost active" id="chart-filter-30">Last 30 Days</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrap">
+              <canvas id="campaignChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Campaigns Table -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-satellite-dish"></i> Campaign Statistics</h3>
+            <div class="card-actions">
+              <a href="composer.html" class="btn btn-sm btn-primary"><i class="fa-solid fa-plus"></i> Compose New</a>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Campaign Name</th>
+                  <th>Audience Size</th>
+                  <th>Opened</th>
+                  <th>Clicked</th>
+                  <th>Engagement</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="campaign-table-body">
+                <tr>
+                  <td colspan="6" style="text-align:center;padding:2rem;color:var(--text2)">Loading campaigns statistics...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Recent Contacts, System Details, Quick Actions -->
+      <div>
+        <!-- Quick Actions -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-bolt"></i> Studio Quick Actions</h3>
+          </div>
+          <div class="card-body">
+            <div class="qa-grid">
+              <a href="composer.html" class="qa-card">
+                <div class="qa-icon"><i class="fa-solid fa-pen-nib"></i></div>
+                <div class="qa-label">Compose</div>
+                <div class="qa-sub">New email design</div>
+              </a>
+              <a href="members.html" class="qa-card purple">
+                <div class="qa-icon"><i class="fa-solid fa-users"></i></div>
+                <div class="qa-label">Audience</div>
+                <div class="qa-sub">Import & sync</div>
+              </a>
+              <a href="broadcast.html" class="qa-card green">
+                <div class="qa-icon"><i class="fa-solid fa-satellite-dish"></i></div>
+                <div class="qa-label">Broadcast</div>
+                <div class="qa-sub">Send campaign</div>
+              </a>
+              <a href="setting.html" class="qa-card gold">
+                <div class="qa-icon"><i class="fa-solid fa-gear"></i></div>
+                <div class="qa-label">Settings</div>
+                <div class="qa-sub">SMTP & API keys</div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Contacts -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-user-plus"></i> Recent Subscribers</h3>
+            <a href="members.html" class="btn btn-sm btn-ghost">View All</a>
+          </div>
+          <div class="card-body">
+            <div id="recent-contacts-list">
+              <!-- Dynamically populated from STATE.members -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Timeline -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-timeline"></i> Operation Audit Log</h3>
+          </div>
+          <div class="card-body">
+            <div class="timeline" id="audit-log-timeline">
+              <div style="text-align:center;color:var(--text2);padding:1rem">Fetching system logs...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System & Network Config -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-circle-info"></i> Connection Config</h3>
+          </div>
+          <div class="card-body" style="padding:0.75rem 1.25rem">
+            <div class="smtp-row">
+              <span class="smtp-key">SMTP Relay Host</span>
+              <span class="smtp-val" id="meta-host">smtp.gmail.com</span>
+            </div>
+            <div class="smtp-row">
+              <span class="smtp-key">SMTP TLS Port</span>
+              <span class="smtp-val" id="meta-port">587</span>
+            </div>
+            <div class="smtp-row">
+              <span class="smtp-key">Sender Email</span>
+              <span class="smtp-val" id="meta-sender">ascentcircle.community@gmail.com</span>
+            </div>
+            <div class="smtp-row">
+              <span class="smtp-key">Database Engine</span>
+              <span class="smtp-val" style="color:var(--green)">Supabase API</span>
+            </div>
+            
+            <!-- Mini Calendar -->
+            <div class="calendar-wrap">
+              <div class="calendar-header">
+                <button class="calendar-nav" id="cal-prev"><i class="fa-solid fa-chevron-left"></i></button>
+                <div class="calendar-month" id="cal-month-label"></div>
+                <button class="calendar-nav" id="cal-next"><i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+              <div class="calendar-grid" id="calendar-grid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="powered-strip" style="position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--bg2);border-top:1px solid var(--border);padding:0.4rem 1rem;font-size:0.65rem;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:0.4rem">
+    <i class="fa-solid fa-bolt" style="color:var(--accent);font-size:0.6rem"></i>
+    MailPilot v2.0 &nbsp;·&nbsp; Connected to Supabase &nbsp;·&nbsp; Made with <span style="color:var(--red);margin:0 .1rem">❤️</span> by Harsh Vats
+  </div>
+
+  <!-- Toast system -->
+  <div id="toast-container" style="position:fixed;bottom:2.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;pointer-events:none;"></div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="common.js"></script>
+  <script>
+    /* ═══════════════════════════════════════
+       DASHBOARD CONTROLLER
+    ═══════════════════════════════════════ */
+    let campaignChart;
+    let calDate = new Date();
+    const scheduledDates = new Set([5, 12, 18, 25]); // Dummy dates for schedule highlight
+
+    document.addEventListener('DOMContentLoaded', () => {
+      load(); // Init state via common.js
+      initDashboard();
+    });
+
+    function initDashboard() {
+      // Sync SMTP configuration display
+      renderSmtpInfo();
+
+      // Enable Supabase realtime updates for dashboard data
+      if (typeof setupRealtime === 'function') {
+        setupRealtime();
+      }
+
+      // Render calendar
+      renderCalendar();
+      document.getElementById('cal-prev').addEventListener('click', () => {
+        calDate.setMonth(calDate.getMonth() - 1);
+        renderCalendar();
+      });
+      document.getElementById('cal-next').addEventListener('click', () => {
+        calDate.setMonth(calDate.getMonth() + 1);
+        renderCalendar();
+      });
+
+      // Refresh Dashboard components
+      refreshAll();
+    }
+
+    async function refreshAll() {
+      // Set user profile greetings
+      const client = initSupabaseClient();
+      if (client) {
+        const { data: { session } } = await client.auth.getSession();
+        if (session) {
+          const email = session.user.email;
+          const name = session.user.user_metadata?.full_name || email.split('@')[0];
+          document.getElementById('hero-username').textContent = name;
+          document.getElementById('profile-display-name').textContent = name;
+          document.getElementById('profile-display-email').textContent = email;
+        }
+      }
+
+      // Update total contacts count
+      const contactsVal = STATE.members ? STATE.members.length : 0;
+      animateCounter('stat-contacts', contactsVal);
+      document.getElementById('top-member-count').textContent = contactsVal;
+      document.getElementById('profile-db-count').textContent = `${contactsVal} members`;
+
+      // Update Recent Subscribers list
+      renderRecentSubscribers();
+
+      // Load campaign metadata from Supabase and keep counts accurate
+      if (typeof fetchCampaignsFromSupabase === 'function') {
+        await fetchCampaignsFromSupabase();
+      }
+
+      // Fetch server tracking statistics & draw chart
+      await fetchServerStats();
+
+      // Use live campaign count from Supabase if available
+      const campaignCount = STATE.campaigns?.length || 0;
+      animateCounter('stat-campaigns', campaignCount);
+
+      // Fetch secure audit logs
+      await fetchAuditLogs();
+
+      document.getElementById('last-sync-time').textContent = new Date().toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    window.refreshAll = refreshAll;
+
+    // Helper for beautiful counter animations
+    function animateCounter(id, targetVal) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const start = parseInt(el.textContent, 10) || 0;
+      if (start === targetVal) {
+        el.textContent = targetVal.toLocaleString();
+        return;
+      }
+      const duration = 1000;
+      const startTime = performance.now();
+
+      function step(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+        el.textContent = Math.floor(start + ease * (targetVal - start)).toLocaleString();
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          el.textContent = targetVal.toLocaleString();
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    // Populate SMTP settings dynamically
+    function renderSmtpInfo() {
+      let meta = {};
+      try {
+        meta = JSON.parse(localStorage.getItem('mf_composer_meta') || '{}');
+      } catch (e) {}
+
+      const host = meta.smtpHost || 'smtp.gmail.com';
+      const port = meta.smtpPort || '587';
+      const user = meta.smtpFromEmail || 'ascentcircle.community@gmail.com';
+
+      document.getElementById('stat-smtp-server').textContent = host;
+      document.getElementById('meta-host').textContent = host;
+      document.getElementById('meta-port').textContent = port;
+      document.getElementById('meta-sender').textContent = user;
+
+      // Topbar dropdown elements
+      const profileSmtpHost = document.getElementById('profile-smtp-host');
+      const profileSmtpFrom = document.getElementById('profile-smtp-from');
+      if (profileSmtpHost) profileSmtpHost.textContent = host;
+      if (profileSmtpFrom) profileSmtpFrom.textContent = user;
+    }
+
+    // Render Recent Subscribers using live members state
+    function renderRecentSubscribers() {
+      const el = document.getElementById('recent-contacts-list');
+      if (!el) return;
+      if (!STATE.members || STATE.members.length === 0) {
+        el.innerHTML = `<div style="text-align:center;padding:1.5rem 0;color:var(--text2);font-size:0.78rem;">No members in database.</div>`;
+        return;
+      }
+
+      // Sort newest members first
+      const newestList = STATE.members.slice().reverse().slice(0, 5);
+
+      el.innerHTML = newestList.map(m => {
+        const initials = (m.name || '?').trim().split(/\s+/).map(x => x[0]).join('').substring(0, 2).toUpperCase();
+        return `
+          <div class="contact-item">
+            <div class="contact-avatar" style="background:${avatarColor(m.name)};">${initials}</div>
+            <div class="contact-info">
+              <div class="contact-name">${esc(m.name)}</div>
+              <div class="contact-email">${esc(m.email)}</div>
+            </div>
+            <div class="contact-tag">${esc(m.group || 'General')}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Fetch live statistics from server backend
+    async function fetchServerStats() {
+      try {
+        const headers = await getAuthHeaders();
+        const response = await fetch(`${window.API_BASE_URL}/stats`, { headers });
+        if (!response.ok) throw new Error('Failed to fetch server stats');
+        const data = await response.json();
+
+        if (data.success) {
+          animateCounter('stat-sent', data.summary.totalSent);
+          
+          // Group campaigns by subject to render campaign stats
+          const logs = data.logs || [];
+          const campaignsList = getCampaignsFromLogs(logs);
+          renderCampaignsTable(campaignsList);
+          renderCampaignsChart(logs);
+        }
+      } catch (e) {
+        console.error('Error fetching stats:', e);
+        // Fallback to empty display
+        renderCampaignsTable([]);
+        renderCampaignsChart([]);
+      }
+    }
+
+    // Group logs by subject to build campaign-level statistics
+    function getCampaignsFromLogs(logs) {
+      const cmap = new Map();
+      // Reverse to traverse oldest first (capturing the earliest dispatch date)
+      const sortedLogs = logs.slice().reverse();
+      
+      sortedLogs.forEach(l => {
+        if (!l.subject) return;
+        const key = l.subject;
+        if (!cmap.has(key)) {
+          cmap.set(key, {
+            name: key,
+            subject: key,
+            recipients: 0,
+            sent: 0,
+            opened: 0,
+            clicked: 0,
+            created: l.timestamp ? new Date(l.timestamp).toLocaleDateString('en', { month: 'short', day: 'numeric' }) : 'N/A',
+            timestamp: l.timestamp ? new Date(l.timestamp).getTime() : 0
+          });
+        }
+        const camp = cmap.get(key);
+        if (l.type === 'sent') {
+          camp.recipients++;
+          camp.sent++;
+        } else if (l.type === 'open') {
+          camp.opened++;
+        } else if (l.type === 'click') {
+          camp.clicked++;
+        }
+      });
+
+      return Array.from(cmap.values()).sort((a, b) => b.timestamp - a.timestamp);
+    }
+
+    // Render stats table
+    function renderCampaignsTable(campaignsList) {
+      const tbody = document.getElementById('campaign-table-body');
+      if (!tbody) return;
+
+      if (campaignsList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text2)">No campaign dispatches found. Complete a broadcast first.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = campaignsList.slice(0, 5).map(c => {
+        const openRate = c.sent > 0 ? Math.round((c.opened / c.sent) * 100) : 0;
+        return `
+          <tr>
+            <td class="td-primary">${esc(c.name)}</td>
+            <td>${c.recipients}</td>
+            <td>${c.opened}</td>
+            <td>${c.clicked}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:0.4rem">
+                <span class="status-pill" style="font-size:0.65rem;background:rgba(79, 142, 247, 0.15);color:var(--accent);padding:0.1rem 0.35rem;border-radius:4px;font-weight:700">${openRate}%</span>
+                <span style="color:var(--text2);font-size:0.7rem">open rate</span>
+              </div>
+            </td>
+            <td>${c.created}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Draw dispatch history chart
+    function renderCampaignsChart(logs) {
+      const ctx = document.getElementById('campaignChart');
+      if (!ctx) return;
+
+      // Group dispatches by last 7 days
+      const days = 7;
+      const labels = [];
+      const dataValues = [];
+      const now = new Date();
+
+      for (let i = days - 1; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+        labels.push(dateStr);
+
+        // Count dispatches for this date
+        const dispatchesForDay = logs.filter(l => {
+          if (l.type !== 'sent' || !l.timestamp) return false;
+          const logDate = new Date(l.timestamp);
+          return logDate.getDate() === d.getDate() && 
+                 logDate.getMonth() === d.getMonth() && 
+                 logDate.getFullYear() === d.getFullYear();
+        }).length;
+
+        dataValues.push(dispatchesForDay);
+      }
+
+      if (campaignChart) campaignChart.destroy();
+
+      const canvasCtx = ctx.getContext('2d');
+      const gradient = canvasCtx.createLinearGradient(0, 0, 0, 180);
+      gradient.addColorStop(0, 'rgba(79, 142, 247, 0.35)');
+      gradient.addColorStop(1, 'rgba(79, 142, 247, 0.02)');
+
+      campaignChart = new Chart(canvasCtx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Emails Sent',
+            data: dataValues,
+            borderColor: '#4f8ef7',
+            backgroundColor: gradient,
+            borderWidth: 2,
+            pointBackgroundColor: '#4f8ef7',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 1.5,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            tension: 0.35,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(12,22,40,.95)',
+              borderColor: 'rgba(79,142,247,.3)',
+              borderWidth: 1,
+              titleColor: '#e8edf8',
+              bodyColor: '#7a90bb',
+              titleFont: { family: 'Inter', weight: '700', size: 12 },
+              bodyFont: { family: 'Inter', size: 11 }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,.04)', drawBorder: false },
+              ticks: { color: '#7a90bb', font: { family: 'Inter', size: 10 } }
+            },
+            y: {
+              grid: { color: 'rgba(255,255,255,.04)', drawBorder: false },
+              ticks: { color: '#7a90bb', font: { family: 'Inter', size: 10 } },
+              beginAtZero: true,
+              suggestedMax: 10
+            }
+          }
+        }
+      });
+    }
+
+    // Fetch and render secure audit logs from database proxy
+    async function fetchAuditLogs() {
+      const timeline = document.getElementById('audit-log-timeline');
+      if (!timeline) return;
+
+      try {
+        const headers = await getAuthHeaders();
+        const response = await fetch(`${window.API_BASE_URL}/api/logs`, { headers });
+        if (!response.ok) throw new Error('Audit logs HTTP error');
+        const result = await response.json();
+
+        if (result.success && result.data && result.data.length > 0) {
+          const list = result.data.slice(0, 5); // display latest 5 logs
+          timeline.innerHTML = list.map(l => {
+            const time = new Date(l.timestamp).toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' });
+            let dotClass = 'primary';
+            let icon = '<i class="fa-solid fa-circle-info"></i>';
+
+            if (l.actionType === 'success') {
+              dotClass = 'success';
+              icon = '<i class="fa-solid fa-check"></i>';
+            } else if (l.actionType === 'warning') {
+              dotClass = 'warning';
+              icon = '<i class="fa-solid fa-exclamation"></i>';
+            } else if (l.actionType === 'error') {
+              dotClass = 'danger';
+              icon = '<i class="fa-solid fa-xmark"></i>';
+            }
+
+            return `
+              <div class="timeline-item">
+                <div class="timeline-dot ${dotClass}">${icon}</div>
+                <div class="timeline-content">
+                  <div class="timeline-title">${esc(l.userName)} (${esc(l.userRole)})</div>
+                  <div class="timeline-desc">${esc(l.details)}</div>
+                  <div class="timeline-time">${time}</div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        } else {
+          timeline.innerHTML = `<div style="text-align:center;color:var(--text2);padding:1rem;font-size:0.75rem;">No operations logs recorded yet.</div>`;
+        }
+      } catch (e) {
+        console.error('Error fetching audit logs:', e);
+        timeline.innerHTML = `<div style="text-align:center;color:var(--text2);padding:1rem;font-size:0.75rem;">Connected to Supabase. No activity logs in this workspace yet.</div>`;
+      }
+    }
+
+    // Realtime integration to refresh audit logs dynamically
+    window.refreshAuditLogs = function(newLog) {
+      // Re-fetch to pull and refresh log interface
+      fetchAuditLogs();
+      // Show mini toast of activity
+      showToast(`Activity Logged: ${newLog.details}`, 'info');
+    };
+
+    // Render Calendar
+    function renderCalendar() {
+      const label = document.getElementById('cal-month-label');
+      const grid = document.getElementById('calendar-grid');
+      if (!label || !grid) return;
+
+      const year = calDate.getFullYear();
+      const month = calDate.getMonth();
+      const today = new Date();
+
+      label.textContent = calDate.toLocaleDateString('en', { month: 'long', year: 'numeric' });
+
+      const days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const daysInPrev = new Date(year, month, 0).getDate();
+
+      let html = days.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+
+      for (let i = 0; i < firstDay; i++) {
+        html += `<div class="cal-day other-month">${daysInPrev - firstDay + i + 1}</div>`;
+      }
+      for (let d = 1; d <= daysInMonth; d++) {
+        const isToday = year === today.getFullYear() && month === today.getMonth() && d === today.getDate();
+        const hasEvent = scheduledDates.has(d) && month === today.getMonth();
+        html += `<div class="cal-day${isToday ? ' today' : ''}${hasEvent && !isToday ? ' has-event' : ''}">${d}</div>`;
+      }
+      const remaining = (7 - (firstDay + daysInMonth) % 7) % 7;
+      for (let i = 1; i <= remaining; i++) html += `<div class="cal-day other-month">${i}</div>`;
+
+      grid.innerHTML = html;
+    }
+
+    // Helper functions
+    function avatarColor(name) {
+      const colors = ['#1f6feb', '#238636', '#d29922', '#a371f7', '#da3633', '#39c5cf', '#f76791', '#fb8500'];
+      let h = 0; for (let c of (name || '?')) h = (h << 5) - h + c.charCodeAt(0);
+      return colors[Math.abs(h) % colors.length];
+    }
+    function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+    // Simple toast notification system
+    function showToast(msg, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      t.style.opacity = '0';
+      t.style.transform = 'translateY(10px)';
+      t.style.background = 'var(--surface)';
+      t.style.border = '1px solid var(--border2)';
+      t.style.borderRadius = 'var(--r)';
+      t.style.padding = '0.75rem 1rem';
+      t.style.fontSize = '0.8rem';
+      t.style.display = 'flex';
+      t.style.alignItems = 'center';
+      t.style.gap = '0.5rem';
+      t.style.pointerEvents = 'all';
+      t.style.cursor = 'pointer';
+      t.style.transition = 'all 0.3s ease';
+
+      let icon = '<i class="fa-solid fa-circle-check" style="color:var(--green)"></i>';
+      if (type === 'error') icon = '<i class="fa-solid fa-circle-xmark" style="color:var(--red)"></i>';
+      if (type === 'warning') icon = '<i class="fa-solid fa-triangle-exclamation" style="color:var(--gold)"></i>';
+      if (type === 'info') icon = '<i class="fa-solid fa-circle-info" style="color:var(--accent)"></i>';
+
+      t.innerHTML = `${icon}<span style="color:var(--text)">${msg}</span>`;
+      container.appendChild(t);
+
+      setTimeout(() => {
+        t.style.opacity = '1';
+        t.style.transform = 'translateY(0)';
+      }, 50);
+
+      const dismiss = () => {
+        t.style.opacity = '0';
+        t.style.transform = 'translateY(10px)';
+        setTimeout(() => t.remove(), 300);
+      };
+      t.addEventListener('click', dismiss);
+      setTimeout(dismiss, 3500);
+    }
+  </script>
+</body>
+</html>

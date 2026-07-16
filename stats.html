@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MailPilot Studio — Campaign Analytics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ══ PAGE TOPBAR ══ -->
+  <header class="page-topbar">
+    <button class="mobile-sidebar-btn" id="mp-mobile-menu"><i class="fa-solid fa-bars"></i></button>
+    <div class="page-breadcrumb">
+      <a href="dashboard.html">MailPilot</a>
+      <span class="sep">/</span>
+      <span class="crumb-current">Analytics</span>
+    </div>
+    <div class="topbar-gap"></div>
+    <div class="topbar-right">
+      <div class="status-dot"></div>
+      <div class="member-pill"><i class="fa-solid fa-users"></i> <span id="top-member-count">0</span> members</div>
+      <button class="icon-btn" id="theme-toggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+    </div>
+  </header>
+
+  <!-- ══ APP BODY ══ -->
+  <div class="page-scroll">
+
+    <div class="stats-page">
+      
+      <!-- Header bar with title and refresh -->
+      <div class="stats-header-bar">
+        <div>
+          <h2><i class="fa-solid fa-chart-line" style="color:var(--text3);margin-right:0.4rem"></i> Campaign Analytics</h2>
+          <p>Delivery statistics for your email campaigns — sent and failed counts only.</p>
+        </div>
+        <div style="display:flex;gap:0.5rem">
+          <button class="btn btn-outline" id="btn-refresh-stats"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+          <button class="btn btn-primary" id="btn-clear-stats" style="background:var(--red);border-color:var(--red)"><i class="fa-solid fa-trash-can"></i> Clear Stats</button>
+        </div>
+      </div>
+
+      <!-- Stats Grid Cards — delivery only -->
+      <div class="stats-grid-row">
+        <!-- Sent Card -->
+        <div class="stats-card">
+          <div class="stats-card-icon" style="background: rgba(31, 111, 235, 0.12); color: var(--accent2);">
+            <i class="fa-solid fa-paper-plane"></i>
+          </div>
+          <div class="stats-card-data">
+            <span class="val" id="stat-sent">0</span>
+            <span class="lbl">Emails Sent</span>
+          </div>
+        </div>
+
+        <!-- Failed Card -->
+        <div class="stats-card">
+          <div class="stats-card-icon" style="background: rgba(248, 81, 73, 0.12); color: var(--red);">
+            <i class="fa-solid fa-circle-xmark"></i>
+          </div>
+          <div class="stats-card-data">
+            <span class="val" id="stat-failed">0</span>
+            <span class="lbl">Failed</span>
+          </div>
+        </div>
+
+        <!-- Success Rate Card -->
+        <div class="stats-card">
+          <div class="stats-card-icon" style="background: rgba(46, 160, 67, 0.12); color: var(--green);">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+          <div class="stats-card-data">
+            <span class="val" id="stat-success-rate">—</span>
+            <span class="lbl">Success Rate</span>
+          </div>
+        </div>
+
+        <!-- Total Members Card -->
+        <div class="stats-card">
+          <div class="stats-card-icon" style="background: rgba(163, 113, 247, 0.12); color: var(--purple);">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <div class="stats-card-data">
+            <span class="val" id="stat-total">0</span>
+            <span class="lbl">Total Recipients</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delivery progress bar -->
+      <div class="chart-box" style="margin-bottom:1.5rem">
+        <h3 style="margin-bottom:1rem">Delivery Progress</h3>
+        <div style="display:flex;flex-direction:column;gap:0.75rem">
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--text2);margin-bottom:0.3rem">
+              <span><i class="fa-solid fa-paper-plane" style="color:var(--accent2)"></i> Sent</span>
+              <span id="lbl-sent-pct">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="bar-sent" style="width:0%;background:var(--accent)"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--text2);margin-bottom:0.3rem">
+              <span><i class="fa-solid fa-circle-xmark" style="color:var(--red)"></i> Failed</span>
+              <span id="lbl-failed-pct">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="bar-failed" style="width:0%;background:var(--red)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delivery Log Table -->
+      <div class="stats-log-panel">
+        <div class="panel-head">
+          <h3><i class="fa-solid fa-list-check"></i> Delivery Log</h3>
+          <div style="display:flex;gap:0.6rem;align-items:center">
+            <div class="search-box" style="width:200px">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="activity-search" placeholder="Search recipient or subject…">
+            </div>
+            <div style="display:flex;gap:2px">
+              <button class="btn btn-sm btn-outline feed-filter active" data-filter="all">All</button>
+              <button class="btn btn-sm btn-outline feed-filter" data-filter="sent">Sent</button>
+              <button class="btn btn-sm btn-outline feed-filter" data-filter="failed">Failed</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-log-table-wrapper">
+          <table class="stats-log-table">
+            <thead>
+              <tr>
+                <th>Recipient</th>
+                <th>Status</th>
+                <th>Subject</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="activity-feed-body">
+              <tr>
+                <td colspan="4" style="text-align:center;color:var(--text2);padding:2rem">No delivery activity yet. Start a campaign to see results.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toast-msg">Success!</span>
+  </div>
+
+  <!-- Core Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="common.js"></script>
+  <script src="stats.js"></script>
+</body>
+</html>

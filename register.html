@@ -1,0 +1,820 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MailPilot Studio — Create Account</title>
+  <meta name="description" content="Create your MailPilot Studio account to automate and scale your email outreach campaigns.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=DM+Serif+Display&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ═══════════════════════════════════════════════════
+       DESIGN TOKENS
+    ═══════════════════════════════════════════════════ */
+    :root {
+      --bg:        #0d0f12;
+      --bg2:       #13161b;
+      --bg3:       #1a1e25;
+      --border:    rgba(255,255,255,0.07);
+      --text:      #e6eaf0;
+      --text2:     #7a8899;
+      --accent:    #1f6feb;
+      --accent2:   #388bfd;
+      --purple:    #a371f7;
+      --green:     #2ea043;
+      --red:       #f85149;
+      --gold:      #f5a623;
+      --font:      'DM Sans', system-ui, sans-serif;
+      --font-d:    'DM Serif Display', serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       LEFT HERO PANEL
+    ═══════════════════════════════════════════════════ */
+    .hero-panel {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 2.5rem;
+      background: linear-gradient(145deg, #0d1117 0%, #0f1a2e 50%, #0d0f12 100%);
+      overflow: hidden;
+    }
+
+    .hero-panel::before {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(31, 111, 235, 0.18) 0%, transparent 70%);
+      top: -100px;
+      left: -100px;
+      pointer-events: none;
+    }
+
+    .hero-panel::after {
+      content: '';
+      position: absolute;
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(163, 113, 247, 0.12) 0%, transparent 70%);
+      bottom: 0px;
+      right: -80px;
+      pointer-events: none;
+    }
+
+    .hero-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-logo {
+      height: 36px;
+      width: auto;
+      border-radius: 6px;
+    }
+
+    .hero-brand-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .hero-brand-name span {
+      color: var(--text2);
+      font-weight: 400;
+    }
+
+    .hero-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2rem;
+      position: relative;
+      z-index: 1;
+      padding: 2rem 0;
+    }
+
+    .hero-headline {
+      font-family: var(--font-d);
+      font-size: 2.8rem;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    .hero-headline .highlight {
+      background: linear-gradient(90deg, var(--accent2), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtext {
+      font-size: 0.92rem;
+      color: var(--text2);
+      line-height: 1.7;
+      max-width: 360px;
+    }
+
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--text2);
+    }
+
+    .feature-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(31, 111, 235, 0.12);
+      border: 1px solid rgba(31, 111, 235, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent2);
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .hero-footer {
+      font-size: 0.75rem;
+      color: var(--text2);
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-footer a {
+      color: var(--accent2);
+      text-decoration: none;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       RIGHT FORM PANEL
+    ═══════════════════════════════════════════════════ */
+    .form-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem;
+      background: var(--bg2);
+      border-left: 1px solid var(--border);
+      overflow-y: auto;
+    }
+
+    .register-card {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+      animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+    }
+
+    .card-header p {
+      font-size: 0.82rem;
+      color: var(--text2);
+    }
+
+    /* Google OAuth button */
+    .oauth-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      padding: 0.78rem 1rem;
+      background: #ffffff;
+      color: #1f2937;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+
+    .oauth-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .oauth-btn:active { transform: translateY(0); }
+
+    .oauth-btn img {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--text2);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Form */
+    .reg-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .field label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text2);
+      letter-spacing: 0.02em;
+    }
+
+    .field-wrap {
+      position: relative;
+    }
+
+    .field-wrap i {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text2);
+      font-size: 0.78rem;
+      pointer-events: none;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 0.7rem 0.9rem 0.7rem 2.2rem;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.86rem;
+      font-family: var(--font);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+    }
+
+    .field input::placeholder { color: var(--text2); opacity: 0.6; }
+
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.15);
+    }
+
+    .field input.valid {
+      border-color: var(--green);
+    }
+
+    .field input.invalid {
+      border-color: var(--red);
+    }
+
+    /* Password strength */
+    .password-strength {
+      display: flex;
+      gap: 4px;
+      margin-top: 0.3rem;
+    }
+
+    .strength-bar {
+      flex: 1;
+      height: 3px;
+      background: var(--bg3);
+      border-radius: 2px;
+      transition: background 0.3s;
+    }
+
+    .strength-bar.active-weak   { background: var(--red); }
+    .strength-bar.active-fair   { background: var(--gold); }
+    .strength-bar.active-strong { background: var(--green); }
+
+    .strength-label {
+      font-size: 0.68rem;
+      color: var(--text2);
+      text-align: right;
+      margin-top: 0.2rem;
+    }
+
+    /* Terms checkbox */
+    .terms-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+    }
+
+    .terms-row input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      accent-color: var(--accent);
+      margin-top: 2px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .terms-row label {
+      font-size: 0.78rem;
+      color: var(--text2);
+      line-height: 1.5;
+      cursor: pointer;
+    }
+
+    .terms-row label a {
+      color: var(--accent2);
+      text-decoration: none;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: linear-gradient(135deg, var(--accent) 0%, #1557c0 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 15px rgba(31, 111, 235, 0.3);
+    }
+
+    .submit-btn:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(31, 111, 235, 0.4);
+    }
+
+    .submit-btn:active { transform: translateY(0); }
+
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Sign In Link */
+    .signin-link {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text2);
+    }
+
+    .signin-link a {
+      color: var(--accent2);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .signin-link a:hover { text-decoration: underline; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.84rem;
+      color: var(--text);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      z-index: 9999;
+      max-width: 320px;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast.ok i { color: var(--green); }
+    .toast.err i { color: var(--red); }
+    .toast.warn i { color: var(--gold); }
+
+    /* Decorative floating dots on hero */
+    .dot {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .dot-1 {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      top: 38%; left: 68%;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .dot-2 {
+      width: 4px; height: 4px;
+      background: var(--purple);
+      top: 55%; left: 20%;
+      animation: float 5s ease-in-out infinite 1s;
+    }
+
+    .dot-3 {
+      width: 8px; height: 8px;
+      background: rgba(31,111,235,0.4);
+      top: 22%; left: 55%;
+      animation: float 6s ease-in-out infinite 0.5s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body { grid-template-columns: 1fr; }
+      .hero-panel { display: none; }
+      .form-panel { padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════════════════════
+       LEFT: HERO PANEL
+  ════════════════════════════════ -->
+  <div class="hero-panel">
+    <div class="dot dot-1"></div>
+    <div class="dot dot-2"></div>
+    <div class="dot dot-3"></div>
+
+    <!-- Brand -->
+    <div class="hero-brand">
+      <img src="logo.png" alt="MailPilot Logo" class="hero-logo">
+      <span class="hero-brand-name">MailPilot <span>Studio</span></span>
+    </div>
+
+    <!-- Hero Content -->
+    <div class="hero-content">
+      <h1 class="hero-headline">
+        Launch campaigns<br>at <span class="highlight">warp speed</span>
+      </h1>
+      <p class="hero-subtext">
+        Join teams using MailPilot to automate bulk outreach, track audience growth, and deliver personalized campaigns at scale.
+      </p>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fa-solid fa-users"></i></div>
+          <span>Manage unlimited member contacts across custom groups</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fa-solid fa-paper-plane"></i></div>
+          <span>Send batch broadcasts with smart SMTP relay</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
+          <span>Visualize audience growth & campaign analytics</span>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fa-solid fa-palette"></i></div>
+          <span>Design beautiful email templates in minutes</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-footer">
+      &copy; 2026 MailPilot Studio &nbsp;·&nbsp;
+      <a href="#">Privacy Policy</a> &nbsp;·&nbsp;
+      <a href="#">Terms of Service</a>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════
+       RIGHT: REGISTER FORM PANEL
+  ════════════════════════════════ -->
+  <div class="form-panel">
+    <div class="register-card">
+
+      <div class="card-header">
+        <h2>Create your account</h2>
+        <p>Get started free — no credit card required</p>
+      </div>
+
+      <!-- Google OAuth -->
+      <button class="oauth-btn" id="btn-google" onclick="handleGoogleRegister()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+        Continue with Google
+      </button>
+
+      <div class="divider">or register with email</div>
+
+      <!-- Registration Form -->
+      <form class="reg-form" id="register-form" onsubmit="event.preventDefault(); handleRegisterSubmit();">
+
+        <!-- Full Name & Organization Row -->
+        <div class="form-row">
+          <div class="field">
+            <label for="full-name">Full Name</label>
+            <div class="field-wrap">
+              <i class="fa-solid fa-user"></i>
+              <input type="text" id="full-name" placeholder="Jane Doe" required autocomplete="name">
+            </div>
+          </div>
+          <div class="field">
+            <label for="org-name">Organization</label>
+            <div class="field-wrap">
+              <i class="fa-solid fa-building"></i>
+              <input type="text" id="org-name" placeholder="Ascent Circle" autocomplete="organization">
+            </div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="field">
+          <label for="reg-email">Email Address</label>
+          <div class="field-wrap">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="reg-email" placeholder="you@domain.com" required autocomplete="email" oninput="validateEmail(this)">
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="field">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <label for="reg-password" style="margin: 0;">Password</label>
+          </div>
+          <div class="field-wrap">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="reg-password" placeholder="Min. 8 characters" required minlength="8" oninput="checkStrength(this.value)">
+          </div>
+          <!-- Strength meter -->
+          <div class="password-strength">
+            <div class="strength-bar" id="sb1"></div>
+            <div class="strength-bar" id="sb2"></div>
+            <div class="strength-bar" id="sb3"></div>
+            <div class="strength-bar" id="sb4"></div>
+          </div>
+          <div class="strength-label" id="strength-label"></div>
+          <div class="field-tip" style="font-size: 0.72rem; color: var(--text2); margin-top: 0.4rem; display: flex; align-items: flex-start; gap: 0.4rem; line-height: 1.3;">
+            <i class="fa-solid fa-circle-info" style="color: var(--accent); margin-top: 2px;"></i>
+            <span>Your MailPilot password secures your account. SMTP configuration and sending credentials are managed separately in Settings.</span>
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="field">
+          <label for="reg-confirm">Confirm Password</label>
+          <div class="field-wrap">
+            <i class="fa-solid fa-shield-halved"></i>
+            <input type="password" id="reg-confirm" placeholder="Repeat password" required oninput="validateConfirm(this)">
+          </div>
+        </div>
+
+        <!-- Terms -->
+        <div class="terms-row">
+          <input type="checkbox" id="terms-check" required>
+          <label for="terms-check">
+            I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I understand MailPilot will use my data to provide the service.
+          </label>
+        </div>
+
+
+
+        <!-- Submit -->
+        <button type="submit" class="submit-btn" id="btn-submit">
+          <i class="fa-solid fa-user-plus"></i>
+          Create Account
+        </button>
+      </form>
+
+      <div class="signin-link">
+        Already have an account? <a href="login.html">Sign In</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toast-msg">Done!</span>
+  </div>
+
+  <!-- ════════════════════════════════
+       SCRIPTS
+  ════════════════════════════════ -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="common.js"></script>
+  <script>
+    /* ── TOAST ─────────────────────────────────────────── */
+    function showToast(msg, type = 'ok') {
+      const t = document.getElementById('toast');
+      t.querySelector('#toast-msg').textContent = msg;
+      t.querySelector('i').className = `fa-solid fa-${type === 'ok' ? 'circle-check' : type === 'err' ? 'circle-xmark' : 'triangle-exclamation'}`;
+      t.className = `toast show ${type}`;
+      clearTimeout(t._t);
+      t._t = setTimeout(() => { t.className = 'toast'; }, 3500);
+    }
+
+    /* ── EMAIL VALIDATION ──────────────────────────────── */
+    function validateEmail(input) {
+      const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim());
+      input.classList.toggle('valid', valid && input.value.length > 0);
+      input.classList.toggle('invalid', !valid && input.value.length > 0);
+    }
+
+    /* ── CONFIRM PASSWORD ──────────────────────────────── */
+    function validateConfirm(input) {
+      const pw = document.getElementById('reg-password').value;
+      const match = input.value === pw && input.value.length > 0;
+      input.classList.toggle('valid', match);
+      input.classList.toggle('invalid', !match && input.value.length > 0);
+    }
+
+    /* ── PASSWORD STRENGTH METER ───────────────────────── */
+    function checkStrength(val) {
+      const bars = [
+        document.getElementById('sb1'),
+        document.getElementById('sb2'),
+        document.getElementById('sb3'),
+        document.getElementById('sb4'),
+      ];
+      const label = document.getElementById('strength-label');
+
+      let score = 0;
+      if (val.length >= 8)  score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      const classes = ['', 'active-weak', 'active-fair', 'active-fair', 'active-strong'];
+      const labels  = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+      const colors  = ['', '#f85149', '#f5a623', '#f5a623', '#2ea043'];
+
+      bars.forEach((b, i) => {
+        b.className = 'strength-bar';
+        if (i < score) b.classList.add(classes[score]);
+      });
+
+      label.textContent = val.length ? labels[score] : '';
+      label.style.color = colors[score];
+    }
+
+    /* ── GOOGLE REGISTER ───────────────────────────────── */
+    async function handleGoogleRegister() {
+      const btn = document.getElementById('btn-google');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
+      try {
+        const client = initSupabaseClient();
+        if (!client) throw new Error('Supabase not initialized');
+        const { error } = await client.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: window.location.origin + '/dashboard.html' }
+        });
+        if (error) throw error;
+      } catch (err) {
+        showToast(err.message || 'Google sign-in failed', 'err');
+        btn.disabled = false;
+        btn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"> Continue with Google';
+      }
+    }
+
+    /* ── FORM SUBMIT ───────────────────────────────────── */
+    async function handleRegisterSubmit() {
+      const name    = document.getElementById('full-name').value.trim();
+      const org     = document.getElementById('org-name').value.trim();
+      const email   = document.getElementById('reg-email').value.trim();
+      const pw      = document.getElementById('reg-password').value;
+      const confirm = document.getElementById('reg-confirm').value;
+      const terms   = document.getElementById('terms-check').checked;
+      const btn     = document.getElementById('btn-submit');
+
+      // Client-side validation
+      if (!name)  { showToast('Please enter your full name', 'err'); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Please enter a valid email', 'err'); return; }
+      if (pw.length < 8) { showToast('Password must be at least 8 characters', 'err'); return; }
+      if (pw !== confirm) { showToast('Passwords do not match', 'err'); return; }
+      if (!terms) { showToast('Please accept the terms to continue', 'warn'); return; }
+
+      btn.disabled = true;
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating Account...';
+
+      try {
+        const client = initSupabaseClient();
+        if (!client) throw new Error('Supabase client not ready');
+
+        const { data, error } = await client.auth.signUp({
+          email,
+          password: pw,
+          options: {
+            data: {
+              full_name: name,
+              organization: org
+            },
+            emailRedirectTo: window.location.origin + '/login.html'
+          }
+        });
+
+        if (error) throw error;
+
+        if (data?.user && !data.session) {
+          // Email confirmation required (default Supabase behavior)
+          showToast('Account created! Check your email to confirm.', 'ok');
+          btn.innerHTML = '<i class="fa-solid fa-envelope-circle-check"></i> Check Your Email';
+        } else {
+          // Auto-confirmed (email confirm disabled in Supabase dashboard)
+          showToast('Account created! Signing you in...', 'ok');
+          setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+        }
+      } catch (err) {
+        showToast(err.message || 'Registration failed', 'err');
+        btn.disabled = false;
+        btn.innerHTML = orig;
+      }
+    }
+  </script>
+
+</body>
+</html>

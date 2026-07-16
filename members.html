@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MailPilot Studio</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ══ PAGE TOPBAR ══ -->
+  <header class="page-topbar">
+    <button class="mobile-sidebar-btn" id="mp-mobile-menu"><i class="fa-solid fa-bars"></i></button>
+    <div class="page-breadcrumb">
+      <a href="dashboard.html">MailPilot</a>
+      <span class="sep">/</span>
+      <span class="crumb-current">Members</span>
+    </div>
+    <div class="topbar-gap"></div>
+    <div class="topbar-right">
+      <div class="status-dot"></div>
+      <div class="member-pill"><i class="fa-solid fa-users"></i> <span id="top-member-count">0</span> members</div>
+      <button class="icon-btn" id="theme-toggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+    </div>
+  </header>
+
+  <!-- ══ APP BODY ══ -->
+  <div class="page-scroll">
+
+
+
+    
+    <!-- ══════════════════════════════════
+       TAB 2 — MEMBERS
+    ══════════════════════════════════ -->
+    <div class="tab-panel active" id="panel-members">
+      <div class="members-page">
+        <div class="members-topbar">
+          <h2><i class="fa-solid fa-users" style="color:var(--text3);margin-right:0.35rem"></i> Member Directory</h2>
+          <div class="members-stats">
+            <div class="mstat"><strong id="stat-total">0</strong> total</div>
+            <div class="mstat" style="color:var(--green)">●</div>
+            <div class="mstat"><strong id="stat-groups">0</strong> groups</div>
+          </div>
+          <div class="ml-auto" style="display:flex;gap:0.5rem;align-items:center">
+            <div class="search-box" style="width:180px">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="member-table-search" placeholder="Search members…">
+            </div>
+            <button class="btn btn-green btn-sm" id="btn-add-member-open"><i class="fa-solid fa-user-plus"></i> Add Member</button>
+            <button class="btn btn-outline btn-sm" id="btn-manage-groups-open"><i class="fa-solid fa-tags"></i> Manage Groups</button>
+            <button class="btn btn-outline btn-sm" id="btn-export-members"><i class="fa-solid fa-download"></i> Export</button>
+            <button class="btn btn-outline btn-sm" id="btn-clean-members"
+              style="border-color:var(--gold);color:var(--gold)" title="Remove duplicates and invalid emails"><i
+                class="fa-solid fa-broom"></i> Clean List</button>
+            <button class="btn btn-primary btn-sm" id="btn-clear-all-members"><i class="fa-solid fa-trash"></i> Clear All</button>
+          </div>
+        </div>
+        <div class="members-body">
+
+          <!-- Table -->
+          <div class="members-table-panel">
+            <div class="table-topbar">
+              <h3>All Members</h3>
+              <span class="badge badge-blue" id="members-count-badge">0 members</span>
+              <div class="ml-auto" style="display:flex;gap:0.8rem;align-items:center;">
+                <label id="admin-trash-toggle-label" style="display:none; font-size:0.78rem; color:var(--text2); cursor:pointer; align-items:center; gap:0.25rem;">
+                  <input type="checkbox" id="filter-deleted" style="cursor:pointer;"> Show Trash/Archived
+                </label>
+                <select id="filter-group"
+                  style="padding:0.3rem 0.6rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:0.78rem;outline:none">
+                  <option value="all">All Groups</option>
+                </select>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="select-all-cb"></th>
+                  <th class="sortable" data-col="name" style="cursor:pointer;user-select:none"
+                    onclick="sortTable('name')">Name <span id="sort-name" style="font-size:0.7rem;opacity:0.5">↕</span>
+                  </th>
+                  <th class="sortable" data-col="email" style="cursor:pointer;user-select:none"
+                    onclick="sortTable('email')">Email <span id="sort-email"
+                      style="font-size:0.7rem;opacity:0.5">↕</span></th>
+                  <th class="sortable" data-col="college" style="cursor:pointer;user-select:none"
+                    onclick="sortTable('college')">College / Org <span id="sort-college"
+                      style="font-size:0.7rem;opacity:0.5">↕</span></th>
+                  <th>Phone</th>
+                  <th class="sortable" data-col="group" style="cursor:pointer;user-select:none"
+                    onclick="sortTable('group')">Group <span id="sort-group"
+                      style="font-size:0.7rem;opacity:0.5">↕</span></th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="members-table-body">
+                <tr>
+                  <td colspan="7" style="text-align:center;color:var(--text2);padding:2rem">No members yet. Add some
+                    above or import a CSV.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /app-body -->
+
+  <!-- ══ TOAST ══ -->
+  <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i> <span id="toast-msg"></span></div>
+
+  <!-- ── ADD MEMBER CHOICE MODAL ───────────────────── -->
+  <div class="modal-overlay" id="modal-add-choice">
+    <div class="modal-box" style="max-width:480px">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-user-plus" style="color:var(--green);margin-right:0.4rem"></i> Add Member</h3>
+        <button class="modal-close" id="modal-add-choice-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1.25rem">Select how you want to add members to your directory.</p>
+      
+      <div class="choice-cards-container" style="display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;margin-bottom:1.25rem">
+        <div class="choice-card" id="choice-individual">
+          <div class="choice-icon" style="width:40px;height:40px;border-radius:50%;background:rgba(35,134,54,0.15);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:1.25rem">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <h4 style="margin:0;font-size:0.9rem;font-weight:600;color:var(--text)">Individual Upload</h4>
+          <p style="margin:0;font-size:0.75rem;color:var(--text2);line-height:1.35">Add a single member manually using a form.</p>
+        </div>
+        
+        <div class="choice-card" id="choice-bulk">
+          <div class="choice-icon" style="width:40px;height:40px;border-radius:50%;background:rgba(31,111,235,0.15);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:1.25rem">
+            <i class="fa-solid fa-file-import"></i>
+          </div>
+          <h4 style="margin:0;font-size:0.9rem;font-weight:600;color:var(--text)">Bulk Upload</h4>
+          <p style="margin:0;font-size:0.75rem;color:var(--text2);line-height:1.35">Import multiple members from a CSV spreadsheet.</p>
+        </div>
+      </div>
+      
+      <div style="display:flex;justify-content:flex-end">
+        <button class="btn btn-ghost" id="modal-add-choice-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MEMBER MODAL (ADD & EDIT) ───────────────────── -->
+  <div class="modal-overlay" id="modal-member">
+    <div class="modal-box" style="max-width:480px">
+      <div class="modal-head">
+        <h3 id="modal-member-title"><i class="fa-solid fa-user-plus" style="color:var(--green);margin-right:0.4rem"></i> Add New Member</h3>
+        <button class="modal-close" id="modal-member-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.7rem;margin-top:0.4rem">
+        <div class="field"><label>Full Name *</label><input type="text" id="m-name" placeholder="Full name"></div>
+        <div class="field"><label>Email Address *</label><input type="text" id="m-email" placeholder="email@example.com"></div>
+        <div class="field"><label>College / Organization</label><input type="text" id="m-college" placeholder="e.g. IIT Delhi"></div>
+        <div class="field"><label>Phone Number</label><input type="text" id="m-phone" placeholder="+91 98765 43210"></div>
+        <div class="field"><label>Group / Tag</label><input type="text" id="m-group" placeholder="General"></div>
+        <div class="field"><label>Custom Field Key</label><input type="text" id="m-custom-key" placeholder="e.g. Course"></div>
+        <div class="field"><label>Custom Field Value</label><input type="text" id="m-custom-val" placeholder="e.g. B.Tech CSE"></div>
+        <input type="hidden" id="m-edit-id">
+      </div>
+      <div style="display:flex;gap:0.5rem;margin-top:1.2rem;justify-content:flex-end">
+        <button class="btn btn-ghost" id="modal-member-cancel">Cancel</button>
+        <button class="btn btn-green" id="btn-save-member"><i class="fa-solid fa-plus"></i> Add Member</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MANAGE GROUPS MODAL ───────────────────── -->
+  <div class="modal-overlay" id="modal-groups">
+    <div class="modal-box" style="max-width:400px">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-tags" style="color:var(--accent);margin-right:0.4rem"></i> Manage Groups</h3>
+        <button class="modal-close" id="modal-groups-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">Create and delete custom audience groups.</p>
+      
+      <div class="group-list" id="group-list-display" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.2rem"></div>
+      
+      <div style="display:flex;gap:0.4rem;align-items:center">
+        <input type="text" id="new-group-input" placeholder="New group name"
+          style="flex:1;padding:0.45rem 0.7rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:0.82rem;outline:none">
+        <button class="btn btn-primary btn-sm" id="btn-add-group" style="padding:0.5rem 0.8rem"><i class="fa-solid fa-plus"></i> Add</button>
+      </div>
+      <div style="display:flex;gap:0.5rem;margin-top:1.5rem;justify-content:flex-end">
+        <button class="btn btn-ghost" id="modal-groups-cancel">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CSV IMPORT MODAL ───────────────────── -->
+  <div class="modal-overlay" id="modal-csv">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-file-import" style="color:var(--green);margin-right:0.4rem"></i> Import CSV</h3>
+        <button class="modal-close" id="modal-csv-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">Upload a CSV with columns: <code>name</code>,
+        <code>email</code>, <code>college</code>, <code>phone</code> (any order, header row required).
+      </p>
+      <div class="csv-drop-zone" id="modal-csv-drop">
+        <i class="fa-solid fa-file-csv"></i>
+        <p>Drop CSV here or <strong>click to choose file</strong></p>
+        <input type="file" accept=".csv" id="modal-csv-input" style="display:none">
+      </div>
+      <div id="csv-preview-wrap" style="display:none;margin-top:0.8rem">
+        <div style="font-size:0.78rem;color:var(--text2);margin-bottom:0.4rem" id="csv-preview-info"></div>
+        <div style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r)">
+          <table style="font-size:0.74rem" id="csv-preview-table">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.5rem;margin-top:1rem;justify-content:flex-end">
+        <button class="btn btn-ghost" id="modal-csv-cancel">Cancel</button>
+        <button class="btn btn-green" id="modal-csv-confirm" disabled><i class="fa-solid fa-check"></i> Import
+          Members</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="common.js"></script>
+  <script src="members.js"></script>
+</body>
+</html>

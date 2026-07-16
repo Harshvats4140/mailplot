@@ -1,0 +1,2353 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MailPilot Studio — Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* ── BODY LAYOUT ── */
+        .admin-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .admin-hero {
+            position: relative;
+            overflow: hidden;
+            padding: 1.2rem 1.25rem;
+            border-radius: var(--r3);
+            border: 1px solid var(--border2);
+            background:
+                radial-gradient(circle at top right, rgba(79, 142, 247, 0.18), transparent 38%),
+                linear-gradient(135deg, rgba(79, 142, 247, 0.14) 0%, rgba(99, 102, 241, 0.08) 50%, rgba(167, 139, 250, 0.07) 100%);
+            box-shadow: var(--shadow2);
+            margin-bottom: 1.2rem;
+        }
+
+        .admin-hero::after {
+            content: '';
+            position: absolute;
+            inset: auto -24px -28px auto;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.16), transparent 70%);
+            pointer-events: none;
+        }
+
+        .admin-hero .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.8rem;
+        }
+
+        .admin-hero .hero-badge {
+            margin-bottom: 0.6rem;
+        }
+
+        .admin-hero .hero-highlights {
+            margin-top: 0.7rem;
+        }
+
+        .summary-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.55rem;
+            margin-top: 0.5rem;
+        }
+
+        .summary-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text);
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .summary-chip i {
+            color: var(--accent);
+        }
+
+        /* ── LEFT NAV ── */
+        .admin-nav {
+            width: var(--sidebar-w, 240px);
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            flex-shrink: 0;
+            padding: 1.1rem 0.85rem;
+        }
+
+        .admin-nav::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .admin-nav::-webkit-scrollbar-thumb {
+            background: var(--surface2);
+            border-radius: 4px;
+        }
+
+        .nav-group {
+            margin-bottom: 1.3rem;
+        }
+
+        .nav-group-title {
+            font-size: 0.66rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text2);
+            padding: 0 0.6rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.52rem 0.7rem;
+            border-radius: var(--r);
+            cursor: pointer;
+            color: var(--text2);
+            font-size: 0.83rem;
+            font-weight: 500;
+            transition: all 0.16s;
+            margin-bottom: 0.1rem;
+            border: 1px solid transparent;
+        }
+
+        .nav-item i {
+            width: 16px;
+            text-align: center;
+            font-size: 0.84rem;
+        }
+
+        .nav-item:hover {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: rgba(79, 142, 247, 0.1);
+            color: var(--accent);
+            border-color: rgba(79, 142, 247, 0.25);
+        }
+
+        .nav-item .nbadge {
+            margin-left: auto;
+            font-size: 0.62rem;
+            font-weight: 700;
+            padding: 0.08rem 0.4rem;
+            border-radius: 20px;
+            background: var(--surface2);
+            color: var(--text2);
+        }
+
+        .nav-item.active .nbadge {
+            background: rgba(79, 142, 247, 0.2);
+            color: var(--accent);
+        }
+
+        /* ── MAIN ── */
+        .admin-main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.6rem 2rem 3rem;
+        }
+
+        .admin-main::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .admin-main::-webkit-scrollbar-thumb {
+            background: var(--surface2);
+            border-radius: 4px;
+        }
+
+        .admin-section {
+            display: none;
+            max-width: 1280px;
+        }
+
+        .admin-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .page-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 1.4rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .page-head h1 {
+            font-family: var(--font-d);
+            font-size: 1.55rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-head p {
+            font-size: 0.83rem;
+            color: var(--text2);
+        }
+
+        .page-head-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* ── KPI GRID ── */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.9rem;
+            margin-bottom: 1.3rem;
+        }
+
+        .kpi-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--r2);
+            padding: 1.1rem 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.6rem;
+        }
+
+        .kpi-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .kpi-trend {
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .kpi-trend.up {
+            color: var(--green);
+        }
+
+        .kpi-trend.down {
+            color: var(--red2);
+        }
+
+        .kpi-val {
+            font-family: var(--font-d);
+            font-size: 1.85rem;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .kpi-lbl {
+            font-size: 0.75rem;
+            color: var(--text2);
+            font-weight: 500;
+        }
+
+        /* ── CARD ── */
+        .a-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--r2);
+            padding: 1.3rem 1.4rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .a-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .a-card-head h3 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .a-card-head h3 i {
+            color: var(--gold);
+            font-size: 0.85rem;
+        }
+
+        .a-card-sub {
+            font-size: 0.78rem;
+            color: var(--text2);
+        }
+
+        /* ── TWO COLUMN ── */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 1.1rem;
+        }
+
+        .three-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.1rem;
+        }
+
+        /* ── BAR CHART (CSS only) ── */
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.6rem;
+            height: 160px;
+            padding-top: 1rem;
+        }
+
+        .bar-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .bar-fill {
+            width: 100%;
+            max-width: 36px;
+            border-radius: 6px 6px 2px 2px;
+            background: linear-gradient(180deg, var(--accent2), rgba(99, 102, 241, 0.3));
+            position: relative;
+            transition: height 0.6s cubic-bezier(0.2, 0.8, 0.3, 1);
+            min-height: 4px;
+        }
+
+        .bar-fill::after {
+            content: attr(data-val);
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: var(--text2);
+            white-space: nowrap;
+        }
+
+        .bar-lbl {
+            font-size: 0.66rem;
+            color: var(--text2);
+            font-weight: 600;
+        }
+
+        /* ── DONUT (CSS conic-gradient) ── */
+        .donut-wrap {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            justify-content: center;
+            padding: 0.6rem 0;
+        }
+
+        .donut {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .donut-center {
+            position: absolute;
+            inset: 14px;
+            border-radius: 50%;
+            background: var(--bg2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .donut-center .dnum {
+            font-family: var(--font-d);
+            font-size: 1.3rem;
+            line-height: 1;
+        }
+
+        .donut-center .dlbl {
+            font-size: 0.6rem;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-top: 0.15rem;
+        }
+
+        .donut-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.78rem;
+        }
+
+        .legend-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .legend-item strong {
+            margin-left: auto;
+            font-size: 0.8rem;
+        }
+
+        /* ── TABLE ── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.81rem;
+        }
+
+        thead th {
+            background: var(--bg2);
+            padding: 0.55rem 0.8rem;
+            text-align: left;
+            font-size: 0.67rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text2);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.12s;
+        }
+
+        tbody tr:hover {
+            background: var(--surface);
+        }
+
+        tbody td {
+            padding: 0.55rem 0.8rem;
+            color: var(--text);
+            vertical-align: middle;
+        }
+
+        .td-avatar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .row-avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .td-actions {
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .tbl-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text2);
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .tbl-btn:hover {
+            background: var(--surface2);
+            color: var(--text);
+        }
+
+        .tbl-btn.del:hover {
+            background: rgba(242, 92, 110, 0.15);
+            color: var(--red);
+            border-color: rgba(242, 92, 110, 0.3);
+        }
+
+        .tbl-scroll {
+            max-height: 420px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+        }
+
+        .tbl-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .tbl-scroll::-webkit-scrollbar-thumb {
+            background: var(--surface2);
+            border-radius: 4px;
+        }
+
+        /* ── ACTIVITY FEED ── */
+        .feed-item {
+            display: flex;
+            gap: 0.7rem;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .feed-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .feed-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            flex-shrink: 0;
+        }
+
+        .feed-body {
+            flex: 1;
+        }
+
+        .feed-body strong {
+            font-size: 0.82rem;
+        }
+
+        .feed-body p {
+            font-size: 0.78rem;
+            color: var(--text2);
+            margin-top: 0.1rem;
+        }
+
+        .feed-time {
+            font-size: 0.68rem;
+            color: var(--text2);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* ── ROLE CARDS ── */
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.9rem;
+        }
+
+        .role-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--r2);
+            padding: 1.2rem;
+        }
+
+        .role-card-head {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.8;
+        }
+
+        .role-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .role-card h4 {
+            font-size: 0.88rem;
+        }
+
+        .role-card .rcount {
+            font-size: 0.72rem;
+            color: var(--text2);
+        }
+
+        .perm-list {
+            list-style: none;
+            font-size: 0.76rem;
+            color: var(--text2);
+        }
+
+        .perm-list li {
+            padding: 0.25rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .perm-list li i {
+            color: var(--green);
+            font-size: 0.7rem;
+            width: 14px;
+        }
+
+        .perm-list li.off i {
+            color: var(--text2);
+        }
+
+        .perm-list li.off {
+            opacity: 0.5;
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            color: var(--text2);
+        }
+
+        .empty-state i {
+            font-size: 2.4rem;
+            opacity: 0.25;
+            display: block;
+            margin-bottom: 0.7rem;
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
+        }
+
+        /* ── LOG TERMINAL ── */
+        .log-terminal {
+            background: #050b14;
+            border-radius: var(--r);
+            padding: 0.9rem;
+            font-family: var(--font-m);
+            font-size: 0.74rem;
+            line-height: 1.75;
+            max-height: 360px;
+            overflow-y: auto;
+        }
+
+        .log-terminal::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .log-terminal::-webkit-scrollbar-thumb {
+            background: var(--surface2);
+            border-radius: 4px;
+        }
+
+        .log-line {
+            padding: 0.05rem 0;
+        }
+
+        .log-line.sys {
+            color: #58a6ff;
+        }
+
+        .log-line.ok {
+            color: #22d3a3;
+        }
+
+        .log-line.err {
+            color: #f25c6e;
+        }
+
+        .log-line.warn {
+            color: #f5a623;
+        }
+
+        .log-line.info {
+            color: #7a90bb;
+        }
+
+        .log-ts {
+            color: rgba(122, 144, 187, 0.4);
+            margin-right: 0.4rem;
+        }
+
+        .coming-soon-card {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, rgba(79,142,247,0.06) 0%, rgba(99,102,241,0.04) 50%, rgba(167,139,250,0.03) 100%);
+            border: 1px dashed var(--border2);
+            border-radius: var(--r2);
+            position: relative;
+            overflow: hidden;
+        }
+        .coming-soon-card::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            background: rgba(79,142,247,0.06);
+            pointer-events: none;
+        }
+        .coming-soon-card::after {
+            content: '';
+            position: absolute;
+            bottom: -30px; left: 20px;
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            background: rgba(167,139,250,0.05);
+            pointer-events: none;
+        }
+        .coming-soon-icon {
+            width: 64px; height: 64px;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem;
+            margin: 0 auto 1.2rem;
+            background: rgba(79,142,247,0.1);
+            color: var(--accent);
+            position: relative;
+        }
+        .coming-soon-card h3 {
+            font-family: var(--font-d);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            position: relative;
+        }
+        .coming-soon-card p {
+            font-size: 0.82rem;
+            color: var(--text2);
+            max-width: 400px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .badge-soon {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            font-size: 0.6rem; font-weight: 700;
+            letter-spacing: 0.06em; text-transform: uppercase;
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+            background: rgba(167,139,250,0.15);
+            color: var(--purple);
+            margin-top: 1rem;
+            position: relative;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══ TOPBAR ══ -->
+    <header class="topbar">
+        <a class="topbar-brand" href="dashboard.html" style="display:flex;align-items:center;gap:0.6rem;text-decoration:none;">
+            <img src="logo.png" alt="MailPilot Logo" class="brand-logo-img" style="height:38px;width:auto;display:block;object-fit:contain;border-radius:4px;">
+            <span class="brand-name">MailPilot</span>
+            <span class="brand-version">Studio</span>
+        </a>
+
+        <!-- Nav Tabs -->
+        <nav class="main-tabs" style="margin-left:1.5rem">
+            <button class="tab-btn" data-tab="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+            <button class="tab-btn" data-tab="composer"><i class="fa-solid fa-pen-nib"></i> Composer</button>
+            <button class="tab-btn" data-tab="members"><i class="fa-solid fa-users"></i> Members</button>
+            <button class="tab-btn" data-tab="broadcast"><i class="fa-solid fa-satellite-dish"></i> Broadcast</button>
+            <button class="tab-btn" data-tab="templates"><i class="fa-solid fa-layer-group"></i> Templates</button>
+            <button class="tab-btn" data-tab="stats"><i class="fa-solid fa-chart-line"></i> Analytics</button>
+            <button class="tab-btn" data-tab="settings"><i class="fa-solid fa-gear"></i> Settings</button>
+            <button class="tab-btn active" data-tab="admin"><i class="fa-solid fa-shield-halved"></i> Admin</button>
+        </nav>
+
+        <div class="topbar-sep"></div>
+
+        <div class="topbar-actions">
+            <div class="search-box" style="width:230px">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="global-search" placeholder="Search members, campaigns…">
+            </div>
+            <button class="icon-btn" id="theme-toggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+            <button class="icon-btn" id="btn-notifications" title="Notifications"><i class="fa-solid fa-bell"></i><span
+                    class="ping" id="notif-ping"></span></button>
+            
+            <!-- Profile settings dropdown -->
+            <div class="profile-container" style="position: relative;">
+                <button class="icon-btn" id="profile-trigger" title="User settings" style="border-radius: 50%; overflow: hidden; padding: 0; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-user"></i>
+                </button>
+                <div class="profile-dropdown" id="profile-dropdown">
+                    <div class="profile-header">
+                        <div class="profile-avatar-lg">AD</div>
+                        <div class="profile-info">
+                            <h4>Admin</h4>
+                            <p>admin@mailpilot.app</p>
+                        </div>
+                    </div>
+                    <div class="profile-menu">
+                        <div class="profile-menu-item" id="pd-profile" style="cursor:pointer">
+                            <i class="fa-solid fa-user"></i>
+                            <div>
+                                <span>My Profile</span>
+                                <small>View and edit profile</small>
+                            </div>
+                        </div>
+                        <div class="profile-menu-item" id="pd-settings" style="cursor:pointer">
+                            <i class="fa-solid fa-gear"></i>
+                            <div>
+                                <span>Settings</span>
+                                <small>SMTP, branding &amp; data</small>
+                            </div>
+                        </div>
+                        <div class="profile-menu-item">
+                            <i class="fa-solid fa-users"></i>
+                            <div>
+                                <span>Audience Size</span>
+                                <small id="profile-db-count">0 members</small>
+                            </div>
+                        </div>
+                        <div class="profile-menu-item">
+                            <i class="fa-solid fa-server"></i>
+                            <div>
+                                <span>SMTP Host</span>
+                                <small id="profile-smtp-host">smtp.gmail.com</small>
+                            </div>
+                        </div>
+                        <div class="profile-menu-item">
+                            <i class="fa-solid fa-envelope"></i>
+                            <div>
+                                <span>Sender Address</span>
+                                <small id="profile-smtp-from">admin@mailpilot.app</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="admin-body">
+
+        <!-- ══ LEFT NAV ══ -->
+        <nav class="admin-nav">
+            <div class="nav-group">
+                <div class="nav-group-title">Overview</div>
+                <div class="nav-item active" data-target="overview"><i class="fa-solid fa-chart-pie"></i> Dashboard
+                </div>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Outreach</div>
+                <div class="nav-item" data-target="campaigns"><i class="fa-solid fa-satellite-dish"></i> Campaigns <span
+                        class="nbadge" id="nav-campaign-count">0</span></div>
+                <div class="nav-item" data-target="templates"><i class="fa-solid fa-layer-group"></i> Templates <span class="nbadge" style="background:rgba(167,139,250,0.15);color:var(--purple);font-size:0.55rem">SOON</span></div>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">People</div>
+                <div class="nav-item" data-target="members"><i class="fa-solid fa-users"></i> Members <span
+                        class="nbadge" id="nav-member-count">0</span></div>
+                <div class="nav-item" data-target="groups"><i class="fa-solid fa-layer-group"></i> Groups <span
+                        class="nbadge" id="nav-group-count">0</span></div>
+                <div class="nav-item" data-target="roles"><i class="fa-solid fa-user-shield"></i> Admins & Roles</div>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">System</div>
+                <div class="nav-item" data-target="logs"><i class="fa-solid fa-terminal"></i> Activity Logs</div>
+                <div class="nav-item" data-target="health"><i class="fa-solid fa-heart-pulse"></i> System Health</div>
+            </div>
+        </nav>
+
+        <!-- ══ MAIN ══ -->
+        <main class="admin-main">
+
+            <!-- ═══════════ OVERVIEW ═══════════ -->
+            <section class="admin-section active" id="sec-overview">
+                <div class="admin-hero">
+                    <div class="hero-top">
+                        <div>
+                            <div class="hero-badge"><i class="fa-solid fa-shield-halved"></i> Command Center</div>
+                            <h1 style="font-family:var(--font-d);font-size:1.45rem;font-weight:800;margin-bottom:0.3rem;display:flex;align-items:center;gap:0.5rem;"><i class="fa-solid fa-chart-pie" style="color:var(--text3)"></i> Dashboard Overview</h1>
+                            <p style="font-size:0.83rem;color:var(--text2);max-width:720px;line-height:1.6;">A premium, real-time snapshot of your audience growth, outreach activity, and system health.</p>
+                        </div>
+                        <div class="page-head-actions">
+                            <button class="btn btn-outline btn-sm" id="btn-refresh-overview"><i
+                                    class="fa-solid fa-rotate"></i> Refresh</button>
+                            <a href="dashboard.html" class="btn btn-primary btn-sm"><i class="fa-solid fa-paper-plane"></i> New
+                                Campaign</a>
+                        </div>
+                    </div>
+                    <div class="summary-strip">
+                        <span class="summary-chip"><i class="fa-solid fa-bolt"></i> Stable delivery</span>
+                        <span class="summary-chip"><i class="fa-solid fa-users"></i> Audience healthy</span>
+                        <span class="summary-chip"><i class="fa-solid fa-wand-magic-sparkles"></i> Automation ready</span>
+                    </div>
+                </div>
+
+                <!-- KPI Cards -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                            <div class="kpi-icon" style="background:rgba(31,111,235,0.15);color:var(--text3)"><i
+                                    class="fa-solid fa-users"></i></div>
+                            <span class="kpi-trend up" id="kpi-members-trend"><i class="fa-solid fa-arrow-up"></i>
+                                0%</span>
+                        </div>
+                        <div class="kpi-val" id="kpi-total-members">0</div>
+                        <div class="kpi-lbl">Total Members</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                            <div class="kpi-icon" style="background:rgba(63,185,80,0.15);color:var(--green)"><i
+                                    class="fa-solid fa-paper-plane"></i></div>
+                            <span class="kpi-trend up" id="kpi-sent-trend"><i class="fa-solid fa-arrow-up"></i>
+                                0%</span>
+                        </div>
+                        <div class="kpi-val" id="kpi-total-sent">0</div>
+                        <div class="kpi-lbl">Emails Sent (All Time)</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                            <div class="kpi-icon" style="background:rgba(210,153,34,0.15);color:var(--gold2)"><i
+                                    class="fa-solid fa-percent"></i></div>
+                            <span class="kpi-trend up" id="kpi-rate-trend"><i class="fa-solid fa-arrow-up"></i>
+                                0%</span>
+                        </div>
+                        <div class="kpi-val" id="kpi-success-rate">0%</div>
+                        <div class="kpi-lbl">Delivery Success Rate</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                            <div class="kpi-icon" style="background:rgba(163,113,247,0.15);color:var(--purple)"><i
+                                    class="fa-solid fa-layer-group"></i></div>
+                            <span class="kpi-trend up" id="kpi-groups-trend"><i class="fa-solid fa-arrow-up"></i>
+                                —</span>
+                        </div>
+                        <div class="kpi-val" id="kpi-total-groups">0</div>
+                        <div class="kpi-lbl">Active Groups</div>
+                    </div>
+                </div>
+
+                <div class="two-col">
+                    <!-- Left: Send Activity Chart -->
+                    <div class="a-card">
+                        <div class="a-card-head">
+                            <h3><i class="fa-solid fa-chart-column"></i> Send Activity (Last 7 Campaigns)</h3>
+                            <span class="a-card-sub" id="chart-sub">No campaigns yet</span>
+                        </div>
+                        <div class="bar-chart" id="bar-chart"></div>
+                    </div>
+
+                    <!-- Right: Member Distribution Donut -->
+                    <div class="a-card">
+                        <div class="a-card-head">
+                            <h3><i class="fa-solid fa-circle-nodes"></i> Member Distribution</h3>
+                        </div>
+                        <div class="donut-wrap">
+                            <div class="donut" id="member-donut"></div>
+                            <div class="donut-legend" id="donut-legend"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="two-col">
+                    <!-- Recent Activity Feed -->
+                    <div class="a-card">
+                        <div class="a-card-head">
+                            <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity</h3>
+                            <button class="btn btn-ghost btn-sm" data-nav="logs">View All</button>
+                        </div>
+                        <div id="activity-feed"></div>
+                    </div>
+
+                    <!-- Account Health -->
+                    <div class="a-card">
+                        <div class="a-card-head">
+                            <h3><i class="fa-solid fa-heart-pulse"></i> Account Health</h3>
+                        </div>
+                        <div class="health-row">
+                            <span class="health-lbl">SMTP Connection</span>
+                            <div class="health-bar">
+                                <div class="health-fill" id="health-smtp" style="width:0%;background:var(--text2)">
+                                </div>
+                            </div>
+                            <span class="health-val" id="health-smtp-val">—</span>
+                        </div>
+                        <div class="health-row">
+                            <span class="health-lbl">Data Backup</span>
+                            <div class="health-bar">
+                                <div class="health-fill" id="health-backup" style="width:60%;background:var(--gold2)">
+                                </div>
+                            </div>
+                            <span class="health-val" id="health-backup-val">60%</span>
+                        </div>
+                        <div class="health-row">
+                            <span class="health-lbl">List Quality</span>
+                            <div class="health-bar">
+                                <div class="health-fill" id="health-quality" style="width:0%;background:var(--green)">
+                                </div>
+                            </div>
+                            <span class="health-val" id="health-quality-val">—</span>
+                        </div>
+                        <div class="health-row">
+                            <span class="health-lbl">Storage Used</span>
+                            <div class="health-bar">
+                                <div class="health-fill" id="health-storage" style="width:5%;background:var(--purple)">
+                                </div>
+                            </div>
+                            <span class="health-val" id="health-storage-val">5%</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ═══════════ CAMPAIGNS ═══════════ -->
+            <section class="admin-section" id="sec-campaigns">
+                <div class="page-head">
+                    <div>
+                        <h1><i class="fa-solid fa-satellite-dish" style="color:var(--accent)"></i> Campaign History</h1>
+                        <p>Every broadcast sent from this device, with full delivery breakdowns.</p>
+                    </div>
+                    <div class="page-head-actions">
+                        <button class="btn btn-outline btn-sm" id="btn-export-campaigns"><i
+                                class="fa-solid fa-download"></i> Export</button>
+                        <a href="dashboard.html" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> New
+                            Campaign</a>
+                    </div>
+                </div>
+
+                <div class="a-card" style="padding:0">
+                    <div class="tbl-scroll" style="max-height:600px">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Audience</th>
+                                    <th>Sent</th>
+                                    <th>Delivered</th>
+                                    <th>Failed</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="campaigns-table-body">
+                                <tr>
+                                    <td colspan="8">
+                                        <div class="empty-state"><i class="fa-solid fa-inbox"></i>
+                                            <p>No campaigns recorded yet. Send your first broadcast from the Composer.
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ TEMPLATES (Coming Soon) ═══════════ -->
+            <section class="admin-section" id="sec-templates">
+                <div class="page-head">
+                    <div>
+                        <h1><i class="fa-solid fa-layer-group" style="color:var(--gold2)"></i> Template Library</h1>
+                        <p>Design, save, and reuse email templates across campaigns.</p>
+                    </div>
+                </div>
+                <div class="coming-soon-card">
+                    <div class="coming-soon-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <h3>Template Manager Coming Soon</h3>
+                    <p>Create reusable email templates, categorize them by purpose, and share across your team. This feature is currently under development.</p>
+                    <div class="badge-soon"><i class="fa-solid fa-clock"></i> In Development</div>
+                </div>
+            </section>
+
+            <!-- ═══════════ MEMBERS ═══════════ -->
+            <section class="admin-section" id="sec-members">
+                <div class="page-head">
+                    <div>
+                        <h1><i class="fa-solid fa-users" style="color:var(--text3)"></i> All Members</h1>
+                        <p>Full directory oversight — search, filter, and bulk manage your audience.</p>
+                    </div>
+                    <div class="page-head-actions">
+                        <button class="btn btn-outline btn-sm" id="btn-export-members-admin"><i
+                                class="fa-solid fa-download"></i> Export CSV</button>
+                        <a href="dashboard.html" class="btn btn-primary btn-sm"><i class="fa-solid fa-user-plus"></i> Manage
+                            in Composer</a>
+                    </div>
+                </div>
+
+                <div class="a-card">
+                    <div class="a-card-head">
+                        <h3><i class="fa-solid fa-filter"></i> Filters</h3>
+                    </div>
+                    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center">
+                        <div class="search-box" style="width:240px"><i class="fa-solid fa-magnifying-glass"></i><input
+                                type="text" id="admin-member-search" placeholder="Search by name, email, college…">
+                        </div>
+                        <select id="admin-group-filter"
+                            style="padding:0.42rem 0.7rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:0.82rem;outline:none">
+                            <option value="all">All Groups</option>
+                        </select>
+                        <select id="admin-deleted-filter"
+                            style="padding:0.42rem 0.7rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:0.82rem;outline:none">
+                            <option value="active">Active Members</option>
+                            <option value="deleted">Deleted (Trash)</option>
+                            <option value="all">All Statuses</option>
+                        </select>
+                        <span class="badge badge-blue" id="admin-filtered-count">0 members</span>
+                    </div>
+                </div>
+
+                <div class="a-card" style="padding:0">
+                    <div class="tbl-scroll" style="max-height:560px">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="admin-select-all"></th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>College / Org</th>
+                                    <th>Phone</th>
+                                    <th>Group</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-members-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ GROUPS ═══════════ -->
+            <section class="admin-section" id="sec-groups">
+                <div class="page-head">
+                    <div>
+                        <h1><i class="fa-solid fa-layer-group" style="color:var(--purple)"></i> Groups</h1>
+                        <p>Organize members into segments for targeted broadcasts.</p>
+                    </div>
+                    <div class="page-head-actions">
+                        <button class="btn btn-primary btn-sm" id="btn-add-group-admin"><i class="fa-solid fa-plus"></i>
+                            New Group</button>
+                    </div>
+                </div>
+                <div class="three-col" id="groups-grid"></div>
+            </section>
+
+            <!-- ═══════════ ADMINS & ROLES ═══════════ -->
+            <section class="admin-section" id="sec-roles">
+                <div class="page-head">
+                    <div>
+                        <h1><i class="fa-solid fa-user-shield" style="color:var(--gold2)"></i> Admins & Roles</h1>
+                        <p>Full admin oversight: add team admins, review current roles, and revoke elevated access instantly.</p>
+                    </div>
+                    <div class="page-head-actions">
+                        <button class="btn btn-primary btn-sm" id="btn-invite-admin"><i class="fa-solid fa-user-plus"></i> Invite Admin</button>
+                    </div>
+                </div>
+                <div class="a-card" style="padding:0">
+                    <div class="tbl-scroll" style="max-height:560px">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Last Active</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admins-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════ ACTIVITY LOGS ═══════════ -->
+            <section class="admin-section" id="sec-logs">
+                <div class="page-head">
+                    <div>
+                        <h1><i class="fa-solid fa-terminal" style="color:var(--text3)"></i> Activity Logs</h1>
+                        <p>A running audit trail of actions taken across MailPilot.</p>
+                    </div>
+                    <div class="page-head-actions">
+                        <button class="btn btn-outline btn-sm" id="btn-clear-admin-logs"><i
+                                class="fa-solid fa-trash"></i> Clear</button>
+                        <button class="btn btn-outline btn-sm" id="btn-export-admin-logs"><i
+                                class="fa-solid fa-download"></i> Export</button>
+                    </div>
+                </div>
+                <div class="a-card">
+                    <div class="log-terminal" id="admin-log-terminal"></div>
+                </div>
+            </section>
+
+            <!-- ═══════════ SYSTEM HEALTH ═══════════ -->
+            <section class="admin-section" id="sec-health">
+                <div class="page-head">
+                    <div>
+                        <h1><i class="fa-solid fa-heart-pulse" style="color:var(--green)"></i> System Health</h1>
+                        <p>Storage, browser, and connection diagnostics.</p>
+                    </div>
+                </div>
+
+                <div class="two-col">
+                    <div class="a-card">
+                        <div class="a-card-head">
+                            <h3><i class="fa-solid fa-database"></i> Local Storage Usage</h3>
+                        </div>
+                        <div class="health-row">
+                            <span class="health-lbl">Members data</span>
+                            <div class="health-bar">
+                                <div class="health-fill" id="hs-members-bar" style="width:0%;background:var(--text3)">
+                                </div>
+                            </div>
+                            <span class="health-val" id="hs-members-kb">0 KB</span>
+                        </div>
+                        <div class="health-row">
+                            <span class="health-lbl">Groups data</span>
+                            <div class="health-bar">
+                                <div class="health-fill" id="hs-groups-bar" style="width:0%;background:var(--purple)">
+                                </div>
+                            </div>
+                            <span class="health-val" id="hs-groups-kb">0 KB</span>
+                        </div>
+                        <div class="health-row">
+                            <span class="health-lbl">Settings data</span>
+                            <div class="health-bar">
+                                <div class="health-fill" id="hs-settings-bar" style="width:0%;background:var(--gold2)">
+                                </div>
+                            </div>
+                            <span class="health-val" id="hs-settings-kb">0 KB</span>
+                        </div>
+                        <div class="divider"></div>
+                        <div style="font-size:0.78rem;color:var(--text2)">Total: <strong id="hs-total-kb"
+                                style="color:var(--text)">0 KB</strong> of ~5MB available (browser limit)</div>
+                    </div>
+
+                    <div class="a-card">
+                        <div class="a-card-head">
+                            <h3><i class="fa-solid fa-circle-info"></i> Environment</h3>
+                        </div>
+                        <div style="font-size:0.82rem;display:flex;flex-direction:column;gap:0.6rem">
+                            <div style="display:flex;justify-content:space-between"><span
+                                    style="color:var(--text2)">Browser</span><strong id="env-browser">—</strong></div>
+                            <div style="display:flex;justify-content:space-between"><span
+                                    style="color:var(--text2)">Platform</span><strong id="env-platform">—</strong></div>
+                            <div style="display:flex;justify-content:space-between"><span
+                                    style="color:var(--text2)">Screen Size</span><strong id="env-screen">—</strong>
+                            </div>
+                            <div style="display:flex;justify-content:space-between"><span
+                                    style="color:var(--text2)">Language</span><strong id="env-lang">—</strong></div>
+                            <div style="display:flex;justify-content:space-between"><span
+                                    style="color:var(--text2)">Local Storage</span><strong
+                                    style="color:var(--green)">Available</strong></div>
+                            <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">App
+                                    Version</span><strong>2.0</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ══ TOAST ══ -->
+    <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i> <span id="toast-msg"></span></div>
+
+    <!-- ══ ADD GROUP MODAL ══ -->
+    <div class="modal-overlay" id="modal-add-group">
+        <div class="modal-box">
+            <h3><i class="fa-solid fa-layer-group" style="color:var(--purple)"></i> New Group</h3>
+            <p class="modal-desc">Create a segment to target specific members during broadcasts.</p>
+            <div class="field"><label>Group Name</label><input type="text" id="new-group-name-admin"
+                    placeholder="e.g. VIP Members, Chapter A"></div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" id="cancel-add-group">Cancel</button>
+                <button class="btn btn-primary" id="confirm-add-group"><i class="fa-solid fa-check"></i> Create
+                    Group</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ INVITE ADMIN MODAL ══ -->
+    <div class="modal-overlay" id="modal-invite-admin">
+        <div class="modal-box">
+            <h3><i class="fa-solid fa-user-plus" style="color:var(--gold2)"></i> Invite Admin</h3>
+            <p class="modal-desc">Add or promote a user to an admin role. Existing users will be elevated automatically.</p>
+            <div class="field"><label>Name</label><input type="text" id="invite-name" placeholder="Full name"></div>
+            <div class="field"><label>Email</label><input type="email" id="invite-email" placeholder="user@domain.com"></div>
+            <div class="field"><label>Role</label><select id="invite-role"><option value="admin">Admin</option><option value="editor">Editor</option><option value="viewer">Viewer</option></select></div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" id="cancel-invite-admin">Cancel</button>
+                <button class="btn btn-primary" id="confirm-invite-admin"><i class="fa-solid fa-paper-plane"></i> Send Invite</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── EDIT MEMBER MODAL (ADMIN) ───────────────────── -->
+    <div class="modal-overlay" id="admin-modal-edit-member">
+        <div class="modal-box" style="max-width:480px">
+            <div class="modal-head" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                <h3 style="margin:0"><i class="fa-solid fa-pen" style="color:var(--accent2);margin-right:0.4rem"></i> Edit Member</h3>
+                <button class="modal-close" id="admin-modal-edit-close" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:1.1rem"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.7rem;margin-top:0.4rem">
+                <div class="field"><label>Full Name *</label><input type="text" id="admin-m-name" placeholder="Full name"></div>
+                <div class="field"><label>Email Address *</label><input type="text" id="admin-m-email" placeholder="email@example.com"></div>
+                <div class="field"><label>College / Organization</label><input type="text" id="admin-m-college" placeholder="e.g. IIT Delhi"></div>
+                <div class="field"><label>Phone Number</label><input type="text" id="admin-m-phone" placeholder="+91 98765 43210"></div>
+                <div class="field"><label>Group / Tag</label><input type="text" id="admin-m-group" placeholder="General"></div>
+                <input type="hidden" id="admin-m-id">
+            </div>
+            <div class="modal-actions" style="margin-top:1.5rem;display:flex;gap:0.5rem;justify-content:flex-end">
+                <button class="btn btn-ghost" id="admin-modal-edit-cancel">Cancel</button>
+                <button class="btn btn-green" id="admin-modal-edit-save"><i class="fa-solid fa-save"></i> Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── VIEW CAMPAIGNS MODAL (ADMIN) ────────────────── -->
+    <div class="modal-overlay" id="modal-admin-view-campaigns">
+        <div class="modal-box" style="max-width:700px">
+            <div class="modal-head" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                <h3 style="margin:0"><i class="fa-solid fa-paper-plane" style="color:var(--green);margin-right:0.4rem"></i> Campaigns Run by <span id="view-campaigns-user-email"></span></h3>
+                <button class="modal-close" id="modal-admin-view-campaigns-close" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:1.1rem"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="tbl-scroll" style="max-height:350px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r);margin-top:0.8rem">
+                <table style="width:100%; border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left; padding:8px;">Campaign Name</th>
+                            <th style="text-align:left; padding:8px;">Audience</th>
+                            <th style="text-align:left; padding:8px;">Sent</th>
+                            <th style="text-align:left; padding:8px;">Failed</th>
+                            <th style="text-align:left; padding:8px;">Status</th>
+                            <th style="text-align:left; padding:8px;">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-admin-view-campaigns-tbody">
+                        <!-- Dynamic content -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-actions" style="margin-top:1.5rem;display:flex;justify-content:flex-end">
+                <button class="btn btn-ghost" id="modal-admin-view-campaigns-cancel">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── VIEW MEMBERS MODAL (ADMIN) ────────────────── -->
+    <div class="modal-overlay" id="modal-admin-view-members">
+        <div class="modal-box" style="max-width:700px">
+            <div class="modal-head" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                <h3 style="margin:0"><i class="fa-solid fa-users" style="color:var(--blue);margin-right:0.4rem"></i> Members Added by <span id="view-members-user-email"></span></h3>
+                <button class="modal-close" id="modal-admin-view-members-close" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:1.1rem"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="tbl-scroll" style="max-height:350px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r);margin-top:0.8rem">
+                <table style="width:100%; border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left; padding:8px;">Name</th>
+                            <th style="text-align:left; padding:8px;">Email</th>
+                            <th style="text-align:left; padding:8px;">College / Org</th>
+                            <th style="text-align:left; padding:8px;">Phone</th>
+                            <th style="text-align:left; padding:8px;">Group</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-admin-view-members-tbody">
+                        <!-- Dynamic content -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-actions" style="margin-top:1.5rem;display:flex;justify-content:flex-end">
+                <button class="btn btn-ghost" id="modal-admin-view-members-cancel">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-box">
+            <h3 id="confirm-title"><i class="fa-solid fa-triangle-exclamation" style="color:var(--red2)"></i> Are you
+                sure?</h3>
+            <p class="modal-desc" id="confirm-desc">This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" id="confirm-cancel">Cancel</button>
+                <button class="btn btn-red" id="confirm-ok">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="common.js"></script>
+    <script>
+        /* ══════════════════════════════════════════════════════════
+           MAILPILOT ADMIN — Engine (Connected to Supabase)
+        ══════════════════════════════════════════════════════════ */
+
+        // ── UTILS ──────────────────────────────────────────────────
+        function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function initials(name) { const p = (name || '?').trim().split(/\s+/); return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
+        function timeAgo(iso) {
+            if (!iso) return 'never';
+            const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+            if (diff < 60) return 'just now';
+            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+            return Math.floor(diff / 86400) + 'd ago';
+        }
+        
+        function showToast(msg, type = 'ok') {
+            const t = document.getElementById('toast');
+            t.querySelector('#toast-msg').textContent = msg;
+            t.querySelector('i').className = `fa-solid fa-${type === 'ok' ? 'circle-check' : type === 'err' ? 'circle-xmark' : 'triangle-exclamation'}`;
+            t.className = `toast show ${type}`;
+            clearTimeout(t._t); t._t = setTimeout(() => { t.className = 'toast'; }, 2800);
+        }
+
+        // ── AUTH & SECURITY GUARD ──────────────────────────────────
+        async function checkAdminAccess() {
+            const client = initSupabaseClient();
+            if (!client) {
+                return new Promise(resolve => setTimeout(() => resolve(checkAdminAccess()), 100));
+            }
+            try {
+                const { data: { session } } = await client.auth.getSession();
+                if (!session) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                const email = session.user.email.toLowerCase();
+                const ownerEmails = ['harsh@ascentcircle.in', 'ascentcircle.community@gmail.com', 'admin@mailpilot.app'];
+                const isOwner = ownerEmails.includes(email);
+                
+                if (!isOwner) {
+                    alert('Access denied. Owner privileges required.');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                
+                // Update profile display
+                const displayName = session.user.user_metadata?.full_name || email.split('@')[0];
+                const pill = document.querySelector('.admin-pill span');
+                if (pill) pill.textContent = displayName;
+                const avatar = document.querySelector('.admin-avatar');
+                if (avatar) avatar.textContent = displayName.substring(0, 2).toUpperCase();
+            } catch (e) {
+                console.error('Error checking admin access:', e);
+                window.location.href = 'dashboard.html';
+            }
+        }
+
+        // ── INITIALIZATION ──────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', () => {
+            load(); // Init state via common.js
+            checkAdminAccess().then(() => {
+                initAdmin();
+            });
+        });
+
+        function initAdmin() {
+            // Nav item click events
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => navigateTo(item.dataset.target));
+            });
+            document.querySelectorAll('[data-nav]').forEach(el => {
+                el.addEventListener('click', () => navigateTo(el.dataset.nav));
+            });
+            
+            // Global Search
+            document.getElementById('global-search').addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' && this.value.trim()) {
+                    navigateTo('members');
+                    document.getElementById('admin-member-search').value = this.value;
+                    renderAdminMembersTable();
+                }
+            });
+
+            // Notifications Toggle
+            document.getElementById('btn-notifications').addEventListener('click', function () {
+                document.getElementById('notif-ping').style.display = 'none';
+                showToast('No new notifications');
+            });
+
+            // Refresh Button
+            document.getElementById('btn-refresh-overview').addEventListener('click', async () => {
+                await refreshAll();
+                showToast('Dashboard refreshed');
+            });
+
+            // Theme toggle hooks
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    setTimeout(() => {
+                        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+                        themeToggle.querySelector('i').className = `fa-solid fa-${currentTheme === 'dark' ? 'moon' : 'sun'}`;
+                    }, 50);
+                });
+            }
+
+            // Sync database profile data
+            populateGroupFilter();
+            refreshAll();
+            logAudit('info', 'Admin panel accessed');
+        }
+
+        // ── NAV CONTROLLER ──────────────────────────────────────────
+        function navigateTo(target) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+            const navItem = document.querySelector(`.nav-item[data-target="${target}"]`);
+            if (navItem) navItem.classList.add('active');
+            const sec = document.getElementById('sec-' + target);
+            if (sec) sec.classList.add('active');
+            document.querySelector('.admin-main').scrollTop = 0;
+            
+            if (target === 'members') renderAdminMembersTable();
+            if (target === 'groups') renderGroupsGrid();
+            if (target === 'roles') renderAdminsTable();
+            if (target === 'logs') renderAdminLogs();
+            if (target === 'health') renderSystemHealth();
+            if (target === 'campaigns') renderCampaignsTable();
+            if (target === 'templates') renderTemplateGallery();
+        }
+
+        // ── REFRESH ALL COMPONENTS ─────────────────────────────────
+        async function refreshAll() {
+            const count = STATE.members ? STATE.members.length : 0;
+            document.getElementById('nav-member-count').textContent = count;
+            document.getElementById('nav-group-count').textContent = STATE.groups ? STATE.groups.length : 0;
+            
+            await renderOverview();
+            
+            const activeSection = document.querySelector('.admin-section.active');
+            if (activeSection) {
+                const id = activeSection.id.replace('sec-', '');
+                if (id === 'members') renderAdminMembersTable();
+                if (id === 'groups') renderGroupsGrid();
+                if (id === 'roles') renderAdminsTable();
+                if (id === 'logs') renderAdminLogs();
+                if (id === 'health') renderSystemHealth();
+                if (id === 'campaigns') renderCampaignsTable();
+                if (id === 'templates') renderTemplateGallery();
+            }
+        }
+        window.refreshAll = refreshAll;
+
+        // ── OVERVIEW RENDER ─────────────────────────────────────────
+        async function renderOverview() {
+            const members = STATE.members || [];
+            const groups = STATE.groups || [];
+            
+            document.getElementById('kpi-total-members').textContent = members.length;
+            document.getElementById('kpi-total-groups').textContent = groups.length;
+            
+            let campaigns = [];
+            let totalSent = 0;
+            let totalDelivered = 0;
+            try {
+                const headers = await getAuthHeaders();
+                const response = await fetch(`${window.API_BASE_URL}/api/campaigns?all=true`, { headers });
+                if (response.ok) {
+                    const res = await response.json();
+                    if (res.success) {
+                        campaigns = (res.data || []).map(c => ({
+                            ...c,
+                            delivered: c.sent_count || 0
+                        }));
+                        totalSent = campaigns.reduce((acc, c) => acc + (c.sent_count || 0) + (c.failed_count || 0), 0);
+                        totalDelivered = campaigns.reduce((acc, c) => acc + (c.sent_count || 0), 0);
+                    }
+                }
+            } catch (e) {
+                console.error('Error fetching overview stats:', e);
+            }
+            
+            document.getElementById('kpi-total-sent').textContent = totalSent;
+            const rate = totalSent ? Math.round((totalDelivered / totalSent) * 100) : 0;
+            document.getElementById('kpi-success-rate').textContent = rate + '%';
+
+            document.getElementById('kpi-members-trend').innerHTML = members.length ? `<i class="fa-solid fa-arrow-up"></i> Active` : `<i class="fa-solid fa-minus"></i> Empty`;
+            document.getElementById('kpi-sent-trend').innerHTML = campaigns.length ? `<i class="fa-solid fa-arrow-up"></i> ${campaigns.length} runs` : `<i class="fa-solid fa-minus"></i> None yet`;
+            document.getElementById('kpi-rate-trend').innerHTML = rate >= 90 ? `<i class="fa-solid fa-arrow-up"></i> Healthy` : (totalSent ? `<i class="fa-solid fa-arrow-down"></i> Watch` : `<i class="fa-solid fa-minus"></i> —`);
+            document.getElementById('kpi-groups-trend').innerHTML = `<i class="fa-solid fa-tags"></i> ${groups.length} total`;
+            document.getElementById('nav-campaign-count').textContent = campaigns.length;
+
+            // Bar Chart - Last 7 campaigns
+            const barChart = document.getElementById('bar-chart');
+            const recent = campaigns.slice(0, 7).reverse();
+            if (!recent.length) {
+                barChart.innerHTML = `<div class="empty-state" style="width:100%"><i class="fa-solid fa-chart-column"></i><p>No campaign data yet</p></div>`;
+                document.getElementById('chart-sub').textContent = 'No campaigns yet';
+            } else {
+                const max = Math.max(...recent.map(c => c.delivered || 0), 1);
+                barChart.innerHTML = recent.map((c, i) => {
+                    const h = Math.max(8, Math.round(((c.delivered || 0) / max) * 130));
+                    return `<div class="bar-col">
+                        <div class="bar-fill" data-val="${c.delivered || 0}" style="height:${h}px"></div>
+                        <span class="bar-lbl">${esc(c.name.slice(0, 8))}…</span>
+                    </div>`;
+                }).join('');
+                document.getElementById('chart-sub').textContent = `${recent.length} most recent campaign(s)`;
+            }
+
+            renderMemberDonut(members, groups);
+            await renderOverviewActivity();
+
+            // SMTP Connection Indicators
+            let meta = {};
+            try {
+                meta = JSON.parse(localStorage.getItem('mf_composer_meta') || '{}');
+            } catch (e) {}
+            const smtpConfigured = !!(meta.smtpHost);
+            document.getElementById('health-smtp').style.width = smtpConfigured ? '100%' : '15%';
+            document.getElementById('health-smtp').style.background = smtpConfigured ? 'var(--green)' : 'var(--red2)';
+            document.getElementById('health-smtp-val').textContent = smtpConfigured ? 'Connected' : 'Not set';
+
+            const validEmails = members.filter(m => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.email)).length;
+            const quality = members.length ? Math.round((validEmails / members.length) * 100) : 0;
+            document.getElementById('health-quality').style.width = quality + '%';
+            document.getElementById('health-quality-val').textContent = members.length ? quality + '%' : '—';
+
+            // Cache size
+            const localSize = JSON.stringify(STATE.members).length;
+            document.getElementById('health-storage').style.width = '100%';
+            document.getElementById('health-storage').style.background = 'var(--accent2)';
+            document.getElementById('health-storage-val').textContent = (localSize / 1024).toFixed(1) + ' KB (cache)';
+        }
+
+        // Parse campaigns from dispatch logs
+        function getCampaignsFromLogs(logs) {
+            const cmap = new Map();
+            const sortedLogs = logs.slice().reverse();
+            sortedLogs.forEach(l => {
+                if (!l.subject) return;
+                const key = l.subject;
+                if (!cmap.has(key)) {
+                    cmap.set(key, {
+                        name: key,
+                        audienceLabel: l.audienceLabel || 'All Members',
+                        sent: 0,
+                        delivered: 0,
+                        failed: 0,
+                        status: 'completed',
+                        date: l.timestamp || new Date().toISOString()
+                    });
+                }
+                const c = cmap.get(key);
+                if (l.type === 'sent') {
+                    c.sent++;
+                    c.delivered++;
+                } else if (l.type === 'error') {
+                    c.failed++;
+                }
+            });
+            return Array.from(cmap.values());
+        }
+
+        // Donut Chart - Group Breakdown
+        function renderMemberDonut(members, groups) {
+            const donut = document.getElementById('member-donut');
+            const legend = document.getElementById('donut-legend');
+            if (!members.length) {
+                donut.style.background = 'var(--surface2)';
+                donut.innerHTML = `<div class="donut-center"><span class="dnum">0</span><span class="dlbl">members</span></div>`;
+                legend.innerHTML = `<div class="legend-item" style="color:var(--text2)">No members yet</div>`;
+                return;
+            }
+            const colors = ['#1f6feb', '#238636', '#d29922', '#a371f7', '#da3633', '#39c5cf', '#f76791'];
+            const counts = {};
+            members.forEach(m => { const g = m.group || 'General'; counts[g] = (counts[g] || 0) + 1; });
+            const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+            let cursor = 0;
+            const stops = entries.map(([g, count], i) => {
+                const pct = (count / members.length) * 100;
+                const start = cursor; cursor += pct;
+                return `${colors[i % colors.length]} ${start}% ${cursor}%`;
+            }).join(', ');
+            donut.style.background = `conic-gradient(${stops})`;
+            donut.innerHTML = `<div class="donut-center"><span class="dnum">${members.length}</span><span class="dlbl">members</span></div>`;
+            legend.innerHTML = entries.map(([g, count], i) => `
+                <div class="legend-item">
+                    <span class="legend-dot" style="background:${colors[i % colors.length]}"></span>
+                    ${esc(g)} <strong>${count}</strong>
+                </div>`).join('');
+        }
+
+        // Render dashboard overview mini timeline
+        async function renderOverviewActivity() {
+            const feed = document.getElementById('activity-feed');
+            try {
+                const headers = await getAuthHeaders();
+                const response = await fetch(`${window.API_BASE_URL}/api/logs`, { headers });
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.data && result.data.length > 0) {
+                        const logs = result.data.slice(0, 6);
+                        const iconMap = { success: ['fa-circle-check', 'var(--green)'], error: ['fa-circle-xmark', 'var(--red2)'], warning: ['fa-triangle-exclamation', 'var(--gold2)'], info: ['fa-circle-info', 'var(--text2)'] };
+                        feed.innerHTML = logs.map(l => {
+                            const [icon, color] = iconMap[l.actionType] || iconMap.info;
+                            return `<div class="feed-item">
+                                <div class="feed-icon" style="background:${color}22;color:${color}"><i class="fa-solid ${icon}"></i></div>
+                                <div class="feed-body"><strong>${esc(l.userName)}:</strong> ${esc(l.details)}</div>
+                                <span class="feed-time">${timeAgo(l.timestamp)}</span>
+                            </div>`;
+                        }).join('');
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+            feed.innerHTML = `<div class="empty-state"><i class="fa-solid fa-clock"></i><p>No activity logs recorded</p></div>`;
+        }
+
+        // ── CAMPAIGNS PANEL ──────────────────────────────────────────
+        window.resumeCampaign = function(id) {
+            localStorage.setItem('mf_active_campaign_id', id);
+            window.location.href = 'broadcast.html';
+        };
+
+        window.editCampaignInComposer = function(id) {
+            localStorage.setItem('mf_active_campaign_id', id);
+            window.location.href = 'dashboard.html';
+        };
+
+        window.deleteCampaignFromAdmin = async function(id) {
+            if (!confirm('Are you sure you want to delete this campaign? This cannot be undone.')) return;
+            try {
+                const headers = await getAuthHeaders();
+                const response = await fetch(`${window.API_BASE_URL}/api/campaigns/${encodeURIComponent(id)}`, {
+                    method: 'DELETE',
+                    headers
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Campaign deleted successfully', 'ok');
+                    renderCampaignsTable();
+                } else {
+                    showToast(result.error || 'Failed to delete campaign', 'err');
+                }
+            } catch (e) {
+                console.error(e);
+                showToast('Network error deleting campaign', 'err');
+            }
+        };
+
+        async function renderCampaignsTable() {
+            const body = document.getElementById('campaigns-table-body');
+            body.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text2)">Loading campaigns...</td></tr>`;
+            
+            try {
+                const headers = await getAuthHeaders();
+                const response = await fetch(`${window.API_BASE_URL}/api/campaigns?all=true`, { headers });
+                if (!response.ok) throw new Error('Campaigns API failed');
+                const result = await response.json();
+                const campaigns = result.data || [];
+                
+                if (!campaigns.length) {
+                    body.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fa-solid fa-inbox"></i><p>No campaigns recorded yet.</p></div></td></tr>`;
+                    return;
+                }
+                
+                body.innerHTML = campaigns.map(c => {
+                    const aud = c.audience_filter === 'group' ? `Group: ${c.audience_group}` : (c.audience_filter === 'selected' ? 'Selected Members' : 'All Members');
+                    
+                    let statusBadge = '<span class="badge badge-gray">Draft</span>';
+                    if (c.status === 'completed') statusBadge = '<span class="badge badge-green">Completed</span>';
+                    else if (c.status === 'sending') statusBadge = '<span class="badge badge-blue">Sending</span>';
+                    else if (c.status === 'paused') statusBadge = '<span class="badge badge-warn">Paused</span>';
+
+                    const isResumeable = c.status === 'sending' || c.status === 'paused';
+                    
+                    return `<tr>
+                        <td>
+                            <strong>${esc(c.name)}</strong>
+                            ${c.subject ? `<div style="font-size:0.75rem;color:var(--text2);margin-top:2px;">${esc(c.subject)}</div>` : ''}
+                        </td>
+                        <td>${esc(aud)}</td>
+                        <td>${c.sent_count || 0}</td>
+                        <td style="color:var(--green)">${c.sent_count || 0}</td>
+                        <td style="color:var(--red2)">${c.failed_count || 0}</td>
+                        <td>${statusBadge}</td>
+                        <td style="color:var(--text2);font-size:0.76rem">${new Date(c.updated_at || c.created_at).toLocaleString()}</td>
+                        <td><div class="td-actions" style="display:flex;gap:0.4rem;align-items:center;">
+                            <button class="btn btn-outline btn-sm" style="padding: 2px 6px; font-size: 0.72rem;" onclick="editCampaignInComposer('${c.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
+                            ${isResumeable ? `<button class="btn btn-primary btn-sm" style="padding: 2px 6px; font-size: 0.72rem;" onclick="resumeCampaign('${c.id}')"><i class="fa-solid fa-play"></i> Resume</button>` : ''}
+                            <button class="btn btn-outline btn-sm" style="padding: 2px 6px; font-size: 0.72rem; color:var(--red2); border-color:rgba(218,54,51,0.3);" onclick="deleteCampaignFromAdmin('${c.id}')"><i class="fa-solid fa-trash"></i> Delete</button>
+                        </div></td>
+                    </tr>`;
+                }).join('');
+            } catch (e) {
+                console.error(e);
+                body.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--red2)">Failed to load campaign records.</td></tr>`;
+            }
+        }
+
+
+        document.getElementById('btn-export-campaigns').addEventListener('click', async () => {
+            try {
+                const headers = await getAuthHeaders();
+                const response = await fetch(`${window.API_BASE_URL}/api/campaigns?all=true`, { headers });
+                const result = await response.json();
+                const campaigns = result.data || [];
+                if (!campaigns.length) { showToast('No campaigns to export', 'warn'); return; }
+                const rows = [['name', 'subject', 'audience', 'sent', 'failed', 'status', 'date'],
+                ...campaigns.map(c => [
+                    c.name || '',
+                    c.subject || '',
+                    c.audience_filter === 'group' ? `Group: ${c.audience_group}` : (c.audience_filter === 'selected' ? 'Selected' : 'All'),
+                    c.sent_count || 0,
+                    c.failed_count || 0,
+                    c.status || 'draft',
+                    c.updated_at || c.created_at || ''
+                ])];
+                const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+                const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'campaigns.csv'; a.click();
+                showToast('Campaigns exported');
+            } catch (e) {
+                showToast('Failed to export', 'err');
+            }
+        });
+
+        // ── TEMPLATE GALLERY ─────────────────────────────────────────
+        const TEMPLATE_DEFS = [
+            { id: 'event', name: 'Event Invite', desc: 'Invite members to an event with date, time & venue', icon: 'fa-calendar-days', color: '#1f6feb' },
+            { id: 'newsletter', name: 'Newsletter', desc: 'Regular updates and roundups for your community', icon: 'fa-newspaper', color: '#238636' },
+            { id: 'announcement', name: 'Announcement', desc: 'Important, time-sensitive notices', icon: 'fa-bullhorn', color: '#d29922' },
+            { id: 'welcome', name: 'Welcome', desc: 'Greet new members joining your list', icon: 'fa-face-smile', color: '#a371f7' },
+            { id: 'promotion', name: 'Promotion', desc: 'Exclusive offers and limited-time deals', icon: 'fa-tag', color: '#39c5cf' },
+            { id: 'reminder', name: 'Reminder', desc: 'Friendly nudges before a deadline or event', icon: 'fa-bell', color: '#ff7b72' },
+        ];
+        function renderTemplateGallery() {
+            const gallery = document.getElementById('template-gallery');
+            gallery.innerHTML = TEMPLATE_DEFS.map(t => {
+                return `<div class="tg-card" onclick="window.location.href='dashboard.html'">
+                    <div class="tg-thumb" style="background:linear-gradient(135deg,${t.color}33,${t.color}11)"><i class="fa-solid ${t.icon}" style="color:${t.color}"></i></div>
+                    <div class="tg-body"><h4>${esc(t.name)}</h4><p>${esc(t.desc)}</p></div>
+                    <div class="tg-foot"><span class="tg-uses">Active template</span><span class="badge badge-blue">Open</span></div>
+                </div>`;
+            }).join('');
+        }
+
+        // ── MEMBERS OVERSIGHT ────────────────────────────────────────
+        function populateGroupFilter() {
+            const groups = STATE.groups || [];
+            const sel = document.getElementById('admin-group-filter');
+            sel.innerHTML = `<option value="all">All Groups</option>${groups.map(g => `<option value="${esc(g)}">${esc(g)}</option>`).join('')}`;
+        }
+
+        function renderAdminMembersTable() {
+            const members = STATE.members || [];
+            const q = (document.getElementById('admin-member-search').value || '').toLowerCase();
+            const groupFilter = document.getElementById('admin-group-filter').value;
+            const deletedFilter = document.getElementById('admin-deleted-filter').value;
+
+            const filtered = members.filter(m => {
+                if (deletedFilter === 'active' && m.is_deleted) return false;
+                if (deletedFilter === 'deleted' && !m.is_deleted) return false;
+
+                const matchQ = !q || m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q) || (m.college || '').toLowerCase().includes(q);
+                const matchG = groupFilter === 'all' || m.group === groupFilter;
+                return matchQ && matchG;
+            });
+            document.getElementById('admin-filtered-count').textContent = `${filtered.length} member${filtered.length !== 1 ? 's' : ''}`;
+            const body = document.getElementById('admin-members-table');
+            if (!filtered.length) {
+                body.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fa-solid fa-users-slash"></i><p>No members match your filters.</p></div></td></tr>`;
+                return;
+            }
+            body.innerHTML = filtered.map(m => `
+            <tr>
+              <td><input type="checkbox" class="admin-row-cb" data-id="${m.id}"></td>
+              <td><div class="td-avatar"><div class="row-avatar" style="background:${avatarColor(m.name)}">${initials(m.name)}</div><span>${esc(m.name)}</span></div></td>
+              <td style="color:var(--text2)">${esc(m.email)}</td>
+              <td style="color:var(--text2)">${esc(m.college || '—')}</td>
+              <td style="color:var(--text2)">${esc(m.phone || '—')}</td>
+              <td>${m.group ? `<span class="badge" style="background:${avatarColor(m.group)}22;color:${avatarColor(m.group)}">${esc(m.group)}</span>` : ''}</td>
+              <td><div class="td-actions">
+                ${m.is_deleted ? `
+                  <button class="tbl-btn edit" onclick="adminRestoreMember('${m.id}')" title="Restore Member"><i class="fa-solid fa-arrow-rotate-left"></i></button>
+                  <button class="tbl-btn del" onclick="adminPurgeMember('${m.id}')" title="Purge Permanently"><i class="fa-solid fa-trash-can" style="color:var(--red)"></i></button>
+                ` : `
+                  <button class="tbl-btn edit" onclick="adminEditMember('${m.id}')" title="Edit Member"><i class="fa-solid fa-pen"></i></button>
+                  <button class="tbl-btn del" onclick="adminDeleteMember('${m.id}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                `}
+              </div></td>
+            </tr>`).join('');
+        }
+
+        window.adminRestoreMember = async function(id) {
+            const member = STATE.members.find(m => m.id === id);
+            if (!member) return;
+            member.is_deleted = false;
+            try {
+                const table = getSupabaseTableName();
+                const headers = await getAuthHeaders({ 'Content-Type': 'application/json' });
+                const response = await fetch(`${window.API_BASE_URL}/api/members?table=${encodeURIComponent(table)}`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify([member])
+                });
+                const result = await response.json();
+                if (result.success) {
+                    localStorage.setItem('mf_members', JSON.stringify(STATE.members));
+                    await logAudit('info', `Restored member ${member.email}`);
+                    renderAdminMembersTable();
+                    renderOverview();
+                    showToast('Member restored');
+                } else {
+                    showToast('Failed to restore member', 'err');
+                }
+            } catch(e) {
+                console.error(e);
+            }
+        };
+
+        window.adminPurgeMember = function(id) {
+            const member = STATE.members.find(m => m.id === id);
+            if (!member) return;
+            openConfirm('Purge this member permanently?', `This will permanently delete ${member.name} from the Supabase database. This action CANNOT be undone.`, async () => {
+                await deleteMemberFromDatabase(id, true); // pass hard = true
+                STATE.members = STATE.members.filter(m => m.id !== id);
+                localStorage.setItem('mf_members', JSON.stringify(STATE.members));
+                await logAudit('danger', `Permanently purged member ${member.email} from database`);
+                renderAdminMembersTable();
+                renderOverview();
+                showToast('Member permanently purged');
+            });
+        };
+
+        window.adminDeleteMember = function (id) {
+            const member = STATE.members.find(m => m.id === id);
+            if (!member) return;
+            openConfirm('Soft-delete this member?', `This will move ${member.name} to the trash.`, async () => {
+                await deleteMemberFromDatabase(id, false); // pass hard = false (soft-delete)
+                member.is_deleted = true;
+                localStorage.setItem('mf_members', JSON.stringify(STATE.members));
+                await logAudit('warning', `Soft-deleted member ${member.email}`);
+                renderAdminMembersTable();
+                renderOverview();
+                showToast('Member moved to trash');
+            });
+        };
+
+        window.adminEditMember = function(id) {
+            const m = STATE.members.find(x => x.id === id);
+            if (!m) return;
+            document.getElementById('admin-m-id').value = id;
+            document.getElementById('admin-m-name').value = m.name;
+            document.getElementById('admin-m-email').value = m.email;
+            document.getElementById('admin-m-college').value = m.college || '';
+            document.getElementById('admin-m-phone').value = m.phone || '';
+            document.getElementById('admin-m-group').value = m.group || 'General';
+            document.getElementById('admin-modal-edit-member').classList.add('open');
+        };
+
+        function closeAdminEditModal() {
+            document.getElementById('admin-modal-edit-member').classList.remove('open');
+        }
+
+        document.getElementById('admin-modal-edit-close').addEventListener('click', closeAdminEditModal);
+        document.getElementById('admin-modal-edit-cancel').addEventListener('click', closeAdminEditModal);
+
+        document.getElementById('admin-modal-edit-save').addEventListener('click', async () => {
+            const id = document.getElementById('admin-m-id').value;
+            const name = document.getElementById('admin-m-name').value.trim();
+            const email = document.getElementById('admin-m-email').value.trim();
+            const college = document.getElementById('admin-m-college').value.trim();
+            const phone = document.getElementById('admin-m-phone').value.trim();
+            const group = document.getElementById('admin-m-group').value.trim() || 'General';
+
+            if (!name || !email) { showToast('Name and Email are required', 'warn'); return; }
+            const dup = STATE.members.find(m => m.email.toLowerCase() === email.toLowerCase() && m.id !== id);
+            if (dup) { showToast('Another member already has this email', 'warn'); return; }
+
+            const idx = STATE.members.findIndex(m => m.id === id);
+            if (idx > -1) {
+                const member = { ...STATE.members[idx], name, email, college, phone, group };
+                STATE.members[idx] = member;
+                
+                try {
+                    const table = getSupabaseTableName();
+                    const headers = await getAuthHeaders({ 'Content-Type': 'application/json' });
+                    const response = await fetch(`${window.API_BASE_URL}/api/members?table=${encodeURIComponent(table)}`, {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify([member])
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        localStorage.setItem('mf_members', JSON.stringify(STATE.members));
+                        await logAudit('info', `Edited member ${member.email}`);
+                        renderAdminMembersTable();
+                        renderOverview();
+                        showToast('Member updated successfully');
+                        closeAdminEditModal();
+                    } else {
+                        showToast('Failed to save changes to Supabase', 'err');
+                    }
+                } catch(e) {
+                    console.error(e);
+                    showToast('Network error saving changes', 'err');
+                }
+            }
+        });
+
+        document.getElementById('admin-member-search').addEventListener('input', renderAdminMembersTable);
+        document.getElementById('admin-group-filter').addEventListener('change', renderAdminMembersTable);
+        document.getElementById('admin-deleted-filter').addEventListener('change', renderAdminMembersTable);
+        document.getElementById('admin-select-all').addEventListener('change', function () {
+            document.querySelectorAll('.admin-row-cb').forEach(cb => cb.checked = this.checked);
+        });
+
+        document.getElementById('btn-export-members-admin').addEventListener('click', () => {
+            const members = STATE.members || [];
+            if (!members.length) { showToast('No members to export', 'warn'); return; }
+            const rows = [['name', 'email', 'college', 'phone', 'group'], ...members.map(m => [m.name, m.email, m.college || '', m.phone || '', m.group || ''])];
+            const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'members.csv'; a.click();
+            showToast('Members exported');
+        });
+
+        // ── GROUPS GRID ─────────────────────────────────────────────
+        function renderGroupsGrid() {
+            const groups = STATE.groups || [];
+            const members = STATE.members || [];
+            const grid = document.getElementById('groups-grid');
+            if (!groups.length) {
+                grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><i class="fa-solid fa-layer-group"></i><p>No groups segments created.</p></div>`;
+                return;
+            }
+            grid.innerHTML = groups.map(g => {
+                const count = members.filter(m => m.group === g).length;
+                const color = avatarColor(g);
+                return `<div class="a-card" style="margin-bottom:0">
+              <div class="a-card-head">
+                <h3><span style="width:10px;height:10px;border-radius:50%;background:${color};display:inline-block"></span> ${esc(g)}</h3>
+                ${g !== 'General' && g !== 'Admin' ? `<button class="tbl-btn del" onclick="deleteGroupAdmin('${esc(g)}')" title="Delete group"><i class="fa-solid fa-trash"></i></button>` : ''}
+              </div>
+              <div class="kpi-val" style="font-size:1.6rem">${count}</div>
+              <div class="kpi-lbl">member${count !== 1 ? 's' : ''}</div>
+            </div>`;
+            }).join('');
+        }
+
+        window.deleteGroupAdmin = function (g) {
+            openConfirm(`Delete "${g}" group?`, 'Members in this group will be moved to "General". This does not delete the members from the database.', async () => {
+                const affectedMembers = STATE.members.filter(m => m.group === g);
+                affectedMembers.forEach(m => m.group = 'General');
+                
+                const table = getSupabaseTableName();
+                const headers = await getAuthHeaders({ 'Content-Type': 'application/json' });
+                await fetch(`${window.API_BASE_URL}/api/members?table=${encodeURIComponent(table)}`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(affectedMembers)
+                });
+                
+                await fetchMembersFromSupabase();
+                await logAudit('warning', `Deleted segment group: "${g}"`);
+                renderGroupsGrid();
+                renderOverview();
+                showToast('Group deleted');
+            });
+        };
+
+        document.getElementById('btn-add-group-admin').addEventListener('click', () => {
+            document.getElementById('new-group-name-admin').value = '';
+            document.getElementById('modal-add-group').classList.add('open');
+        });
+        document.getElementById('cancel-add-group').addEventListener('click', () => document.getElementById('modal-add-group').classList.remove('open'));
+        
+        document.getElementById('confirm-add-group').addEventListener('click', async () => {
+            const name = document.getElementById('new-group-name-admin').value.trim();
+            if (!name) { showToast('Enter a group name', 'warn'); return; }
+            if (STATE.groups.includes(name)) { showToast('Group already exists', 'warn'); return; }
+            
+            STATE.groups.push(name);
+            localStorage.setItem('mf_groups', JSON.stringify(STATE.groups));
+            
+            await logAudit('success', `Created segment group: "${name}"`);
+            document.getElementById('modal-add-group').classList.remove('open');
+            renderGroupsGrid();
+            populateGroupFilter();
+            renderOverview();
+            showToast(`Group "${name}" created`);
+        });
+
+        // ── ADMINS & ROLES ──────────────────────────────────────────
+        function renderAdminsTable() {
+            const members = STATE.members || [];
+            const admins = members.filter(m => m.group === 'Admin' || m.role === 'admin');
+            const body = document.getElementById('admins-table-body');
+            
+            if (!admins.length) {
+                body.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fa-solid fa-user-shield"></i><p>No admins registered.</p></div></td></tr>`;
+                return;
+            }
+            
+            body.innerHTML = admins.map(a => `
+            <tr>
+              <td><div class="td-avatar"><div class="row-avatar" style="background:${avatarColor(a.name)}">${initials(a.name)}</div><span>${esc(a.name)}</span></div></td>
+              <td style="color:var(--text2)">${esc(a.email)}</td>
+              <td><span class="badge badge-gold">Admin</span></td>
+              <td><span class="badge badge-green">Active</span></td>
+              <td style="color:var(--text2);font-size:0.76rem">Online</td>
+              <td><div class="td-actions">
+                <button class="tbl-btn view-campaigns" onclick="viewCampaignsByUser('${a.id}', '${esc(a.email)}')" title="View Campaigns"><i class="fa-solid fa-paper-plane"></i></button>
+                <button class="tbl-btn view-members" onclick="viewMembersByUser('${a.id}', '${esc(a.email)}')" title="View Members"><i class="fa-solid fa-users"></i></button>
+                ${a.email !== 'harsh@ascentcircle.in' && a.email !== 'ascentcircle.community@gmail.com' ? `<button class="tbl-btn del" onclick="removeAdmin('${a.id}')" title="Revoke Admin Access"><i class="fa-solid fa-trash"></i></button>` : '<span style="font-size:0.7rem;color:var(--text2)">Protected</span>'}
+              </div></td>
+            </tr>`).join('');
+        }
+
+        window.removeAdmin = function (id) {
+            const member = STATE.members.find(m => m.id === id);
+            if (!member) return;
+            openConfirm('Revoke Admin Privileges?', `This will demote ${member.name} to General user role.`, async () => {
+                member.group = 'General';
+                member.role = 'user';
+                
+                const table = getSupabaseTableName();
+                const headers = await getAuthHeaders({ 'Content-Type': 'application/json' });
+                await fetch(`${window.API_BASE_URL}/api/members?table=${encodeURIComponent(table)}`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify([member])
+                });
+                
+                await fetchMembersFromSupabase();
+                await logAudit('warning', `Revoked admin privileges from ${member.email}`);
+                renderAdminsTable();
+                showToast('Admin access revoked');
+            });
+        };
+
+        document.getElementById('btn-invite-admin').addEventListener('click', () => {
+            document.getElementById('invite-name').value = '';
+            document.getElementById('invite-email').value = '';
+            document.getElementById('invite-role').value = 'Editor';
+            document.getElementById('modal-invite-admin').classList.add('open');
+        });
+        document.getElementById('cancel-invite-admin').addEventListener('click', () => document.getElementById('modal-invite-admin').classList.remove('open'));
+        
+        document.getElementById('confirm-invite-admin').addEventListener('click', async () => {
+            const name = document.getElementById('invite-name').value.trim();
+            const email = document.getElementById('invite-email').value.trim();
+            if (!name || !email) { showToast('Name and email required', 'warn'); return; }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Invalid email', 'err'); return; }
+            
+            let member = STATE.members.find(m => m.email.toLowerCase() === email.toLowerCase());
+            if (member) {
+                member.group = 'Admin';
+                member.role = 'admin';
+            } else {
+                member = {
+                    id: 'usr_' + Math.random().toString(36).substring(2, 11),
+                    name: name,
+                    email: email,
+                    group: 'Admin',
+                    role: 'admin'
+                };
+            }
+            
+            const table = getSupabaseTableName();
+            const headers = await getAuthHeaders({ 'Content-Type': 'application/json' });
+            await fetch(`${window.API_BASE_URL}/api/members?table=${encodeURIComponent(table)}`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify([member])
+            });
+            
+            await fetchMembersFromSupabase();
+            await logAudit('success', `Promoted ${name} (${email}) to admin role`);
+            document.getElementById('modal-invite-admin').classList.remove('open');
+            renderAdminsTable();
+            showToast(`Promoted ${name} to admin successfully`);
+        });
+
+        // ── ACTIVITY LOGS PANEL ──────────────────────────────────────
+        async function renderAdminLogs() {
+            const terminal = document.getElementById('admin-log-terminal');
+            if (!terminal) return;
+            terminal.innerHTML = `<div class="log-line info">Fetching system logs...</div>`;
+            
+            try {
+                const headers = await getAuthHeaders();
+                const response = await fetch(`${window.API_BASE_URL}/api/logs`, { headers });
+                if (!response.ok) throw new Error('Failed to fetch logs');
+                const result = await response.json();
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    terminal.innerHTML = result.data.map(l => {
+                        let typeClass = 'info';
+                        if (l.actionType === 'success') typeClass = 'ok';
+                        if (l.actionType === 'warning') typeClass = 'warn';
+                        if (l.actionType === 'error') typeClass = 'err';
+                        
+                        return `<div class="log-line ${typeClass}"><span class="log-ts">[${new Date(l.timestamp).toLocaleTimeString()}]</span> <strong>${esc(l.userName)} (${esc(l.userRole)}):</strong> ${esc(l.details)}</div>`;
+                    }).join('');
+                } else {
+                    terminal.innerHTML = `<div class="log-line info">No activity recorded yet in this workspace.</div>`;
+                }
+            } catch (e) {
+                console.error(e);
+                terminal.innerHTML = `<div class="log-line err">Failed to load system logs. Check Supabase connection.</div>`;
+            }
+        }
+
+        document.getElementById('btn-clear-admin-logs').addEventListener('click', () => {
+            openConfirm('Clear all logs?', 'This is protected. Supabase auditLogs are immutable.', () => {
+                showToast('Audit logs are read-only.', 'warn');
+            });
+        });
+
+        document.getElementById('btn-export-admin-logs').addEventListener('click', async () => {
+            try {
+                const headers = await getAuthHeaders();
+                const response = await fetch(`${window.API_BASE_URL}/api/logs`, { headers });
+                const result = await response.json();
+                if (result.success && result.data) {
+                    const txt = result.data.map(l => `[${l.timestamp}] (${l.actionType}) ${l.userName} (${l.userRole}): ${l.details}`).join('\n');
+                    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain' })); a.download = 'admin-logs.txt'; a.click();
+                    showToast('Logs exported');
+                }
+            } catch (e) {
+                showToast('Export failed', 'err');
+            }
+        });
+
+        // ── SYSTEM HEALTH ────────────────────────────────────────────
+        function renderSystemHealth() {
+            document.getElementById('env-browser').textContent = navigator.userAgent.includes('Chrome') ? 'Chrome' : navigator.userAgent.includes('Firefox') ? 'Firefox' : navigator.userAgent.includes('Safari') ? 'Safari' : 'Unknown';
+            document.getElementById('env-platform').textContent = navigator.platform || 'Unknown';
+            document.getElementById('env-screen').textContent = `${window.screen.width} × ${window.screen.height}`;
+            document.getElementById('env-lang').textContent = navigator.language || 'en-US';
+            
+            fetch(`${window.API_BASE_URL}/`)
+                .then(res => {
+                    const statusEl = document.getElementById('hs-settings-bar');
+                    statusEl.style.width = '100%';
+                    statusEl.style.background = 'var(--green)';
+                    document.getElementById('hs-settings-kb').textContent = 'ONLINE (Port 3000)';
+                })
+                .catch(err => {
+                    const statusEl = document.getElementById('hs-settings-bar');
+                    statusEl.style.width = '15%';
+                    statusEl.style.background = 'var(--red)';
+                    document.getElementById('hs-settings-kb').textContent = 'OFFLINE';
+                });
+                
+            const client = initSupabaseClient();
+            const statusDBBar = document.getElementById('hs-members-bar');
+            if (client) {
+                statusDBBar.style.width = '100%';
+                statusDBBar.style.background = 'var(--green)';
+                statusDBBar.textContent = 'CONNECTED';
+            } else {
+                statusDBBar.style.width = '15%';
+                statusDBBar.style.background = 'var(--red)';
+                statusDBBar.textContent = 'DISCONNECTED';
+            }
+            
+            const statusGroupsBar = document.getElementById('hs-groups-bar');
+            const groupsCount = STATE.groups ? STATE.groups.length : 0;
+            statusGroupsBar.style.width = Math.min(100, (groupsCount / 10) * 100) + '%';
+            statusGroupsBar.style.background = 'var(--purple)';
+            document.getElementById('hs-groups-kb').textContent = `${groupsCount} active segments`;
+        }
+
+        // ── REALTIME REFRESH TRIGGER ───────────────────────────────
+        window.refreshAuditLogs = function(newLog) {
+            const activeSection = document.querySelector('.admin-section.active');
+            if (activeSection && activeSection.id === 'sec-logs') {
+                renderAdminLogs();
+            }
+            showToast(`System Audit Logged: ${newLog.details}`, 'info');
+        };
+
+        // ── GENERIC CONFIRM MODAL ───────────────────────────────────
+        function openConfirm(title, desc, onConfirm) {
+            document.getElementById('confirm-title').innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color:var(--red2)"></i> ${title}`;
+            document.getElementById('confirm-desc').textContent = desc;
+            const modal = document.getElementById('confirm-modal');
+            modal.classList.add('open');
+            document.getElementById('confirm-ok').onclick = () => { onConfirm(); modal.classList.remove('open'); };
+        }
+        document.getElementById('confirm-cancel').addEventListener('click', () => document.getElementById('confirm-modal').classList.remove('open'));
+    </script>
+</body>
+</html>

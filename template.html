@@ -1,0 +1,1783 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Templates — MailPilot Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* ═══════════════════════════════════════════
+       TEMPLATES PAGE — LOCAL OVERRIDES
+    ═══════════════════════════════════════════ */
+
+        /* Full page scroll for templates */
+        .app-body {
+            overflow-y: auto;
+        }
+
+        #panel-templates {
+            flex-direction: column;
+            overflow: visible;
+            width: 100%;
+        }
+
+        /* ── PAGE HEADER ── */
+        .tpl-page-header {
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            padding: 1.6rem 2rem 1.3rem;
+            flex-shrink: 0;
+        }
+
+        .tpl-page-header-inner {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .tpl-page-title h1 {
+            font-family: var(--font-d);
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.3rem;
+        }
+
+        .tpl-page-title h1 span {
+            color: var(--accent);
+        }
+
+        .tpl-page-title p {
+            font-size: 0.83rem;
+            color: var(--text2);
+        }
+
+        .tpl-page-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ── FILTER BAR ── */
+        .tpl-filter-bar {
+            padding: 0.85rem 2rem;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .filter-bar-inner {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Search */
+        .tpl-search {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            padding: 0.42rem 0.85rem;
+            transition: border 0.18s, box-shadow 0.18s;
+            min-width: 240px;
+        }
+
+        .tpl-search:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.1);
+        }
+
+        .tpl-search i {
+            color: var(--text2);
+            font-size: 0.77rem;
+        }
+
+        .tpl-search input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.81rem;
+        }
+
+        /* Category filters */
+        .cat-filters {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+
+        .cat-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.33rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--bg3);
+            color: var(--text2);
+            font-family: var(--font);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.18s;
+            white-space: nowrap;
+        }
+
+        .cat-btn i {
+            font-size: 0.7rem;
+        }
+
+        .cat-btn:hover {
+            border-color: var(--border2);
+            color: var(--text);
+            background: var(--surface);
+        }
+
+        .cat-btn.active {
+            border-color: var(--accent);
+            background: rgba(79, 142, 247, 0.1);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Sort + view */
+        .filter-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .sort-select {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            color: var(--text2);
+            font-family: var(--font);
+            font-size: 0.76rem;
+            padding: 0.35rem 0.7rem;
+            outline: none;
+            cursor: pointer;
+            transition: border 0.18s;
+        }
+
+        .sort-select:focus {
+            border-color: var(--accent);
+        }
+
+        .sort-select option {
+            background: var(--bg2);
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 2px;
+        }
+
+        .view-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            background: var(--bg3);
+            color: var(--text2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.73rem;
+            transition: all 0.18s;
+        }
+
+        .view-btn.active {
+            background: var(--surface);
+            border-color: var(--border2);
+            color: var(--text);
+        }
+
+        .view-btn:hover:not(.active) {
+            background: var(--surface);
+        }
+
+        /* ── TEMPLATE GRID AREA ── */
+        .tpl-main {
+            flex: 1;
+            padding: 1.5rem 2rem 2rem;
+        }
+
+        .tpl-main-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Results count */
+        .results-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .results-count {
+            font-size: 0.77rem;
+            color: var(--text2);
+        }
+
+        .results-count strong {
+            color: var(--text);
+        }
+
+        /* Grid layout */
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.1rem;
+        }
+
+        .templates-grid.list-view {
+            grid-template-columns: 1fr;
+            gap: 0.6rem;
+        }
+
+        /* Template card */
+        .tpl-card-item {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--r2);
+            overflow: hidden;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tpl-card-item:hover {
+            border-color: var(--border2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(79, 142, 247, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .tpl-card-item.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(79, 142, 247, 0.2);
+        }
+
+        /* Card preview area */
+        .card-preview-wrap {
+            position: relative;
+            background: #e8ecf0;
+            height: 180px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .card-preview-wrap iframe {
+            width: 200%;
+            height: 200%;
+            border: none;
+            transform: scale(0.5);
+            transform-origin: top left;
+            pointer-events: none;
+        }
+
+        .card-preview-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: rgba(7, 16, 31, 0.65);
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .tpl-card-item:hover .card-preview-overlay {
+            opacity: 1;
+        }
+
+        .tpl-cat-badge {
+            position: absolute;
+            top: 0.6rem;
+            left: 0.6rem;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+            backdrop-filter: blur(6px);
+        }
+
+        .tpl-pro-badge {
+            position: absolute;
+            top: 0.6rem;
+            right: 0.6rem;
+            font-size: 0.6rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--gold), #ff9a3c);
+            color: #000;
+        }
+
+        /* Card meta */
+        .card-meta {
+            padding: 0.85rem 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .card-meta-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.4rem;
+        }
+
+        .card-name {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text);
+            font-family: var(--font-d);
+            line-height: 1.2;
+        }
+
+        .card-desc {
+            font-size: 0.74rem;
+            color: var(--text2);
+            line-height: 1.5;
+            flex: 1;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-top: 0.1rem;
+        }
+
+        .card-tag {
+            font-size: 0.62rem;
+            font-weight: 600;
+            padding: 0.1rem 0.42rem;
+            border-radius: 20px;
+            background: var(--surface2);
+            color: var(--text2);
+            border: 1px solid var(--border);
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.6rem 1rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg);
+        }
+
+        .card-uses {
+            font-size: 0.69rem;
+            color: var(--text2);
+            display: flex;
+            align-items: center;
+            gap: 0.28rem;
+        }
+
+        .card-uses i {
+            font-size: 0.65rem;
+        }
+
+        /* Star rating */
+        .card-stars {
+            display: flex;
+            gap: 1px;
+            margin-left: auto;
+        }
+
+        .card-stars i {
+            font-size: 0.62rem;
+            color: var(--gold);
+        }
+
+        .card-stars i.empty {
+            color: var(--surface2);
+        }
+
+        /* Fav button */
+        .card-fav {
+            width: 26px;
+            height: 26px;
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            background: var(--surface);
+            color: var(--text2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.72rem;
+            transition: all 0.18s;
+        }
+
+        .card-fav:hover,
+        .card-fav.active {
+            color: #ff6b6b;
+            border-color: rgba(255, 107, 107, 0.3);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        /* ── LIST VIEW ── */
+        .tpl-card-item.list-mode {
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .tpl-card-item.list-mode .card-preview-wrap {
+            width: 140px;
+            height: 90px;
+            flex-shrink: 0;
+            border-radius: 0;
+        }
+
+        .tpl-card-item.list-mode .card-meta {
+            flex-direction: row;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.7rem 1rem;
+        }
+
+        .tpl-card-item.list-mode .card-name {
+            min-width: 160px;
+        }
+
+        .tpl-card-item.list-mode .card-desc {
+            -webkit-line-clamp: 1;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .tpl-card-item.list-mode .card-tags {
+            flex-wrap: nowrap;
+            overflow: hidden;
+        }
+
+        .tpl-card-item.list-mode .card-footer {
+            border: none;
+            background: none;
+            padding: 0;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        /* ── EMPTY STATE ── */
+        .tpl-empty {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text2);
+        }
+
+        .tpl-empty i {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 0.8rem;
+            opacity: 0.2;
+        }
+
+        .tpl-empty h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.3rem;
+        }
+
+        .tpl-empty p {
+            font-size: 0.82rem;
+        }
+
+        /* ── MODAL: FULL TEMPLATE PREVIEW ── */
+        .preview-modal .modal-box {
+            width: 900px;
+            max-width: 96vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .preview-modal-head {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1rem 1.3rem;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .preview-modal-head h3 {
+            font-family: var(--font-d);
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .preview-modal-meta {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: 0.3rem;
+        }
+
+        .preview-modal-body {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .preview-modal-frame-wrap {
+            flex: 1;
+            overflow-y: auto;
+            background: #e8ecf0;
+        }
+
+        #modal-preview-iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            display: block;
+        }
+
+        .preview-modal-sidebar {
+            width: 240px;
+            border-left: 1px solid var(--border);
+            padding: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .preview-modal-sidebar h4 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--text2);
+            margin-bottom: 0.3rem;
+        }
+
+        .preview-modal-footer {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.85rem 1.3rem;
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        /* ── CUSTOM TEMPLATE CREATOR ── */
+        .create-tpl-card {
+            background: var(--bg2);
+            border: 2px dashed var(--border2);
+            border-radius: var(--r2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 2rem 1rem;
+            cursor: pointer;
+            transition: all 0.22s;
+            min-height: 280px;
+            text-align: center;
+        }
+
+        .create-tpl-card:hover {
+            border-color: var(--accent);
+            background: rgba(79, 142, 247, 0.04);
+        }
+
+        .create-tpl-card i {
+            font-size: 1.8rem;
+            color: var(--text2);
+            opacity: 0.5;
+        }
+
+        .create-tpl-card span {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text2);
+        }
+
+        .create-tpl-card small {
+            font-size: 0.71rem;
+            color: var(--text2);
+            opacity: 0.7;
+        }
+
+        /* ── SECTION LABELS ── */
+        .tpl-section-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            color: var(--text2);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1.4rem 0 0.8rem;
+        }
+
+        .tpl-section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .tpl-section-label:first-child {
+            margin-top: 0;
+        }
+
+        /* ── POWERED STRIP ── */
+        .powered-strip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.32rem;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            font-size: 0.63rem;
+            color: var(--text2);
+            flex-shrink: 0;
+        }
+
+        .powered-strip a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .powered-strip a:hover {
+            text-decoration: underline;
+        }
+
+        /* Skeleton loader */
+        .skeleton {
+            background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+            background-size: 200% 100%;
+            animation: skelLoad 1.4s ease infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes skelLoad {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* Tooltip */
+        [data-tip] {
+            position: relative;
+        }
+
+        [data-tip]::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--surface);
+            border: 1px solid var(--border2);
+            color: var(--text);
+            font-size: 0.68rem;
+            font-weight: 500;
+            padding: 0.25rem 0.55rem;
+            border-radius: 6px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s;
+            box-shadow: var(--shadow2);
+            z-index: 100;
+        }
+
+        [data-tip]:hover::after {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══ TOPBAR ══ -->
+    <header class="topbar">
+        <a class="topbar-brand" href="dashboard.html" style="display:flex;align-items:center;gap:0.6rem;text-decoration:none;">
+            <img src="logo.png" alt="MailPilot Logo" class="brand-logo-img" style="height:38px;width:auto;display:block;object-fit:contain;border-radius:4px;">
+            <span class="brand-name">MailPilot</span>
+            <span class="brand-version">Studio</span>
+        </a>
+
+        <nav class="main-tabs" style="margin-left:1.5rem">
+            <button class="tab-btn" data-tab="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+            <button class="tab-btn" data-tab="composer"><i class="fa-solid fa-pen-nib"></i> Composer</button>
+            <button class="tab-btn" data-tab="members"><i class="fa-solid fa-users"></i> Members</button>
+            <button class="tab-btn" data-tab="broadcast"><i class="fa-solid fa-satellite-dish"></i> Broadcast</button>
+            <button class="tab-btn active" data-tab="templates"><i class="fa-solid fa-layer-group"></i> Templates</button>
+            <button class="tab-btn" data-tab="stats"><i class="fa-solid fa-chart-line"></i> Analytics</button>
+            <button class="tab-btn" data-tab="settings"><i class="fa-solid fa-gear"></i> Settings</button>
+        </nav>
+
+        <div class="topbar-sep"></div>
+
+        <div class="topbar-actions">
+            <span id="member-count-badge" class="badge badge-blue">
+                <i class="fa-solid fa-users"></i> <span id="top-member-count">0</span> members
+            </span>
+            <button class="icon-btn" id="theme-toggle" title="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+            <button class="btn btn-outline btn-sm" id="btn-export-csv"><i class="fa-solid fa-download"></i> Export
+                CSV</button>
+            <button class="btn btn-gradient btn-sm" id="btn-quick-send"><i class="fa-solid fa-paper-plane"></i> Quick
+                Broadcast</button>
+
+            <!-- Profile settings dropdown -->
+            <div class="profile-container" style="position: relative;">
+                <button class="icon-btn" id="profile-trigger" title="User settings" style="border-radius: 50%; overflow: hidden; padding: 0; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-user"></i>
+                </button>
+                <div class="profile-dropdown" id="profile-dropdown">
+                    <div class="profile-header">
+                        <div class="profile-avatar-lg">AC</div>
+                        <div class="profile-info">
+                            <h4>Ascent Circle</h4>
+                            <p>SaaS Dashboard</p>
+                        </div>
+                    </div>
+                    <div class="profile-menu">
+                        <div class="profile-menu-item" id="pd-profile" style="cursor:pointer">
+                            <i class="fa-solid fa-user"></i>
+                            <div>
+                                <span>My Profile</span>
+                                <small>View and edit profile</small>
+                            </div>
+                        </div>
+                        <div class="profile-menu-item" id="pd-settings" style="cursor:pointer">
+                            <i class="fa-solid fa-gear"></i>
+                            <div>
+                                <span>Settings</span>
+                                <small>SMTP, branding & data</small>
+                            </div>
+                        </div>
+                        <div class="profile-menu-item">
+                            <i class="fa-solid fa-users"></i>
+                            <div>
+                                <span>Audience Size</span>
+                                <small id="profile-db-count">0 members</small>
+                            </div>
+                        </div>
+                        <div class="profile-menu-item">
+                            <i class="fa-solid fa-server"></i>
+                            <div>
+                                <span>SMTP Host</span>
+                                <small id="profile-smtp-host">smtp.gmail.com</small>
+                            </div>
+                        </div>
+                        <div class="profile-menu-item">
+                            <i class="fa-solid fa-envelope"></i>
+                            <div>
+                                <span>Sender Address</span>
+                                <small id="profile-smtp-from">ascentcircle.community@gmail.com</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ══ APP BODY ══ -->
+    <div class="app-body" style="overflow-y:auto; flex-direction:column">
+
+        <div class="tab-panel active" id="panel-templates"
+            style="flex-direction:column; overflow:visible; min-height:100%">
+
+            <!-- PAGE HEADER -->
+            <div class="tpl-page-header">
+                <div class="tpl-page-header-inner">
+                    <div class="tpl-page-title">
+                        <h1>Email <span>Templates</span></h1>
+                        <p>Choose from curated templates or build your own. One click to load into the Composer.</p>
+                    </div>
+                    <div class="tpl-page-actions">
+                        <button class="btn btn-outline btn-sm" id="btn-import-tpl">
+                            <i class="fa-solid fa-file-import"></i> Import HTML
+                        </button>
+                        <button class="btn btn-gradient btn-sm" id="btn-create-tpl">
+                            <i class="fa-solid fa-plus"></i> Create Template
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FILTER BAR -->
+            <div class="tpl-filter-bar">
+                <div class="filter-bar-inner">
+                    <!-- Search -->
+                    <div class="tpl-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="tpl-search-input" placeholder="Search templates…">
+                    </div>
+
+                    <!-- Category filters -->
+                    <div class="cat-filters">
+                        <button class="cat-btn active" data-cat="all"><i class="fa-solid fa-grip"></i> All</button>
+                        <button class="cat-btn" data-cat="event"><i class="fa-solid fa-calendar-days"></i>
+                            Events</button>
+                        <button class="cat-btn" data-cat="newsletter"><i class="fa-solid fa-newspaper"></i>
+                            Newsletter</button>
+                        <button class="cat-btn" data-cat="announcement"><i class="fa-solid fa-bullhorn"></i>
+                            Announcement</button>
+                        <button class="cat-btn" data-cat="welcome"><i class="fa-solid fa-hand-wave"></i>
+                            Welcome</button>
+                        <button class="cat-btn" data-cat="promotion"><i class="fa-solid fa-tag"></i> Promotion</button>
+                        <button class="cat-btn" data-cat="reminder"><i class="fa-solid fa-bell"></i> Reminder</button>
+                        <button class="cat-btn" data-cat="custom"><i class="fa-solid fa-user-pen"></i> My
+                            Templates</button>
+                    </div>
+
+                    <!-- Sort + View -->
+                    <div class="filter-right">
+                        <select class="sort-select" id="tpl-sort">
+                            <option value="popular">Most Used</option>
+                            <option value="newest">Newest First</option>
+                            <option value="name">Name A–Z</option>
+                        </select>
+                        <div class="view-toggle">
+                            <button class="view-btn active" id="view-grid" data-tip="Grid view"><i
+                                    class="fa-solid fa-grip"></i></button>
+                            <button class="view-btn" id="view-list" data-tip="List view"><i
+                                    class="fa-solid fa-list"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEMPLATE GRID -->
+            <div class="tpl-main">
+                <div class="tpl-main-inner">
+                    <div class="results-row">
+                        <div class="results-count"><strong id="result-count">0</strong> templates</div>
+                        <div style="font-size:0.72rem;color:var(--text2)">Click any template to preview &amp; load into
+                            Composer</div>
+                    </div>
+
+                    <div class="templates-grid" id="templates-grid">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /panel-templates -->
+
+    </div><!-- /app-body -->
+
+    <!-- Powered by -->
+    <div class="powered-strip">
+        <i class="fa-solid fa-bolt" style="color:var(--accent);font-size:0.6rem"></i>
+        Powered by <a href="https://ascentcircle.in" target="_blank">Ascent Circle</a>
+        &nbsp;·&nbsp; MailPilot Studio v2.0
+    </div>
+
+    <!-- ══ PREVIEW MODAL ══ -->
+    <div class="modal-overlay preview-modal" id="modal-preview">
+        <div class="modal-box">
+            <div class="preview-modal-head">
+                <button class="modal-close" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
+                <h3 id="modal-title">Template Preview</h3>
+                <div class="preview-modal-meta">
+                    <span class="badge badge-blue" id="modal-cat-badge"></span>
+                </div>
+                <div style="margin-left:auto;display:flex;gap:0.4rem">
+                    <button class="btn btn-sm btn-outline" id="modal-copy-html"><i class="fa-solid fa-copy"></i> Copy
+                        HTML</button>
+                    <button class="btn btn-sm btn-gradient" id="modal-use-tpl"><i
+                            class="fa-solid fa-wand-magic-sparkles"></i> Use Template</button>
+                </div>
+            </div>
+
+            <div class="preview-modal-body">
+                <div class="preview-modal-frame-wrap">
+                    <iframe id="modal-preview-iframe" title="Template Preview"></iframe>
+                </div>
+                <div class="preview-modal-sidebar">
+                    <div>
+                        <h4>About</h4>
+                        <div style="font-size:0.79rem;color:var(--text2);line-height:1.55" id="modal-desc">—</div>
+                    </div>
+                    <div>
+                        <h4>Tags</h4>
+                        <div class="card-tags" id="modal-tags"></div>
+                    </div>
+                    <div>
+                        <h4>Details</h4>
+                        <div style="font-size:0.76rem;color:var(--text2);display:flex;flex-direction:column;gap:0.4rem"
+                            id="modal-details"></div>
+                    </div>
+                    <div>
+                        <h4>Viewport</h4>
+                        <div style="display:flex;gap:0.35rem">
+                            <button class="btn btn-sm btn-outline modal-vp-btn active" data-vp="desktop"><i
+                                    class="fa-solid fa-desktop"></i></button>
+                            <button class="btn btn-sm btn-outline modal-vp-btn" data-vp="mobile"><i
+                                    class="fa-solid fa-mobile-screen-button"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-modal-footer">
+                <div style="font-size:0.72rem;color:var(--text2)">
+                    <i class="fa-solid fa-circle-info" style="color:var(--gold);margin-right:0.3rem"></i>
+                    Loading this template will replace your current Composer content.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ IMPORT HTML MODAL ══ -->
+    <div class="modal-overlay" id="modal-import">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h3><i class="fa-solid fa-file-import" style="color:var(--accent);margin-right:0.4rem"></i>Import HTML
+                    Template</h3>
+                <button class="modal-close" id="import-modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="field" style="margin-bottom:0.8rem">
+                <label>Template Name</label>
+                <input type="text" id="import-tpl-name" placeholder="My Custom Template">
+            </div>
+            <div style="margin-bottom:0.8rem">
+                <div class="csv-drop-zone" id="html-drop-zone"
+                    onclick="document.getElementById('html-file-input').click()">
+                    <i class="fa-solid fa-file-code"></i>
+                    <p>Drop your <strong>.html</strong> file here or click to browse</p>
+                    <p style="margin-top:0.3rem;font-size:0.7rem">Inline-styled HTML email files only</p>
+                </div>
+                <input type="file" id="html-file-input" accept=".html,.htm" style="display:none">
+            </div>
+            <div style="font-size:0.75rem;color:var(--text2);margin-bottom:1rem">
+                Or paste HTML directly:
+            </div>
+            <div class="field">
+                <textarea id="import-html-code" rows="6" placeholder="Paste your HTML here…"
+                    style="font-family:var(--font-m);font-size:0.74rem;resize:vertical"></textarea>
+            </div>
+            <div style="display:flex;gap:0.5rem;justify-content:flex-end">
+                <button class="btn btn-ghost btn-sm" id="import-modal-cancel">Cancel</button>
+                <button class="btn btn-gradient btn-sm" id="btn-confirm-import">
+                    <i class="fa-solid fa-upload"></i> Save Template
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ TOAST ══ -->
+    <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toast-msg"></span></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="common.js"></script>
+    <script>
+        /* ══════════════════════════════════════════════════════════
+           TEMPLATES PAGE LOGIC
+           ══════════════════════════════════════════════════════════ */
+
+        // ── BUILT-IN TEMPLATE DEFINITIONS ──────────────────────────
+        const BUILTIN_TEMPLATES = [
+            {
+                id: 'tpl_event_001',
+                name: 'Event Invite — Classic',
+                category: 'event',
+                tags: ['event', 'invite', 'formal'],
+                desc: 'A polished event invitation with date, time, venue, agenda, and a prominent CTA button. Best for college fests, corporate meetups, or community gatherings.',
+                uses: 1284,
+                stars: 5,
+                pro: false,
+                accent: '#4f8ef7',
+                btn: '#4f8ef7',
+                bg: '#ffffff',
+                font: 'Arial, sans-serif',
+                title: "You're Invited to Something Special",
+                greeting: 'Hi {{Name}},',
+                body: "We're thrilled to invite you to an exclusive event. Join us for an unforgettable experience filled with learning, networking, and innovation.\n\nThis is a unique opportunity to connect with like-minded individuals and grow together.",
+                btnText: 'Reserve Your Spot Now',
+                btnUrl: 'https://ascentcircle.in',
+                sig: 'With excitement, Ascent Circle Team',
+                footer: "You're receiving this because you're part of our community.",
+                org: 'Ascent Circle',
+                orgUrl: 'https://ascentcircle.in',
+                showEvent: true,
+                eDate: 'Saturday, July 12, 2026',
+                eTime: '6:00 PM – 9:00 PM',
+                eLoc: 'Main Hall, City Convention Centre',
+                agenda: '6:00 PM — Doors Open\n7:00 PM — Keynote Address\n8:30 PM — Networking',
+                banner: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=600',
+                createdAt: '2026-05-10',
+            },
+            {
+                id: 'tpl_newsletter_001',
+                name: 'Monthly Newsletter',
+                category: 'newsletter',
+                tags: ['newsletter', 'monthly', 'digest'],
+                desc: 'A clean, readable newsletter layout with a warm greeting, content body, and subtle footer. Ideal for community updates, club journals, and digest emails.',
+                uses: 874,
+                stars: 4,
+                pro: false,
+                accent: '#22d3a3',
+                btn: '#22d3a3',
+                bg: '#f6f8fa',
+                font: 'Georgia, serif',
+                title: 'This Month at Ascent Circle',
+                greeting: 'Hello {{Name}},',
+                body: "Here's what's been happening across our community this month — highlights, wins, and what's coming up next.\n\nWe've seen incredible growth in participation and can't wait to share it all with you.",
+                btnText: 'Read More Online',
+                btnUrl: 'https://ascentcircle.in',
+                sig: 'Warm regards, The Ascent Circle Team',
+                footer: "You're subscribed to our monthly newsletter. {{Email}}",
+                org: 'Ascent Circle',
+                orgUrl: 'https://ascentcircle.in',
+                showEvent: false,
+                banner: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=600',
+                createdAt: '2026-04-22',
+            },
+            {
+                id: 'tpl_announcement_001',
+                name: 'Important Announcement',
+                category: 'announcement',
+                tags: ['announcement', 'official', 'urgent'],
+                desc: 'A bold, attention-grabbing announcement template with high contrast. Use for results declarations, policy changes, or critical community updates.',
+                uses: 612,
+                stars: 4,
+                pro: false,
+                accent: '#f5a623',
+                btn: '#f5a623',
+                bg: '#ffffff',
+                font: 'Arial, sans-serif',
+                title: 'Important Announcement for Our Community',
+                greeting: 'Dear {{Name}},',
+                body: 'We have an important update to share with all members. Please read this message carefully and take the required action before the deadline.\n\nThank you for being a valued part of our community.',
+                btnText: 'Learn More',
+                btnUrl: 'https://ascentcircle.in',
+                sig: 'Sincerely, Ascent Circle Leadership',
+                footer: 'This is an official communication from Ascent Circle. {{Email}}',
+                org: 'Ascent Circle',
+                orgUrl: 'https://ascentcircle.in',
+                showEvent: false,
+                banner: 'none',
+                createdAt: '2026-04-01',
+            },
+            {
+                id: 'tpl_welcome_001',
+                name: 'New Member Welcome',
+                category: 'welcome',
+                tags: ['welcome', 'onboarding', 'friendly'],
+                desc: 'A warm, conversational welcome email for new members. Sets the tone for the relationship and guides them to take their first action.',
+                uses: 2341,
+                stars: 5,
+                pro: false,
+                accent: '#a78bfa',
+                btn: '#a78bfa',
+                bg: '#ffffff',
+                font: "'Trebuchet MS', sans-serif",
+                title: 'Welcome to the Community, {{Name}}!',
+                greeting: 'Hi {{Name}}! 👋',
+                body: "We're so glad you've joined Ascent Circle. You're now part of a growing community of ambitious students, leaders, and changemakers.\n\nHere's what you can do next — explore our events, join a team, and connect with fellow members.",
+                btnText: 'Explore Now',
+                btnUrl: 'https://ascentcircle.in',
+                sig: 'Excited to have you, Ascent Circle Team',
+                footer: "You're receiving this because you recently joined Ascent Circle.",
+                org: 'Ascent Circle',
+                orgUrl: 'https://ascentcircle.in',
+                showEvent: false,
+                banner: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=600',
+                createdAt: '2026-03-15',
+            },
+            {
+                id: 'tpl_promo_001',
+                name: 'Exclusive Offer',
+                category: 'promotion',
+                tags: ['promotion', 'offer', 'limited'],
+                desc: 'A vibrant promotion email designed to create urgency. Features a strong headline, personalized offer text, and a prominent call-to-action.',
+                uses: 445,
+                stars: 4,
+                pro: true,
+                accent: '#22d3ee',
+                btn: '#22d3ee',
+                bg: '#fdf6ec',
+                font: 'Arial, sans-serif',
+                title: 'Exclusive Offer Just for You, {{Name}}',
+                greeting: 'Hey {{Name}},',
+                body: "We have something special lined up exclusively for you. This offer is available for a limited time only — don't let it slip by!\n\nAs a valued member of our community, you get early access before anyone else.",
+                btnText: 'Claim Your Offer',
+                btnUrl: 'https://ascentcircle.in',
+                sig: 'Cheers, Ascent Circle Team',
+                footer: "You're getting this exclusive offer as an Ascent Circle member. {{Email}}",
+                org: 'Ascent Circle',
+                orgUrl: 'https://ascentcircle.in',
+                showEvent: false,
+                banner: 'https://images.unsplash.com/photo-1495592822108-9e6261896da8?q=80&w=600',
+                createdAt: '2026-05-02',
+            },
+            {
+                id: 'tpl_reminder_001',
+                name: 'Event Reminder',
+                category: 'reminder',
+                tags: ['reminder', 'deadline', 'follow-up'],
+                desc: 'A friendly but firm reminder email. Perfect for last-minute registrations, payment deadlines, or event day reminders.',
+                uses: 987,
+                stars: 4,
+                pro: false,
+                accent: '#f25c6e',
+                btn: '#f25c6e',
+                bg: '#ffffff',
+                font: 'Verdana, sans-serif',
+                title: "Friendly Reminder: Don't Miss Out!",
+                greeting: 'Hi {{Name}},',
+                body: "Just a quick reminder that the deadline is approaching fast. We'd hate for you to miss this!\n\nPlease take a moment to complete your registration or confirm your attendance before time runs out.",
+                btnText: 'Take Action Now',
+                btnUrl: 'https://ascentcircle.in',
+                sig: 'Warmly, Ascent Circle Team',
+                footer: "You're receiving this reminder as part of the Ascent Circle community. {{Email}}",
+                org: 'Ascent Circle',
+                orgUrl: 'https://ascentcircle.in',
+                showEvent: true,
+                eDate: 'Sunday, July 20, 2026',
+                eTime: 'Deadline: 11:59 PM',
+                eLoc: 'Online — Check your dashboard',
+                agenda: '',
+                banner: 'none',
+                createdAt: '2026-04-18',
+            },
+            {
+                id: 'tpl_dark_001',
+                name: 'Dark Mode Invite',
+                category: 'event',
+                tags: ['dark', 'modern', 'premium'],
+                desc: 'A sleek dark-themed invite email that feels like a premium product launch. Ideal for tech events, hackathons, and high-energy activations.',
+                uses: 763,
+                stars: 5,
+                pro: true,
+                accent: '#4f8ef7',
+                btn: '#6366f1',
+                bg: '#0d1117',
+                font: 'Arial, sans-serif',
+                title: 'Join Us for an Exclusive Experience',
+                greeting: 'Hi {{Name}},',
+                body: "You've been selected for an exclusive invite to our most ambitious event yet. Expect cutting-edge talks, live demos, and a community of builders who think beyond the ordinary.",
+                btnText: 'Secure Your Seat',
+                btnUrl: 'https://ascentcircle.in',
+                sig: '— Ascent Circle Core Team',
+                footer: 'This invite was sent exclusively to Ascent Circle members.',
+                org: 'Ascent Circle',
+                orgUrl: 'https://ascentcircle.in',
+                showEvent: true,
+                eDate: 'Friday, August 8, 2026',
+                eTime: '7:00 PM Onwards',
+                eLoc: 'Auditorium Block A, Chandigarh University',
+                agenda: "7:00 PM — Welcome & Networking\n7:30 PM — Keynote\n9:00 PM — Afterparty",
+                banner: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=600',
+                createdAt: '2026-05-20',
+            },
+            {
+                id: 'tpl_newsletter_002',
+                name: 'Skills Digest',
+                category: 'newsletter',
+                tags: ['skills', 'learning', 'weekly'],
+                desc: 'A structured digest for sharing curated resources, event recaps, and member spotlights. Great for weekly community roundups.',
+                uses: 391,
+                stars: 4,
+                pro: false,
+                accent: '#22d3a3',
+                btn: '#238636',
+                bg: '#eef2ff',
+                font: 'Arial, sans-serif',
+                title: 'Your Weekly Skills Digest ✨',
+                greeting: 'Hello {{Name}},',
+                body: "This week was packed — from workshops to wins. Here's your curated digest of everything worth knowing in the Ascent Circle community.\n\nDive in and keep growing!",
+                btnText: 'View Full Digest',
+                btnUrl: 'https://ascentcircle.in',
+                sig: 'Keep learning, Ascent Circle',
+                footer: "You're subscribed to Ascent Circle's weekly digest. {{Email}}",
+                org: 'Ascent Circle',
+                orgUrl: 'https://ascentcircle.in',
+                showEvent: false,
+                banner: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?q=80&w=600',
+                createdAt: '2026-05-28',
+            },
+        ];
+
+        // ── STATE ──────────────────────────────────────────────────
+        let activeFilter = 'all';
+        let viewMode = 'grid';
+        let searchQuery = '';
+        let sortMode = 'popular';
+        let favorites = new Set(JSON.parse(localStorage.getItem('mf_tpl_favs') || '[]'));
+        let customTemplates = JSON.parse(localStorage.getItem('mf_custom_templates') || '[]');
+        let activeTplId = null;
+
+        // ── HELPERS ────────────────────────────────────────────────
+        function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+        function showToast(msg, type = 'ok') {
+            const t = document.getElementById('toast');
+            t.querySelector('#toast-msg').textContent = msg;
+            const ic = t.querySelector('i');
+            ic.className = `fa-solid fa-${type === 'ok' ? 'circle-check' : type === 'err' ? 'circle-xmark' : 'triangle-exclamation'}`;
+            t.className = `toast show ${type}`;
+            clearTimeout(t._t); t._t = setTimeout(() => t.className = 'toast', 3000);
+        }
+
+        function saveFavs() { localStorage.setItem('mf_tpl_favs', JSON.stringify([...favorites])); }
+
+        function buildEmailHTML(tpl, memberName) {
+            const name = memberName || 'Friend';
+            const merge = s => (s || '').replace(/\{\{Name\}\}/gi, name).replace(/\{\{Email\}\}/gi, 'member@example.com').replace(/\{\{College\}\}/gi, 'Chandigarh University');
+
+            const hasBanner = tpl.banner && tpl.banner !== 'none';
+            const isDark = tpl.bg === '#0d1117';
+            const textMain = isDark ? '#e6edf3' : '#1a1a2e';
+            const textSub = isDark ? '#8b949e' : '#555';
+            const cardBg = isDark ? '#161b22' : '#f8f9fc';
+            const borderC = isDark ? '#30363d' : '#e8ecf0';
+            const w = 600;
+
+            const agendaItems = (tpl.agenda || '').split('\n').filter(x => x.trim()).map(a =>
+                `<tr><td style="padding:5px 0;color:${textSub};font-size:14px;border-bottom:1px solid ${borderC}">• ${esc(a.trim())}</td></tr>`
+            ).join('');
+
+            return `<!DOCTYPE html><h` + `tml><h` + `ead><meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  </h` + `ead>
+  <b` + `ody style="margin:0;padding:0;background:#e8ecf0;font-family:${esc(tpl.font)}">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#e8ecf0;padding:20px 0">
+  <tr><td align="center">
+  <table width="${w}" cellpadding="0" cellspacing="0" style="max-width:${w}px;width:100%;background:${tpl.bg};border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.10)">
+  <tr><td style="background:linear-gradient(90deg,${tpl.accent},${tpl.btn});height:4px;line-height:4px;font-size:4px">&nbsp;</td></tr>
+  ${hasBanner ? `<tr><td style="padding:0;line-height:0"><img src="${esc(tpl.banner)}" width="${w}" alt="Banner" style="display:block;width:100%;max-height:220px;object-fit:cover"></td></tr>` : ''}
+  <tr><td style="padding:36px 40px 28px;background:${tpl.bg}">
+  <h1 style="margin:0 0 18px;font-size:26px;font-weight:700;color:${textMain};line-height:1.2">${esc(merge(tpl.title))}</h1>
+  <p style="margin:0 0 12px;font-size:16px;color:${textMain};font-weight:600">${esc(merge(tpl.greeting))}</p>
+  <p style="margin:0 0 22px;font-size:15px;color:${textSub};line-height:1.7">${merge(tpl.body).replace(/\n/g, '<br>')}</p>
+  ${tpl.showEvent && (tpl.eDate || tpl.eLoc) ? `
+  <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:22px;background:${cardBg};border-radius:8px;border:1px solid ${borderC}">
+  <tr><td style="padding:18px 20px">
+  <p style="margin:0 0 10px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${tpl.accent}">Event Details</p>
+  ${tpl.eDate ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px"><tr><td width="24" style="vertical-align:top;padding-top:2px"><span style="color:${tpl.accent}">📅</span></td><td style="font-size:14px;color:${textMain};font-weight:600">${esc(tpl.eDate)}${tpl.eTime ? ` &nbsp;·&nbsp; <span style="font-weight:400;color:${textSub}">${esc(tpl.eTime)}</span>` : ''}</td></tr></table>` : ''}
+  ${tpl.eLoc ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px"><tr><td width="24" style="vertical-align:top"><span style="color:${tpl.accent}">📍</span></td><td style="font-size:14px;color:${textMain}">${esc(tpl.eLoc)}</td></tr></table>` : ''}
+  ${agendaItems ? `<p style="margin:12px 0 6px;font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:${textSub}">Agenda</p><table width="100%" cellpadding="0" cellspacing="0">${agendaItems}</table>` : ''}
+  </td></tr></table>` : ''}
+  ${tpl.btnUrl ? `<table cellpadding="0" cellspacing="0" style="margin-bottom:26px"><tr><td style="border-radius:8px;background:${tpl.btn}"><a href="${esc(tpl.btnUrl)}" target="_blank" style="display:inline-block;padding:14px 32px;color:#fff;font-size:15px;font-weight:700;text-decoration:none;border-radius:8px">${esc(merge(tpl.btnText))}</a></td></tr></table>` : ''}
+  <p style="margin:0 0 4px;font-size:14px;color:${textSub}">${esc(tpl.sig)}</p>
+  </td></tr>
+  <tr><td style="background:${cardBg};border-top:1px solid ${borderC};padding:18px 40px;text-align:center">
+  <p style="margin:0 0 5px;font-size:13px;font-weight:600"><a href="${esc(tpl.orgUrl)}" style="color:${tpl.accent};text-decoration:none">${esc(tpl.org)}</a></p>
+  <p style="margin:0;font-size:11px;color:${textSub}">${merge(tpl.footer)}</p>
+  <p style="margin:7px 0 0;font-size:10px;color:${textSub}"><a href="#" style="color:${textSub}">Unsubscribe</a> &nbsp;·&nbsp; <a href="${esc(tpl.orgUrl)}" style="color:${textSub}">${esc(tpl.org)}</a></p>
+  </td></tr>
+  <tr><td style="background:linear-gradient(90deg,${tpl.btn},${tpl.accent});height:3px;line-height:3px;font-size:3px">&nbsp;</td></tr>
+  </table>
+  </td></tr>
+  </table>
+  </b` + `ody></h` + `tml>`;
+        }
+
+        // ── CATEGORY BADGE COLORS ──────────────────────────────────
+        const CAT_COLORS = {
+            event: { bg: 'rgba(79,142,247,0.18)', color: '#4f8ef7' },
+            newsletter: { bg: 'rgba(34,211,163,0.18)', color: '#22d3a3' },
+            announcement: { bg: 'rgba(245,166,35,0.18)', color: '#f5a623' },
+            welcome: { bg: 'rgba(167,139,250,0.18)', color: '#a78bfa' },
+            promotion: { bg: 'rgba(34,211,238,0.18)', color: '#22d3ee' },
+            reminder: { bg: 'rgba(242,92,110,0.18)', color: '#f25c6e' },
+            custom: { bg: 'rgba(251,133,0,0.18)', color: '#fb8500' },
+        };
+
+        function catStyle(cat) {
+            const c = CAT_COLORS[cat] || { bg: 'rgba(255,255,255,0.1)', color: '#aaa' };
+            return `background:${c.bg};color:${c.color}`;
+        }
+
+        // ── RENDER ─────────────────────────────────────────────────
+        function allTemplates() {
+            return [...BUILTIN_TEMPLATES, ...customTemplates];
+        }
+
+        function filteredTemplates() {
+            let list = allTemplates();
+
+            if (activeFilter !== 'all') {
+                list = list.filter(t => t.category === activeFilter);
+            }
+
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                list = list.filter(t =>
+                    t.name.toLowerCase().includes(q) ||
+                    t.desc.toLowerCase().includes(q) ||
+                    (t.tags || []).some(g => g.toLowerCase().includes(q))
+                );
+            }
+
+            if (sortMode === 'newest') list.sort((a, b) => (b.createdAt || '') > (a.createdAt || '') ? 1 : -1);
+            else if (sortMode === 'name') list.sort((a, b) => a.name.localeCompare(b.name));
+            else list.sort((a, b) => (b.uses || 0) - (a.uses || 0));
+
+            return list;
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('templates-grid');
+            const list = filteredTemplates();
+            const isList = viewMode === 'list';
+
+            document.getElementById('result-count').textContent = list.length;
+
+            if (!list.length) {
+                grid.innerHTML = `<div class="tpl-empty" style="grid-column:1/-1">
+      <i class="fa-solid fa-layer-group"></i>
+      <h3>No templates found</h3>
+      <p>Try a different search or category filter.</p>
+    </div>`;
+                return;
+            }
+
+            let html = list.map(tpl => {
+                const isFav = favorites.has(tpl.id);
+                const isCustom = customTemplates.some(c => c.id === tpl.id);
+                const catC = CAT_COLORS[tpl.category] || { color: '#aaa' };
+
+                return `
+    <div class="tpl-card-item ${isList ? 'list-mode' : ''}" data-id="${tpl.id}">
+      <div class="card-preview-wrap">
+        <div class="tpl-cat-badge" style="${catStyle(tpl.category)}">${tpl.category}</div>
+        ${tpl.pro ? '<div class="tpl-pro-badge">⭐ Pro</div>' : ''}
+        <div class="card-preview-overlay">
+          <button class="btn btn-sm btn-outline" onclick="openPreview('${tpl.id}');event.stopPropagation()">
+            <i class="fa-solid fa-eye"></i> Preview
+          </button>
+          <button class="btn btn-sm btn-gradient" onclick="useTemplate('${tpl.id}');event.stopPropagation()">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Use
+          </button>
+        </div>
+        <div style="background:#e8ecf0;height:100%;overflow:hidden" id="card-preview-${tpl.id}"></div>
+      </div>
+      <div class="card-meta">
+        <div class="card-meta-top">
+          <div class="card-name">${esc(tpl.name)}</div>
+          <button class="card-fav ${isFav ? 'active' : ''}" data-fav="${tpl.id}" title="Favourite" onclick="toggleFav('${tpl.id}');event.stopPropagation()">
+            <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+          </button>
+        </div>
+        <div class="card-desc">${esc(tpl.desc)}</div>
+        <div class="card-tags">
+          ${(tpl.tags || []).map(t => `<span class="card-tag">${esc(t)}</span>`).join('')}
+          ${isCustom ? '<span class="card-tag" style="color:var(--gold);border-color:rgba(245,166,35,0.3)">custom</span>' : ''}
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-uses"><i class="fa-solid fa-paper-plane"></i> ${(tpl.uses || 0).toLocaleString()} uses</div>
+        <div class="card-stars">
+          ${[1, 2, 3, 4, 5].map(i => `<i class="fa-solid fa-star ${i <= tpl.stars ? '' : 'empty'}"></i>`).join('')}
+        </div>
+        ${isCustom ? `<button class="tbl-btn del" title="Delete" onclick="deleteCustomTemplate('${tpl.id}');event.stopPropagation()"><i class="fa-solid fa-trash"></i></button>` : ''}
+      </div>
+    </div>`;
+            }).join('');
+
+            // Add "Create New" card at end
+            html += `
+  <div class="create-tpl-card" id="create-tpl-card" onclick="openImportModal()">
+    <i class="fa-solid fa-plus"></i>
+    <span>Import Custom Template</span>
+    <small>Upload .html or paste inline HTML</small>
+  </div>`;
+
+            grid.innerHTML = html;
+            grid.className = `templates-grid${isList ? ' list-view' : ''}`;
+
+            // Render mini previews (lazy, just for first 6)
+            list.slice(0, 8).forEach(tpl => {
+                setTimeout(() => renderCardPreview(tpl), 50);
+            });
+        }
+
+        function renderCardPreview(tpl) {
+            const wrap = document.getElementById(`card-preview-${tpl.id}`);
+            if (!wrap) return;
+
+            // Use raw imported HTML if available, otherwise build from template fields
+            const html = tpl.customHtml ? tpl.customHtml : buildEmailHTML(tpl, 'Preview');
+
+            const iframe = document.createElement('iframe');
+            iframe.style.cssText = 'width:200%;height:200%;border:none;transform:scale(0.5);transform-origin:top left;pointer-events:none';
+            iframe.src = 'about:blank';
+            wrap.innerHTML = '';
+            wrap.appendChild(iframe);
+            // Write immediately — both onload + direct for cross-browser
+            const writeToIframe = () => {
+                try {
+                    const doc = iframe.contentDocument || iframe.contentWindow.document;
+                    doc.open(); doc.write(html); doc.close();
+                } catch (e) { }
+            };
+            iframe.onload = writeToIframe;
+            writeToIframe();
+        }
+
+        // ── PREVIEW MODAL ──────────────────────────────────────────
+        function openPreview(id) {
+            const tpl = allTemplates().find(t => t.id === id);
+            if (!tpl) return;
+            activeTplId = id;
+
+            document.getElementById('modal-title').textContent = tpl.name;
+            document.getElementById('modal-cat-badge').textContent = tpl.category;
+            document.getElementById('modal-cat-badge').style = catStyle(tpl.category);
+            document.getElementById('modal-desc').textContent = tpl.desc;
+
+            const tagsEl = document.getElementById('modal-tags');
+            tagsEl.innerHTML = (tpl.tags || []).map(t => `<span class="card-tag">${esc(t)}</span>`).join('');
+
+            document.getElementById('modal-details').innerHTML = `
+    <div><i class="fa-solid fa-paper-plane" style="color:var(--accent);width:14px;text-align:center;margin-right:4px"></i> ${(tpl.uses || 0).toLocaleString()} times used</div>
+    <div><i class="fa-solid fa-calendar" style="color:var(--text2);width:14px;text-align:center;margin-right:4px"></i> Added ${tpl.createdAt || '—'}</div>
+    <div><i class="fa-solid fa-font" style="color:var(--text2);width:14px;text-align:center;margin-right:4px"></i> ${esc(tpl.font)}</div>
+  `;
+
+            const iframe = document.getElementById('modal-preview-iframe');
+            const html = tpl.customHtml ? tpl.customHtml : buildEmailHTML(tpl, 'Harsh');
+            try {
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                doc.open(); doc.write(html); doc.close();
+            } catch (e) { }
+            iframe.style.width = '100%';
+
+            document.getElementById('modal-preview').classList.add('open');
+        }
+
+        function useTemplate(id) {
+            const tpl = allTemplates().find(t => t.id === id);
+            if (!tpl) return;
+
+            // For custom imported HTML templates, store raw HTML for the composer
+            const existing = JSON.parse(localStorage.getItem('mf_composer_meta') || '{}');
+            const updated = {
+                ...existing,
+                title: tpl.title || tpl.name || '',
+                greeting: tpl.greeting || '',
+                body: tpl.body || '',
+                btnText: tpl.btnText || '',
+                btnUrl: tpl.btnUrl || '',
+                signature: tpl.sig || '',
+                footer: tpl.footer || '',
+                orgName: tpl.org || '',
+                orgUrl: tpl.orgUrl || '',
+                banner: tpl.banner || 'none',
+                showEventDetails: !!tpl.showEvent,
+                eventDate: tpl.eDate || '',
+                eventTime: tpl.eTime || '',
+                eventLoc: tpl.eLoc || '',
+                eventAgenda: tpl.agenda || '',
+                btnColor: tpl.btn || '#4f8ef7',
+                accentColor: tpl.accent || '#4f8ef7',
+                bgColor: tpl.bg || '#ffffff',
+                fontFamily: tpl.font || 'Arial, sans-serif',
+                emailWidth: 600,
+                template: tpl.category || 'event',
+                // For custom-imported HTML: store raw HTML so composer can load it directly
+                customHtml: tpl.customHtml || '',
+                codeEdited: !!tpl.customHtml,
+            };
+            localStorage.setItem('mf_composer_meta', JSON.stringify(updated));
+            showToast(`"${tpl.name}" loaded into Composer!`);
+            setTimeout(() => window.location.href = 'dashboard.html', 900);
+        }
+
+        // ── FAVOURITE ──────────────────────────────────────────────
+        function toggleFav(id) {
+            if (favorites.has(id)) favorites.delete(id);
+            else favorites.add(id);
+            saveFavs();
+            const btn = document.querySelector(`[data-fav="${id}"]`);
+            if (btn) {
+                const isFav = favorites.has(id);
+                btn.classList.toggle('active', isFav);
+                btn.innerHTML = `<i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>`;
+            }
+        }
+
+        // ── DELETE CUSTOM ──────────────────────────────────────────
+        function deleteCustomTemplate(id) {
+            if (!confirm('Delete this custom template?')) return;
+            customTemplates = customTemplates.filter(t => t.id !== id);
+            localStorage.setItem('mf_custom_templates', JSON.stringify(customTemplates));
+            showToast('Template deleted.', 'warn');
+            renderGrid();
+        }
+
+        // ── IMPORT MODAL ───────────────────────────────────────────
+        function openImportModal() {
+            document.getElementById('modal-import').classList.add('open');
+        }
+
+        // ── VIEWPORT TOGGLE (MODAL) ────────────────────────────────
+        document.querySelectorAll('.modal-vp-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.modal-vp-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const iframe = document.getElementById('modal-preview-iframe');
+                iframe.style.width = this.dataset.vp === 'mobile' ? '390px' : '100%';
+            });
+        });
+
+        // ── INIT ───────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', () => {
+            // Common header init
+            if (typeof initializeHeader === 'function') initializeHeader();
+            else {
+                // Inline fallback for standalone testing
+                const theme = localStorage.getItem('mf_theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const themeBtn = document.getElementById('theme-toggle');
+                if (themeBtn) {
+                    themeBtn.querySelector('i').className = `fa-solid fa-${theme === 'dark' ? 'moon' : 'sun'}`;
+                    themeBtn.addEventListener('click', () => {
+                        const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                        document.documentElement.setAttribute('data-theme', next);
+                        localStorage.setItem('mf_theme', next);
+                        themeBtn.querySelector('i').className = `fa-solid fa-${next === 'dark' ? 'moon' : 'sun'}`;
+                    });
+                }
+                const badgeVal = document.getElementById('top-member-count');
+                if (badgeVal) {
+                    try { const m = JSON.parse(localStorage.getItem('mf_members') || '[]'); badgeVal.textContent = m.length; } catch (e) { }
+                }
+                // Profile dropdown
+                const pTrigger = document.getElementById('profile-trigger');
+                const pDrop = document.getElementById('profile-dropdown');
+                if (pTrigger && pDrop) {
+                    pTrigger.addEventListener('click', e => { e.stopPropagation(); pDrop.classList.toggle('show'); });
+                    document.addEventListener('click', e => { if (!pDrop.contains(e.target)) pDrop.classList.remove('show'); });
+                }
+                // Nav routing
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const map = { composer: 'dashboard.html', members: 'members.html', broadcast: 'broadcast.html', stats: 'stats.html', templates: 'template.html' };
+                        const dest = map[btn.dataset.tab];
+                        if (dest) window.location.href = dest;
+                    });
+                });
+            }
+
+            renderGrid();
+
+            // Category filter
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    activeFilter = btn.dataset.cat;
+                    renderGrid();
+                });
+            });
+
+            // Search
+            document.getElementById('tpl-search-input').addEventListener('input', function () {
+                searchQuery = this.value.trim();
+                renderGrid();
+            });
+
+            // Sort
+            document.getElementById('tpl-sort').addEventListener('change', function () {
+                sortMode = this.value;
+                renderGrid();
+            });
+
+            // View toggle
+            document.getElementById('view-grid').addEventListener('click', () => {
+                viewMode = 'grid';
+                document.getElementById('view-grid').classList.add('active');
+                document.getElementById('view-list').classList.remove('active');
+                renderGrid();
+            });
+            document.getElementById('view-list').addEventListener('click', () => {
+                viewMode = 'list';
+                document.getElementById('view-list').classList.add('active');
+                document.getElementById('view-grid').classList.remove('active');
+                renderGrid();
+            });
+
+            // Card click → open preview
+            document.getElementById('templates-grid').addEventListener('click', e => {
+                const card = e.target.closest('.tpl-card-item');
+                if (card && card.dataset.id) openPreview(card.dataset.id);
+            });
+
+            // Modal: close
+            document.getElementById('modal-close').addEventListener('click', () => {
+                document.getElementById('modal-preview').classList.remove('open');
+                activeTplId = null;
+            });
+            document.getElementById('modal-preview').addEventListener('click', e => {
+                if (e.target === document.getElementById('modal-preview')) {
+                    document.getElementById('modal-preview').classList.remove('open');
+                }
+            });
+
+            // Modal: use
+            document.getElementById('modal-use-tpl').addEventListener('click', () => {
+                if (activeTplId) useTemplate(activeTplId);
+            });
+
+            // Modal: copy HTML
+            document.getElementById('modal-copy-html').addEventListener('click', () => {
+                if (!activeTplId) return;
+                const tpl = allTemplates().find(t => t.id === activeTplId);
+                if (tpl) {
+                    navigator.clipboard.writeText(buildEmailHTML(tpl)).then(() => showToast('HTML copied!'));
+                }
+            });
+
+            // Header buttons
+            document.getElementById('btn-create-tpl').addEventListener('click', openImportModal);
+            document.getElementById('btn-import-tpl').addEventListener('click', openImportModal);
+            document.getElementById('btn-quick-send').addEventListener('click', () => window.location.href = 'broadcast.html');
+            document.getElementById('btn-export-csv')?.addEventListener('click', () => showToast('Export from Members tab.', 'warn'));
+
+            // Import modal: close
+            document.getElementById('import-modal-close').addEventListener('click', () => {
+                document.getElementById('modal-import').classList.remove('open');
+            });
+            document.getElementById('import-modal-cancel').addEventListener('click', () => {
+                document.getElementById('modal-import').classList.remove('open');
+            });
+            document.getElementById('modal-import').addEventListener('click', e => {
+                if (e.target === document.getElementById('modal-import')) document.getElementById('modal-import').classList.remove('open');
+            });
+
+            // Import: file picker
+            document.getElementById('html-file-input').addEventListener('change', function () {
+                const file = this.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('import-html-code').value = e.target.result;
+                    if (!document.getElementById('import-tpl-name').value) {
+                        document.getElementById('import-tpl-name').value = file.name.replace(/\.(html|htm)$/i, '');
+                    }
+                };
+                reader.readAsText(file);
+            });
+
+            // Import: drop zone drag
+            const dz = document.getElementById('html-drop-zone');
+            ['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); }));
+            ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag'); }));
+            dz.addEventListener('drop', e => {
+                const file = e.dataTransfer.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = ev => { document.getElementById('import-html-code').value = ev.target.result; };
+                reader.readAsText(file);
+            });
+
+            // Import: confirm save
+            document.getElementById('btn-confirm-import').addEventListener('click', () => {
+                const name = document.getElementById('import-tpl-name').value.trim();
+                const code = document.getElementById('import-html-code').value.trim();
+                if (!name) { showToast('Please enter a template name.', 'warn'); return; }
+                if (!code) { showToast('Please paste or upload HTML.', 'warn'); return; }
+
+                const newTpl = {
+                    id: 'custom_' + Date.now(),
+                    name,
+                    category: 'custom',
+                    tags: ['custom', 'imported'],
+                    desc: 'A custom imported HTML template.',
+                    uses: 0,
+                    stars: 5,
+                    pro: false,
+                    accent: '#4f8ef7',
+                    btn: '#4f8ef7',
+                    bg: '#ffffff',
+                    font: 'Arial, sans-serif',
+                    title: name,
+                    greeting: 'Hi {{Name}},',
+                    body: '',
+                    btnText: '',
+                    btnUrl: '',
+                    sig: '',
+                    footer: '',
+                    org: 'Ascent Circle',
+                    orgUrl: 'https://ascentcircle.in',
+                    showEvent: false,
+                    banner: 'none',
+                    customHtml: code,
+                    createdAt: new Date().toISOString().slice(0, 10),
+                };
+
+                customTemplates.push(newTpl);
+                localStorage.setItem('mf_custom_templates', JSON.stringify(customTemplates));
+                document.getElementById('import-html-code').value = '';
+                document.getElementById('import-tpl-name').value = '';
+                document.getElementById('modal-import').classList.remove('open');
+                showToast(`Template "${name}" saved!`);
+                activeFilter = 'custom';
+                document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === 'custom'));
+                renderGrid();
+            });
+
+            // Profile clear
+            document.getElementById('pd-clear')?.addEventListener('click', () => {
+                if (confirm('Clear all MailPilot data?')) { localStorage.clear(); location.reload(); }
+            });
+        });
+    </script>
+</body>
+
+</html>
